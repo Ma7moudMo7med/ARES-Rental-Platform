@@ -31,6 +31,7 @@ import {
 } from "@/api-clients/notfications/notfications";
 import { logger } from "@/utils/logger";
 import DeleteNotificationDialog from "@/components/notifications/DeleteNotificationDialog";
+import { translateNotification } from "@/utils/notificationTranslator";
 
 // Type definition based on your Schema
 type Notification = {
@@ -40,6 +41,7 @@ type Notification = {
   message: string;
   isRead: boolean;
   createdAt: string;
+  type?: string | null;
 };
 
 interface NotificationResponse {
@@ -247,26 +249,31 @@ export default function NotificationsPage() {
               }}
             >
               {/* Content */}
-              <Box sx={{ flex: 1 }}>
-                <Typography
-                  variant="subtitle1"
-                  sx={{ fontWeight: n.isRead ? 500 : 700 }}
-                  color={n.isRead ? "text.secondary" : "text.primary"}
-                >
-                  {n.title}
-                </Typography>
-                <Typography variant="body2" sx={{ my: 0.5, color: "text.secondary" }}>
-                  {n.message}
-                </Typography>
-                <Typography variant="caption" sx={{ color: "text.disabled" }}>
+              {(() => {
+                const { title: displayTitle, message: displayMessage } = translateNotification(n, locale);
+                return (
+                  <Box sx={{ flex: 1 }}>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{ fontWeight: n.isRead ? 500 : 700 }}
+                      color={n.isRead ? "text.secondary" : "text.primary"}
+                    >
+                      {displayTitle}
+                    </Typography>
+                    <Typography variant="body2" sx={{ my: 0.5, color: "text.secondary" }}>
+                      {displayMessage}
+                    </Typography>
+                  </Box>
+                );
+              })()}
+              <Typography variant="caption" sx={{ color: "text.disabled" }}>
                   {formatUtcDateTime(n.createdAt, locale, {
                     month: "short",
                     day: "numeric",
                     hour: "2-digit",
                     minute: "2-digit",
                   })}
-                </Typography>
-              </Box>
+              </Typography>
 
               {/* Actions */}
               <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
