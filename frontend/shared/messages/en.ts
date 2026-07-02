@@ -33,7 +33,8 @@ import drivers from "./en/dashboard/admin/drivers";
 import inspectors from "./en/dashboard/admin/inspectors";
 import financialReports from "./en/dashboard/admin/financial-reports";
 import locationsForm from "./en/dashboard/admin/locations/form";
-import adminNotifications from "./en/dashboard/admin/notifications";
+import adminNotifications from "./en/admin/notifications";
+import adminDashboard from "./en/admin/dashboard";
 import promotions from "./en/dashboard/admin/promotions";
 import scheduler from "./en/dashboard/admin/scheduler";
 import settings from "./en/dashboard/admin/settings";
@@ -143,6 +144,7 @@ const en: MessageSchema = {
       security,
       vehicles,
     },
+    dashboard: adminDashboard,
     bankDetails,
     bookings: adminBookings,
     createBooking,

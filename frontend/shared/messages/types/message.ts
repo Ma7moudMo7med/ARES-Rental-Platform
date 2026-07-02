@@ -33,7 +33,8 @@ import type { AdminDriversLabels } from "./dashboard/admin/drivers";
 import type { AdminInspectorsLabels } from "./dashboard/admin/inspectors";
 import type { FinancialReportsLabels } from "./dashboard/admin/financial-reports";
 import type { AdminLocationsFormLabels } from "./dashboard/admin/locations/form";
-import type { AdminNotificationsLabels } from "./dashboard/admin/notifications";
+import type { AdminNotificationsLabels } from "./admin/notifications";
+import type { AdminDashboardLabels } from "./admin/dashboard";
 import type { PromotionsLabels } from "./dashboard/admin/promotions";
 import type { AdminSchedulerLabels } from "./dashboard/admin/scheduler";
 import type { AdminSettingsLabels } from "./dashboard/admin/settings";
@@ -217,6 +218,7 @@ export type DashboardAdminAdminSchema = {
 
 export type DashboardAdminSchema = {
   readonly admin: DashboardAdminAdminSchema;
+  readonly dashboard: AdminDashboardLabels;
   readonly bankDetails: BankDetailsLabels;
   readonly bookings: AdminBookingsLabels;
   readonly createBooking: CreateBookingLabels;

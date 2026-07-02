@@ -33,7 +33,8 @@ import drivers from "./ar/dashboard/admin/drivers";
 import inspectors from "./ar/dashboard/admin/inspectors";
 import financialReports from "./ar/dashboard/admin/financial-reports";
 import locationsForm from "./ar/dashboard/admin/locations/form";
-import adminNotifications from "./ar/dashboard/admin/notifications";
+import adminNotifications from "./ar/admin/notifications";
+import adminDashboard from "./ar/admin/dashboard";
 import promotions from "./ar/dashboard/admin/promotions";
 import scheduler from "./ar/dashboard/admin/scheduler";
 import settings from "./ar/dashboard/admin/settings";
@@ -143,6 +144,7 @@ const ar: MessageSchema = {
       security,
       vehicles,
     },
+    dashboard: adminDashboard,
     bankDetails,
     bookings: adminBookings,
     createBooking,

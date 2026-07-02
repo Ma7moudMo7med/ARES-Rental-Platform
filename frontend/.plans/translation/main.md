@@ -3,14 +3,15 @@
 ## Overall Progress
 
 - Total Pages: 94
-- Completed Pages: 77
-- Progress: 82%
+- Completed Pages: 79
+- Progress: 84%
 
 ## Messages Structure Progress
 
-- **Types**: 77/94 split (common, auth, errors + 6 auth + 10 customer + 20 admin + 7 driver + 4 inspector + 9 supplier + 16 public/root page types done; 17 remaining)
-- **English**: 77/94 split (common, auth, errors + 6 auth + 10 customer + 20 admin + 7 driver + 4 inspector + 9 supplier + 16 public/root page translations done; 17 remaining)
-- **Arabic**: 77/94 split (common, auth, errors + 6 auth + 10 customer + 20 admin + 7 driver + 4 inspector + 9 supplier + 16 public/root page translations done; 17 remaining)
+- **Types**: 78/94 split (common, auth, errors + 6 auth + 10 customer + 21 admin + 7 driver + 4 inspector + 9 supplier + 16 public/root page types done; 16 remaining)
+- **English**: 78/94 split (common, auth, errors + 6 auth + 10 customer + 21 admin + 7 driver + 4 inspector + 9 supplier + 16 public/root page translations done; 16 remaining)
+- **Arabic**: 78/94 split (common, auth, errors + 6 auth + 10 customer + 21 admin + 7 driver + 4 inspector + 9 supplier + 16 public/root page translations done; 16 remaining)
+
 
 > See `shared/Messages_README.md` for messages directory conventions.
 
@@ -62,7 +63,7 @@
 - [x] [Create Location](pages/dashboard/admin/locations/create.md) — `/(dashboard)/admin/locations/create`
 - [x] [Location Detail](pages/dashboard/admin/locations/_id.md) — `/(dashboard)/admin/locations/[id]`
 - [x] [Edit Location](pages/dashboard/admin/locations/_id/edit.md) — `/(dashboard)/admin/locations/[id]/edit`
-- [ ] [Admin Notifications](pages/dashboard/admin/notifications.md) — `/(dashboard)/admin/notifications`
+- [x] [Admin Notifications](pages/dashboard/admin/notifications.md) — `/(dashboard)/admin/notifications`
 - [ ] [Scheduler](pages/dashboard/admin/scheduler.md) — `/(dashboard)/admin/scheduler`
 - [ ] [Admin Settings](pages/dashboard/admin/settings.md) — `/(dashboard)/admin/settings`
 - [ ] [Admin Suppliers](pages/dashboard/admin/suppliers.md) — `/(dashboard)/admin/suppliers`
