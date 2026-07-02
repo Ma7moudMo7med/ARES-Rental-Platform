@@ -16,4 +16,13 @@ public interface IInspectorService
     Task<List<UserManagementDto>> EnrichInspectorsAsync(
         List<UserManagementDto> users,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Updates inspector specific details.
+    /// </summary>
+    Task UpdateInspectorProfileAsync(
+        Guid userId,
+        string? employeeCode,
+        string? availability,
+        CancellationToken cancellationToken = default);
 }

@@ -502,6 +502,11 @@ public class UserManagementService : IUserManagementService
             }
         }
 
+        if (await _userManager.IsInRoleAsync(user, "Inspector") && _inspectorService != null)
+        {
+            await _inspectorService.UpdateInspectorProfileAsync(user.Id, request.EmployeeCode, request.Availability, cancellationToken);
+        }
+
         _logger.LogInformation("Successfully updated user {UserId}", userId);
 
         return new UserManagementResponse(

@@ -79,4 +79,29 @@ public class InspectorService : IInspectorService
 
         return enrichedUsers;
     }
+
+    public async Task UpdateInspectorProfileAsync(
+        Guid userId,
+        string? employeeCode,
+        string? availability,
+        CancellationToken cancellationToken = default)
+    {
+        var inspector = await _context.Inspectors
+            .FirstOrDefaultAsync(i => i.UserId == userId, cancellationToken);
+
+        if (inspector != null)
+        {
+            if (employeeCode != null)
+            {
+                inspector.EmployeeCode = employeeCode;
+            }
+
+            if (availability != null)
+            {
+                inspector.IsAvailable = availability.Equals("Available", StringComparison.OrdinalIgnoreCase);
+            }
+
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+    }
 }
