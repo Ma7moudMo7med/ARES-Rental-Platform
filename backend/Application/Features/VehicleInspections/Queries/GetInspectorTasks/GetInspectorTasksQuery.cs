@@ -12,9 +12,11 @@ namespace Backend.Application.Features.VehicleInspections.Queries.GetInspectorTa
 public sealed class GetInspectorTasksQuery : IRequest<IReadOnlyList<InspectorTaskDto>>
 {
     public Guid InspectorId { get; }
+    public string TimeFilter { get; }
 
-    public GetInspectorTasksQuery(Guid inspectorId)
+    public GetInspectorTasksQuery(Guid inspectorId, string timeFilter = "today")
     {
         InspectorId = inspectorId;
+        TimeFilter = timeFilter;
     }
 }
