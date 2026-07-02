@@ -39,14 +39,42 @@ public class NotificationService : INotificationService
             userId,
             cancellationToken);
 
-        return notifications.Select(n => new NotificationDto(
-            n.Id,
-            n.UserId,
-            n.Title,
-            n.Message,
-            n.IsRead,
-            n.CreatedAt,
-            n.Type));
+        return notifications.Select(n =>
+        {
+            string? bookingNumber = null;
+            string? vehicleName = null;
+            string? inspectionType = null;
+            string? actionUrl = null;
+
+            if (!string.IsNullOrEmpty(n.Metadata))
+            {
+                try
+                {
+                    using var doc = System.Text.Json.JsonDocument.Parse(n.Metadata);
+                    if (doc.RootElement.TryGetProperty("BookingNumber", out var bn)) bookingNumber = bn.GetString();
+                    if (doc.RootElement.TryGetProperty("VehicleName", out var vn)) vehicleName = vn.GetString();
+                    if (doc.RootElement.TryGetProperty("InspectionType", out var it)) inspectionType = it.GetString();
+                    if (doc.RootElement.TryGetProperty("ActionUrl", out var au)) actionUrl = au.GetString();
+                }
+                catch
+                {
+                    // Ignore parse errors
+                }
+            }
+
+            return new NotificationDto(
+                n.Id,
+                n.UserId,
+                n.Title,
+                n.Message,
+                n.IsRead,
+                n.CreatedAt,
+                n.Type,
+                bookingNumber,
+                vehicleName,
+                inspectionType,
+                actionUrl);
+        });
     }
 
     public async Task MarkAsReadAsync(
@@ -77,7 +105,7 @@ public class NotificationService : INotificationService
         string message,
         CancellationToken cancellationToken = default)
     {
-        return CreateNotificationAsync(userId, title, message, null, cancellationToken);
+        return CreateNotificationAsync(userId, title, message, null, cancellationToken, null);
     }
 
     public async Task CreateNotificationAsync(
@@ -85,7 +113,8 @@ public class NotificationService : INotificationService
         string title,
         string message,
         string? type,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        string? metadata = null)
     {
         var notification = new Notification
         {
@@ -93,6 +122,7 @@ public class NotificationService : INotificationService
             Title = title,
             Message = message,
             Type = type,
+            Metadata = metadata,
             IsRead = false,
             CreatedAt = DateTime.UtcNow
         };
@@ -119,7 +149,8 @@ public class NotificationService : INotificationService
         string title,
         string message,
         string? type,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        string? metadata = null)
     {
         if (_userManager is null) return;
 
@@ -146,6 +177,7 @@ public class NotificationService : INotificationService
                     Title = title,
                     Message = message,
                     Type = type,
+                    Metadata = metadata,
                     IsRead = false,
                     CreatedAt = DateTime.UtcNow
                 };
