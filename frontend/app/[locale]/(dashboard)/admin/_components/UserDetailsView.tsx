@@ -129,6 +129,19 @@ export interface UserDetailsViewProps {
       readonly vehiclesCount?: number;
       readonly totalBookings?: number;
     } | null;
+    readonly customerDetails?: {
+      readonly totalBookings: number;
+      readonly completedBookings: number;
+      readonly cancelledBookings: number;
+      readonly totalSpent: number;
+      readonly lastBookingDate?: string | null;
+    } | null;
+    readonly inspectorDetails?: {
+      readonly employeeCode?: string | null;
+      readonly assignedInspections: number;
+      readonly completedInspections: number;
+      readonly availability?: string | null;
+    } | null;
   };
   readonly isMock?: boolean;
   readonly onBack: () => void;
@@ -1656,6 +1669,8 @@ export default function UserDetailsView({
         roles={data.roles as string[] | undefined}
         driverDetails={data.driverDetails as any}
         supplierDetails={data.supplierDetails as any}
+        customerDetails={data.customerDetails}
+        inspectorDetails={data.inspectorDetails}
         t={t}
       />
 
