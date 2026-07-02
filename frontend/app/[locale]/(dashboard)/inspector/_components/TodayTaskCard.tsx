@@ -153,10 +153,10 @@ export default function TodayTaskCard({ task }: TodayTaskCardProps) {
               fontWeight: 700,
               px: 2,
               borderRadius: 2,
-              boxShadow: theme.palette.shadow?.button,
+              boxShadow: theme.palette.shadow.button,
             }}
           >
-            {t("card.startInspection", { fallback: "Start Inspection" }) as string}
+            {t("card.startInspection", { fallback: "Start Inspection" })}
           </Button>
 
           <Tooltip title={t("card.callTooltip", { customerName: task.customerName })} arrow>

@@ -3,6 +3,8 @@ import type { InspectorInspectionsLabels } from "../../../types/dashboard/inspec
 const inspections: InspectorInspectionsLabels = {
   title: "لوحة تحكم الفاحص",
   description: "نظرة عامة على مهامك ومقاييس اليوم.",
+  recentActivityTitle: "النشاط الأخير",
+  upcomingTitle: "الفحوصات القادمة",
   checkOuts: "تسليم المركبات",
   checkOutsSubtitle: "التسليمات اليوم",
   checkIns: "استلام المركبات",
@@ -25,6 +27,8 @@ const inspections: InspectorInspectionsLabels = {
     allCaughtUp: "تم إنجاز كل شيء!",
     adjustFilter: "حاول تعديل خيارات التصفية أو مصطلح البحث.",
     noPendingTasks: "ليس لديك أي مهام معلقة اليوم.",
+    noUpcoming: "لا توجد فحوصات قادمة مجدولة.",
+    noRecentActivity: "لا يوجد نشاط أخير.",
   },
   card: {
     checkOutBadge: "تسليم 🟢",
@@ -33,11 +37,22 @@ const inspections: InspectorInspectionsLabels = {
     callAriaLabel: "الاتصال بـ {customerName}",
     mapsTooltip: "الفتح في خرائط Google",
     mapsAriaLabel: "فتح الموقع في خرائط Google",
+    startInspection: "بدء الفحص",
+    view: "عرض",
   },
   status: {
     pending: "معلق",
     approved: "مقبول",
     rejected: "مرفوض",
+  },
+  table: {
+    time: "الوقت",
+    vehicle: "المركبة",
+    customer: "العميل",
+    inspectionType: "نوع الفحص",
+    status: "الحالة",
+    quickActions: "إجراءات سريعة",
+    action: "إجراء",
   },
 };
 

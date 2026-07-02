@@ -1,6 +1,8 @@
 export type InspectorInspectionsLabels = {
   readonly title: string;
   readonly description: string;
+  readonly recentActivityTitle: string;
+  readonly upcomingTitle: string;
   readonly checkOuts: string;
   readonly checkOutsSubtitle: string;
   readonly checkIns: string;
@@ -23,6 +25,8 @@ export type InspectorInspectionsLabels = {
     readonly allCaughtUp: string;
     readonly adjustFilter: string;
     readonly noPendingTasks: string;
+    readonly noUpcoming: string;
+    readonly noRecentActivity: string;
   };
   readonly card: {
     readonly checkOutBadge: string;
@@ -31,10 +35,21 @@ export type InspectorInspectionsLabels = {
     readonly callAriaLabel: string;
     readonly mapsTooltip: string;
     readonly mapsAriaLabel: string;
+    readonly startInspection: string;
+    readonly view: string;
   };
   readonly status: {
     readonly pending: string;
     readonly approved: string;
     readonly rejected: string;
+  };
+  readonly table: {
+    readonly time: string;
+    readonly vehicle: string;
+    readonly customer: string;
+    readonly inspectionType: string;
+    readonly status: string;
+    readonly quickActions: string;
+    readonly action: string;
   };
 };

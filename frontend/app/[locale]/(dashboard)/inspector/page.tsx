@@ -103,7 +103,8 @@ export default function InspectorDashboardPage() {
       {/* Today's Tasks — 1-column full-width */}
       <Box
         sx={{
-          mt: 3,
+          mt: 4,
+          mb: 4,
           p: { xs: 2, sm: 3 },
           borderRadius: 3,
           border: "1px solid",
@@ -112,7 +113,7 @@ export default function InspectorDashboardPage() {
           boxShadow: theme.palette.shadow.card,
         }}
       >
-        <Box sx={{ mb: 2.5 }}>
+        <Box sx={{ mb: 4 }}>
           <Typography variant="h6" sx={{ fontWeight: 800 }}>
             {t("sectionTitle")}
           </Typography>
@@ -125,45 +126,53 @@ export default function InspectorDashboardPage() {
       </Box>
 
       {/* Bottom Section: Recent Activity & Upcoming */}
-      <Grid container spacing={3} sx={{ mt: 0 }}>
+      <Grid container spacing={4}>
         <Grid size={{ xs: 12, md: 6 }}>
           <Box
             sx={{
+              display: "flex",
+              flexDirection: "column",
               p: { xs: 2, sm: 3 },
               borderRadius: 3,
               border: "1px solid",
               borderColor: "divider",
               bgcolor: "background.paper",
-              boxShadow: theme.palette.shadow?.card,
+              boxShadow: theme.palette.shadow.card,
               height: "100%",
             }}
           >
-            <Box sx={{ mb: 2.5 }}>
+            <Box sx={{ mb: 3 }}>
               <Typography variant="h6" sx={{ fontWeight: 800 }}>
-                {t("recentActivityTitle", { fallback: "Recent Activity" })}
+                {t("recentActivityTitle")}
               </Typography>
             </Box>
-            <RecentActivityList history={history} loading={loading} />
+            <Box sx={{ flexGrow: 1 }}>
+              <RecentActivityList history={history} loading={loading} />
+            </Box>
           </Box>
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <Box
             sx={{
+              display: "flex",
+              flexDirection: "column",
               p: { xs: 2, sm: 3 },
               borderRadius: 3,
               border: "1px solid",
               borderColor: "divider",
               bgcolor: "background.paper",
-              boxShadow: theme.palette.shadow?.card,
+              boxShadow: theme.palette.shadow.card,
               height: "100%",
             }}
           >
-            <Box sx={{ mb: 2.5 }}>
+            <Box sx={{ mb: 3 }}>
               <Typography variant="h6" sx={{ fontWeight: 800 }}>
-                {t("upcomingTitle", { fallback: "Upcoming Inspections" })}
+                {t("upcomingTitle")}
               </Typography>
             </Box>
-            <UpcomingTasksList tasks={upcoming} loading={loading} />
+            <Box sx={{ flexGrow: 1 }}>
+              <UpcomingTasksList tasks={upcoming} loading={loading} />
+            </Box>
           </Box>
         </Grid>
       </Grid>

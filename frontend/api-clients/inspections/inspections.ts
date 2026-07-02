@@ -187,6 +187,7 @@ export interface InspectorTask {
   customerPhone: string;
   scheduledTime: string; // ISO datetime string
   address: string;
+  status?: string;
 }
 
 export async function getInspectorTasks(timeFilter: "today" | "upcoming" = "today"): Promise<InspectorTask[]> {

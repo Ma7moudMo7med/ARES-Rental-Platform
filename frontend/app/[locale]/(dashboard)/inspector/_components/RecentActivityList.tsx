@@ -6,12 +6,13 @@ import type { InspectionSummary } from "@/api-clients/inspections/inspections";
 import CheckCircleOutlinedIcon from "@mui/icons-material/CheckCircleOutlined";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
+import AssignmentIcon from "@mui/icons-material/Assignment";
 import { parseUtcDate } from "@/utils/dateTime";
 import { useRouter } from "@/shared/i18n/routing";
 
 interface RecentActivityListProps {
-  history: InspectionSummary[];
-  loading: boolean;
+  readonly history: InspectionSummary[];
+  readonly loading: boolean;
 }
 
 export default function RecentActivityList({ history, loading }: RecentActivityListProps) {
@@ -31,8 +32,18 @@ export default function RecentActivityList({ history, loading }: RecentActivityL
 
   if (history.length === 0) {
     return (
-      <Box sx={{ py: 4, textAlign: "center", color: "text.secondary" }}>
-        <Typography variant="body2">{t("emptyState.noRecentActivity", { fallback: "No recent activity." })}</Typography>
+      <Box
+        sx={{
+          py: 4,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "text.secondary",
+        }}
+      >
+        <AssignmentIcon sx={{ fontSize: 40, mb: 1, color: "text.disabled" }} />
+        <Typography variant="body2">{t("emptyState.noRecentActivity")}</Typography>
       </Box>
     );
   }
@@ -52,7 +63,9 @@ export default function RecentActivityList({ history, loading }: RecentActivityL
           <Paper
             key={item.inspectionId}
             elevation={0}
-            onClick={() => router.push(`/inspector/inspections/${item.inspectionId}`)}
+            onClick={() => {
+              router.push(`/inspector/inspections/${item.inspectionId}`);
+            }}
             sx={{
               p: 2,
               borderRadius: 2,
@@ -62,7 +75,7 @@ export default function RecentActivityList({ history, loading }: RecentActivityL
               transition: "all 0.2s ease",
               "&:hover": {
                 borderColor: color,
-                boxShadow: theme.palette.shadow?.cardHover,
+                boxShadow: theme.palette.shadow.cardHover,
                 transform: "translateY(-1px)",
               },
             }}

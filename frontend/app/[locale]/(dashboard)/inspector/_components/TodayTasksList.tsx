@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   Box,
-  Grid,
   InputAdornment,
   Paper,
   Skeleton,
@@ -13,11 +12,26 @@ import {
   Typography,
   useTheme,
   alpha,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Button,
+  Chip,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import SearchIcon from "@mui/icons-material/Search";
+import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
+import CarRepairIcon from "@mui/icons-material/CarRepair";
+import PhoneIcon from "@mui/icons-material/Phone";
+import PlaceIcon from "@mui/icons-material/Place";
 import type { InspectorTask, InspectionTaskType } from "@/api-clients/inspections/inspections";
-import TodayTaskCard from "./TodayTaskCard";
+import { useRouter } from "@/shared/i18n/routing";
+import { parseUtcDate } from "@/utils/dateTime";
 
 type FilterType = "All" | InspectionTaskType;
 
@@ -29,6 +43,7 @@ interface TodaysTasksListProps {
 export default function TodayTasksList({ tasks, loading }: TodaysTasksListProps) {
   const theme = useTheme();
   const t = useTranslations("dashboardInspector.inspections");
+  const router = useRouter();
   const [activeFilter, setActiveFilter] = useState<FilterType>("All");
   const [plateSearch, setPlateSearch] = useState("");
 
@@ -123,23 +138,202 @@ export default function TodayTasksList({ tasks, loading }: TodaysTasksListProps)
 
       {/* Task list */}
       {loading ? (
-        <Grid container spacing={2}>
-          {[1, 2, 3, 4].map(n => (
-            <Grid key={n} size={{ xs: 12, md: 6, lg: 4 }}>
-              <Skeleton variant="rectangular" height={160} sx={{ borderRadius: 3 }} />
-            </Grid>
-          ))}
-        </Grid>
+        <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 3 }} />
       ) : filteredTasks.length === 0 ? (
         <EmptyState hasSearch={plateSearch.length > 0 || activeFilter !== "All"} />
       ) : (
-        <Grid container spacing={2}>
-          {filteredTasks.map(task => (
-            <Grid key={task.inspectionId} size={{ xs: 12, md: 6, lg: 4 }}>
-              <TodayTaskCard task={task} />
-            </Grid>
-          ))}
-        </Grid>
+        <TableContainer
+          component={Paper}
+          elevation={0}
+          sx={{
+            borderRadius: 2,
+            border: "1px solid",
+            borderColor: theme.palette.border.main,
+            boxShadow: theme.palette.shadow.card,
+          }}
+        >
+          <Table sx={{ minWidth: 800 }} aria-label="today's tasks table">
+            <TableHead>
+              <TableRow>
+                <TableCell
+                  sx={{ color: "text.secondary", fontWeight: "600", borderBottom: "2px solid", borderColor: "divider" }}
+                >
+                  {t("table.time", { fallback: "Time" })}
+                </TableCell>
+                <TableCell
+                  sx={{ color: "text.secondary", fontWeight: "600", borderBottom: "2px solid", borderColor: "divider" }}
+                >
+                  {t("table.vehicle", { fallback: "Vehicle" })}
+                </TableCell>
+                <TableCell
+                  sx={{ color: "text.secondary", fontWeight: "600", borderBottom: "2px solid", borderColor: "divider" }}
+                >
+                  {t("table.customer", { fallback: "Customer" })}
+                </TableCell>
+                <TableCell
+                  sx={{ color: "text.secondary", fontWeight: "600", borderBottom: "2px solid", borderColor: "divider" }}
+                >
+                  {t("table.inspectionType", { fallback: "Inspection Type" })}
+                </TableCell>
+                <TableCell
+                  sx={{ color: "text.secondary", fontWeight: "600", borderBottom: "2px solid", borderColor: "divider" }}
+                >
+                  {t("table.status", { fallback: "Status" })}
+                </TableCell>
+                <TableCell
+                  sx={{ color: "text.secondary", fontWeight: "600", borderBottom: "2px solid", borderColor: "divider" }}
+                >
+                  {t("table.quickActions", { fallback: "Quick Actions" })}
+                </TableCell>
+                <TableCell
+                  sx={{
+                    color: "text.secondary",
+                    fontWeight: "600",
+                    borderBottom: "2px solid",
+                    borderColor: "divider",
+                    textAlign: "right",
+                  }}
+                >
+                  {t("table.action", { fallback: "Action" })}
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredTasks.map(task => {
+                const isCheckOut = task.inspectionType === "CheckOut";
+                const TypeIcon = isCheckOut ? DirectionsCarIcon : CarRepairIcon;
+                const accentColor = isCheckOut ? theme.palette.status.active.main : theme.palette.status.cancelled.main;
+
+                const scheduledDate = parseUtcDate(task.scheduledTime);
+                const formattedTime = scheduledDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+                const mapsHref = task.address
+                  ? `https://maps.google.com/maps?q=${encodeURIComponent(task.address)}`
+                  : `https://maps.google.com/maps?q=${encodeURIComponent(task.vehicleName)}`;
+
+                const isCompleted = task.status === "Completed" || task.status?.toLowerCase() === "completed";
+                const statusColor = isCompleted
+                  ? theme.palette.status.completed.main
+                  : theme.palette.status.pending.main;
+
+                return (
+                  <TableRow key={task.inspectionId} hover sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+                    <TableCell sx={{ fontWeight: "600", whiteSpace: "nowrap" }}>{formattedTime}</TableCell>
+                    <TableCell>
+                      <Box sx={{ display: "flex", flexDirection: "column" }}>
+                        <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                          {task.vehicleName}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: "text.secondary" }}>
+                          {task.plateNumber || "—"}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2">{task.customerName}</Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+                        <TypeIcon sx={{ fontSize: 16, color: accentColor }} />
+                        <Typography variant="body2" sx={{ fontWeight: 600, color: accentColor }}>
+                          {isCheckOut ? t("card.checkOutBadge") : t("card.checkInBadge")}
+                        </Typography>
+                      </Stack>
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={task.status || t("status.pending", { fallback: "Pending" })}
+                        size="small"
+                        sx={{
+                          fontWeight: "700",
+                          borderRadius: 2,
+                          bgcolor: alpha(statusColor, 0.12),
+                          color: statusColor,
+                          "& .MuiChip-label": { px: 2 },
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Stack direction="row" spacing={1}>
+                        <Tooltip title={t("card.callTooltip", { customerName: task.customerName })} arrow>
+                          <IconButton
+                            component="a"
+                            href={`tel:${task.customerPhone}`}
+                            onClick={e => e.stopPropagation()}
+                            size="small"
+                            sx={{
+                              bgcolor: alpha(theme.palette.icon.phone.color, 0.1),
+                              color: theme.palette.icon.phone.color,
+                              border: "1px solid",
+                              borderColor: alpha(theme.palette.icon.phone.color, 0.2),
+                              "&:hover": { bgcolor: alpha(theme.palette.icon.phone.color, 0.18) },
+                              width: 36,
+                              height: 36,
+                            }}
+                            aria-label={t("card.callAriaLabel", { customerName: task.customerName })}
+                          >
+                            <PhoneIcon sx={{ fontSize: 16 }} />
+                          </IconButton>
+                        </Tooltip>
+
+                        <Tooltip title={t("card.mapsTooltip")} arrow>
+                          <IconButton
+                            component="a"
+                            href={mapsHref}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={e => e.stopPropagation()}
+                            size="small"
+                            sx={{
+                              bgcolor: alpha(theme.palette.info.main, 0.1),
+                              color: theme.palette.info.main,
+                              border: "1px solid",
+                              borderColor: alpha(theme.palette.info.main, 0.2),
+                              "&:hover": { bgcolor: alpha(theme.palette.info.main, 0.18) },
+                              width: 36,
+                              height: 36,
+                            }}
+                            aria-label={t("card.mapsAriaLabel")}
+                          >
+                            <PlaceIcon sx={{ fontSize: 16 }} />
+                          </IconButton>
+                        </Tooltip>
+                      </Stack>
+                    </TableCell>
+                    <TableCell sx={{ textAlign: "right" }}>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={e => {
+                          e.stopPropagation();
+                          router.push(`/inspector/inspections/${task.inspectionId}`);
+                        }}
+                        sx={{
+                          textTransform: "none",
+                          fontWeight: 700,
+                          px: 2,
+                          borderRadius: 2,
+                          boxShadow: theme.palette.shadow.button,
+                          bgcolor: isCompleted ? "background.paper" : "primary.main",
+                          color: isCompleted ? "text.primary" : "primary.contrastText",
+                          border: isCompleted ? "1px solid" : "none",
+                          borderColor: "divider",
+                          "&:hover": {
+                            bgcolor: isCompleted ? "action.hover" : "primary.dark",
+                          },
+                        }}
+                      >
+                        {isCompleted
+                          ? t("card.view", { fallback: "View" })
+                          : t("card.startInspection", { fallback: "Start Inspection" })}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
     </Box>
   );
@@ -152,7 +346,7 @@ function EmptyState({ hasSearch }: { readonly hasSearch: boolean }) {
       elevation={0}
       sx={{
         textAlign: "center",
-        py: 8,
+        py: 4,
         borderRadius: 3,
         border: "1px dashed",
         borderColor: "divider",
