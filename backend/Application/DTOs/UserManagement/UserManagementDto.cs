@@ -22,5 +22,7 @@ public record UserManagementDto(
     string? DateOfBirth = null,
     string? AvatarUrl = null,
     DriverDetailsDto? DriverDetails = null,
-    SupplierDetailsDto? SupplierDetails = null
+    SupplierDetailsDto? SupplierDetails = null,
+    CustomerDetailsDto? CustomerDetails = null,
+    InspectorDetailsDto? InspectorDetails = null
 );
