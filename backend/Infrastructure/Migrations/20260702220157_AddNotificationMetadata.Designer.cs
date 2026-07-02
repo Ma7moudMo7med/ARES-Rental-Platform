@@ -4,6 +4,7 @@ using Backend.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260702220157_AddNotificationMetadata")]
+    partial class AddNotificationMetadata
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -61,7 +64,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AboutSections", (string)null);
+                    b.ToTable("AboutSections");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.ApplicationUser", b =>
@@ -453,7 +456,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CancelledBy");
 
-                    b.ToTable("BookingCancellations", (string)null);
+                    b.ToTable("BookingCancellations");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.BookingPayment", b =>
@@ -523,7 +526,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("BookingId");
 
-                    b.ToTable("Payments", (string)null);
+                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.Category", b =>
@@ -568,7 +571,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.CompanyProfile", b =>
@@ -610,7 +613,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("CompanyProfiles", (string)null);
+                    b.ToTable("CompanyProfiles");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.DiscountCode", b =>
@@ -703,7 +706,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("IsActive", "IsAutomatic", "ValidFrom", "ValidTo");
 
-                    b.ToTable("DiscountCodes", (string)null);
+                    b.ToTable("DiscountCodes");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.DiscountUsage", b =>
@@ -742,7 +745,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("BookingId", "DiscountId")
                         .IsUnique();
 
-                    b.ToTable("DiscountUsages", (string)null);
+                    b.ToTable("DiscountUsages");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.DiscountValidationLog", b =>
@@ -790,7 +793,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("DiscountId", "ValidatedAt");
 
-                    b.ToTable("DiscountValidationLogs", (string)null);
+                    b.ToTable("DiscountValidationLogs");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.DiscountVehicleCategory", b =>
@@ -805,7 +808,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("DiscountVehicleCategories", (string)null);
+                    b.ToTable("DiscountVehicleCategories");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.Driver", b =>
@@ -868,7 +871,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Drivers", (string)null);
+                    b.ToTable("Drivers");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.DriverEarning", b =>
@@ -1057,7 +1060,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("DriverEarningId");
 
-                    b.ToTable("driver_payout_transactions", (string)null);
+                    b.ToTable("driver_payout_transactions");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.DriverProfile", b =>
@@ -1208,7 +1211,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("DriverProfileId");
 
-                    b.ToTable("driver_reviews", (string)null);
+                    b.ToTable("driver_reviews");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.DriverWorkArea", b =>
@@ -1223,7 +1226,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("ServiceAreaId");
 
-                    b.ToTable("driver_work_areas", (string)null);
+                    b.ToTable("driver_work_areas");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.Favorite", b =>
@@ -1257,7 +1260,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId", "VehicleId")
                         .IsUnique();
 
-                    b.ToTable("Favorites", (string)null);
+                    b.ToTable("Favorites");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.InspectionImage", b =>
@@ -1337,7 +1340,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("InspectionId");
 
-                    b.ToTable("InspectionPhotos", (string)null);
+                    b.ToTable("InspectionPhotos");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.Inspector", b =>
@@ -1381,7 +1384,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Inspectors", (string)null);
+                    b.ToTable("Inspectors");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.Notification", b =>
@@ -1431,7 +1434,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId", "IsRead");
 
-                    b.ToTable("Notifications", (string)null);
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.PaymentMethod", b =>
@@ -1504,7 +1507,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("PaymentMethods", (string)null);
+                    b.ToTable("PaymentMethods");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.PrivacySection", b =>
@@ -1588,7 +1591,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens", (string)null);
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.Review", b =>
@@ -1653,7 +1656,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("VehicleId");
 
-                    b.ToTable("Reviews", (string)null);
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.ServiceArea", b =>
@@ -1679,7 +1682,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("service_areas", (string)null);
+                    b.ToTable("service_areas");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.SystemSetting", b =>
@@ -1710,7 +1713,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SystemSettings", (string)null);
+                    b.ToTable("SystemSettings");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.TermsSection", b =>
@@ -1748,7 +1751,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TermsSections", (string)null);
+                    b.ToTable("TermsSections");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.UserAddress", b =>
@@ -1809,7 +1812,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserAddresses", (string)null);
+                    b.ToTable("UserAddresses");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.Vehicle", b =>
@@ -1896,7 +1899,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Vehicles", (string)null);
+                    b.ToTable("Vehicles");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.VehicleAvailability", b =>
@@ -1940,7 +1943,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("VehicleId", "StartDate", "EndDate");
 
-                    b.ToTable("VehicleAvailabilities", null, t =>
+                    b.ToTable("VehicleAvailabilities", t =>
                         {
                             t.HasCheckConstraint("CK_VehicleAvailability_Dates", "\"StartDate\" < \"EndDate\"");
                         });
@@ -1982,7 +1985,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("VehicleId");
 
-                    b.ToTable("VehicleFeatures", (string)null);
+                    b.ToTable("VehicleFeatures");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.VehicleImage", b =>
@@ -2024,7 +2027,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("VehicleId");
 
-                    b.ToTable("VehicleImages", (string)null);
+                    b.ToTable("VehicleImages");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.VehicleInspection", b =>
@@ -2100,7 +2103,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("VehicleId");
 
-                    b.ToTable("VehicleInspections", (string)null);
+                    b.ToTable("VehicleInspections");
                 });
 
             modelBuilder.Entity("Backend.Domain.Entities.Verification", b =>
@@ -2161,7 +2164,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Verifications", (string)null);
+                    b.ToTable("Verifications");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
