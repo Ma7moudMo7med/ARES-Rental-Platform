@@ -24,5 +24,7 @@ public record InspectionDetailsDto(
     DateTime InspectionDate,
     DateTime? SubmittedAt,
     DateTime CreatedAt,
-    List<InspectionImageDto> Images
+    List<InspectionImageDto> Images,
+    string? CustomerName = null,
+    string? InspectionType = null
 );
