@@ -189,8 +189,8 @@ export interface InspectorTask {
   address: string;
 }
 
-export async function getInspectorTasks(): Promise<InspectorTask[]> {
-  return apiFetchJson<InspectorTask[]>(`/api/inspector/tasks`, {
+export async function getInspectorTasks(timeFilter: "today" | "upcoming" = "today"): Promise<InspectorTask[]> {
+  return apiFetchJson<InspectorTask[]>(`/api/inspector/tasks?timeFilter=${timeFilter}`, {
     method: "GET",
     accessToken: await token(),
   });

@@ -23,5 +23,11 @@ public record UpdateUserRequest(
 
     List<string>? Roles,
 
-    string? DateOfBirth = null
+    string? DateOfBirth = null,
+
+    // Inspector-specific
+    [MaxLength(50)]
+    string? EmployeeCode = null,
+
+    string? Availability = null
 );

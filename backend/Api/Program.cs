@@ -158,6 +158,8 @@ try
     builder.Services.AddScoped<IDriverPayoutRepository, DriverPayoutRepository>();
     builder.Services.AddScoped<IDriverEarningsAdminService, DriverEarningsAdminService>();
     builder.Services.AddScoped<IDriverService, DriverService>();
+    builder.Services.AddScoped<ICustomerService, CustomerService>();
+    builder.Services.AddScoped<IInspectorService, InspectorService>();
     builder.Services.AddScoped<Backend.Application.Services.ITermsService, Backend.Application.Services.TermsService>();
     builder.Services.AddScoped<Backend.Application.Services.IAboutService, Backend.Application.Services.AboutService>();
     builder.Services.AddScoped<Backend.Application.Services.IPrivacyService, Backend.Application.Services.PrivacyService>();

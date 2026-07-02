@@ -35,12 +35,19 @@ public sealed class GetInspectorTasksQueryHandler
         var todayStart = DateTime.UtcNow.Date;
         var tomorrowStart = todayStart.AddDays(1);
 
-        var results = await _context.VehicleInspections
-            .Where(i =>
-                i.InspectorId == request.InspectorId &&
-                !i.IsSubmitted &&
-                i.InspectionDate >= todayStart &&
-                i.InspectionDate < tomorrowStart)
+        var query = _context.VehicleInspections
+            .Where(i => i.InspectorId == request.InspectorId && !i.IsSubmitted);
+
+        if (string.Equals(request.TimeFilter, "upcoming", StringComparison.OrdinalIgnoreCase))
+        {
+            query = query.Where(i => i.InspectionDate >= tomorrowStart);
+        }
+        else
+        {
+            query = query.Where(i => i.InspectionDate >= todayStart && i.InspectionDate < tomorrowStart);
+        }
+
+        var results = await query
             .Select(i => new
             {
                 i.InspectionId,

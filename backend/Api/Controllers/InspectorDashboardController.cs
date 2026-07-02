@@ -45,16 +45,17 @@ public class InspectorDashboardController : ControllerBase
     }
 
     /// <summary>
-    /// Today's enriched task list for the inspector mobile dashboard.
+    /// Enriched task list for the inspector mobile dashboard.
     /// Returns vehicle, customer and scheduling data in a single projection.
     /// </summary>
     [HttpGet("tasks")]
     [ProducesResponseType(typeof(IReadOnlyList<InspectorTaskDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IReadOnlyList<InspectorTaskDto>>> GetTodayTasks(
+        [FromQuery] string timeFilter = "today",
         CancellationToken cancellationToken = default)
     {
         if (!TryGetCurrentUserId(out var userId)) return Unauthorized();
-        var tasks = await _mediator.Send(new GetInspectorTasksQuery(userId), cancellationToken);
+        var tasks = await _mediator.Send(new GetInspectorTasksQuery(userId, timeFilter), cancellationToken);
         return Ok(tasks);
     }
 

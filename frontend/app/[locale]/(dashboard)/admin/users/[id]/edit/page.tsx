@@ -37,6 +37,7 @@ import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import { z } from "zod";
 import { getUserById, updateUser, uploadUserPhoto } from "@/api-clients/users/users";
+import { updateSupplier } from "@/api-clients/suppliers/suppliers";
 import { logger } from "@/utils/logger";
 import { alpha } from "@mui/material/styles";
 
@@ -77,6 +78,16 @@ export default function EditUserPage() {
     role: "",
     profilePhoto: null as File | null,
     avatarUrl: "",
+    // Driver fields
+    licenseNumber: "",
+    licenseExpiryDate: "",
+    availability: "Available",
+    // Supplier fields
+    companyName: "",
+    commercialRegistrationNumber: "",
+    taxNumber: "",
+    // Inspector fields
+    employeeCode: "",
   });
 
   // -------------------------
@@ -112,6 +123,13 @@ export default function EditUserPage() {
           role: data.roles[0] || "",
           profilePhoto: null,
           avatarUrl: (data.avatarUrl as string) || "",
+          licenseNumber: data.driverDetails?.licenseNumber || "",
+          licenseExpiryDate: data.driverDetails?.licenseExpiryDate || "",
+          availability: data.driverDetails?.availability || data.inspectorDetails?.availability || "Available",
+          companyName: data.supplierDetails?.companyName || "",
+          commercialRegistrationNumber: data.supplierDetails?.commercialRegistration || "",
+          taxNumber: data.supplierDetails?.taxNumber || "",
+          employeeCode: data.inspectorDetails?.employeeCode || "",
         });
       } catch (err) {
         logger.error("Failed to load user from API, utilizing mock data", err);
@@ -129,6 +147,13 @@ export default function EditUserPage() {
           role: "Admin",
           profilePhoto: null,
           avatarUrl: "",
+          licenseNumber: "",
+          licenseExpiryDate: "",
+          availability: "Available",
+          companyName: "",
+          commercialRegistrationNumber: "",
+          taxNumber: "",
+          employeeCode: "",
         });
       } finally {
         setLoading(false);
@@ -163,6 +188,16 @@ export default function EditUserPage() {
       }),
     status: z.string(),
     role: z.string().min(1, "Role is required"),
+    // Driver validation
+    licenseNumber: z.string().optional(),
+    licenseExpiryDate: z.string().optional(),
+    availability: z.string().optional(),
+    // Supplier validation
+    companyName: z.string().optional(),
+    commercialRegistrationNumber: z.string().optional(),
+    taxNumber: z.string().optional(),
+    // Inspector validation
+    employeeCode: z.string().optional(),
   });
 
   // -------------------------
@@ -188,14 +223,32 @@ export default function EditUserPage() {
 
       const finalPhoneNumber = form.phoneNumber ? `${form.phoneCountryCode} ${form.phoneNumber}`.trim() : undefined;
 
-      await updateUser(id, {
-        firstName: form.firstName.trim(),
-        lastName: form.lastName.trim(),
-        phoneNumber: finalPhoneNumber || null,
-        status: form.status,
-        roles: [form.role],
-        dateOfBirth: form.dateOfBirth || undefined,
-      });
+      if (form.role === "Supplier") {
+        await updateSupplier(id, {
+          firstName: form.firstName.trim(),
+          lastName: form.lastName.trim(),
+          phoneNumber: finalPhoneNumber || "",
+          status: form.status,
+          companyName: form.companyName.trim(),
+          commercialRegistrationNumber: form.commercialRegistrationNumber.trim(),
+          taxId: form.taxNumber.trim(),
+        });
+      } else {
+        await updateUser(id, {
+          firstName: form.firstName.trim(),
+          lastName: form.lastName.trim(),
+          phoneNumber: finalPhoneNumber || null,
+          status: form.status,
+          roles: [form.role],
+          dateOfBirth: form.dateOfBirth || undefined,
+          ...((form.role === "Inspector" || form.role === "Driver") && {
+            availability: form.availability,
+          }),
+          ...(form.role === "Inspector" && {
+            employeeCode: form.employeeCode.trim(),
+          }),
+        });
+      }
 
       // Upload photo if a new one was selected
       if (form.profilePhoto) {
@@ -531,6 +584,203 @@ export default function EditUserPage() {
               </Grid>
             </Stack>
           </Paper>
+
+          {/* Supplier Specific Fields */}
+          {form.role === "Supplier" && (
+            <Paper
+              elevation={0}
+              sx={{
+                p: { xs: 2, sm: 3 },
+                borderRadius: 3,
+                border: "1px solid",
+                borderColor: theme.palette.divider,
+                bgcolor: theme.palette.background.paper,
+                mb: 3,
+              }}
+            >
+              <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 3 }}>
+                <Box
+                  sx={{
+                    ...sectionIconSx,
+                    bgcolor: alpha(theme.palette.primary.main, 0.1),
+                    color: theme.palette.primary.main,
+                  }}
+                >
+                  <PersonOutlineIcon sx={{ fontSize: 20 }} />
+                </Box>
+                <Box>
+                  <Typography sx={{ fontWeight: 700, fontSize: 16 }}>Supplier Details</Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Manage business and registration information
+                  </Typography>
+                </Box>
+              </Stack>
+              <Stack spacing={2.5}>
+                <Grid container spacing={2.5}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <Typography sx={fieldLabel}>Company Name</Typography>
+                    <TextField
+                      placeholder="Company Name"
+                      value={form.companyName}
+                      onChange={e => setForm({ ...form, companyName: e.target.value })}
+                      fullWidth
+                      sx={bigInputSx}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <Typography sx={fieldLabel}>Commercial Reg. Number</Typography>
+                    <TextField
+                      placeholder="e.g. 123456789"
+                      value={form.commercialRegistrationNumber}
+                      onChange={e => setForm({ ...form, commercialRegistrationNumber: e.target.value })}
+                      fullWidth
+                      sx={bigInputSx}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <Typography sx={fieldLabel}>Tax Number</Typography>
+                    <TextField
+                      placeholder="e.g. TAX-12345"
+                      value={form.taxNumber}
+                      onChange={e => setForm({ ...form, taxNumber: e.target.value })}
+                      fullWidth
+                      sx={bigInputSx}
+                    />
+                  </Grid>
+                </Grid>
+              </Stack>
+            </Paper>
+          )}
+
+          {/* Driver Specific Fields */}
+          {form.role === "Driver" && (
+            <Paper
+              elevation={0}
+              sx={{
+                p: { xs: 2, sm: 3 },
+                borderRadius: 3,
+                border: "1px solid",
+                borderColor: theme.palette.divider,
+                bgcolor: theme.palette.background.paper,
+              }}
+            >
+              <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 3 }}>
+                <Box
+                  sx={{
+                    ...sectionIconSx,
+                    bgcolor: alpha(theme.palette.primary.main, 0.1),
+                    color: theme.palette.primary.main,
+                  }}
+                >
+                  <PersonOutlineIcon sx={{ fontSize: 20 }} />
+                </Box>
+                <Box>
+                  <Typography sx={{ fontWeight: 700, fontSize: 16 }}>Driver Details</Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Manage license and availability information
+                  </Typography>
+                </Box>
+              </Stack>
+              <Stack spacing={2.5}>
+                <Grid container spacing={2.5}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <Typography sx={fieldLabel}>License Number</Typography>
+                    <TextField
+                      placeholder="License Number"
+                      value={form.licenseNumber}
+                      onChange={e => setForm({ ...form, licenseNumber: e.target.value })}
+                      fullWidth
+                      sx={bigInputSx}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <Typography sx={fieldLabel}>License Expiry Date</Typography>
+                    <TextField
+                      type="date"
+                      value={form.licenseExpiryDate}
+                      onChange={e => setForm({ ...form, licenseExpiryDate: e.target.value })}
+                      fullWidth
+                      slotProps={{ inputLabel: { shrink: true } }}
+                      sx={bigInputSx}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <Typography sx={fieldLabel}>Availability</Typography>
+                    <TextField
+                      select
+                      value={form.availability}
+                      onChange={e => setForm({ ...form, availability: e.target.value })}
+                      fullWidth
+                      sx={bigInputSx}
+                    >
+                      <MenuItem value="Available">Available</MenuItem>
+                      <MenuItem value="Busy">Busy</MenuItem>
+                      <MenuItem value="Offline">Offline</MenuItem>
+                    </TextField>
+                  </Grid>
+                </Grid>
+              </Stack>
+            </Paper>
+          )}
+
+          {/* Inspector Specific Fields */}
+          {form.role === "Inspector" && (
+            <Paper
+              elevation={0}
+              sx={{
+                p: { xs: 2, sm: 3 },
+                borderRadius: 3,
+                border: "1px solid",
+                borderColor: theme.palette.divider,
+                bgcolor: theme.palette.background.paper,
+              }}
+            >
+              <Stack direction="row" spacing={1.5} sx={{ alignItems: "center", mb: 3 }}>
+                <Box
+                  sx={{
+                    ...sectionIconSx,
+                    bgcolor: alpha(theme.palette.primary.main, 0.1),
+                    color: theme.palette.primary.main,
+                  }}
+                >
+                  <PersonOutlineIcon sx={{ fontSize: 20 }} />
+                </Box>
+                <Box>
+                  <Typography sx={{ fontWeight: 700, fontSize: 16 }}>Inspector Details</Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Manage inspector identification and availability
+                  </Typography>
+                </Box>
+              </Stack>
+              <Stack spacing={2.5}>
+                <Grid container spacing={2.5}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <Typography sx={fieldLabel}>Employee Code</Typography>
+                    <TextField
+                      placeholder="e.g. INS-1001"
+                      value={form.employeeCode}
+                      onChange={e => setForm({ ...form, employeeCode: e.target.value })}
+                      fullWidth
+                      sx={bigInputSx}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <Typography sx={fieldLabel}>Availability</Typography>
+                    <TextField
+                      select
+                      value={form.availability}
+                      onChange={e => setForm({ ...form, availability: e.target.value })}
+                      fullWidth
+                      sx={bigInputSx}
+                    >
+                      <MenuItem value="Available">Available</MenuItem>
+                      <MenuItem value="Unavailable">Unavailable</MenuItem>
+                    </TextField>
+                  </Grid>
+                </Grid>
+              </Stack>
+            </Paper>
+          )}
         </Grid>
 
         {/* RIGHT: Sidebar */}
