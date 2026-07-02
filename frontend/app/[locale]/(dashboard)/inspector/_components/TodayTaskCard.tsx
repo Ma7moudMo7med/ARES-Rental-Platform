@@ -2,7 +2,7 @@
 
 import { useRouter } from "@/shared/i18n/routing";
 import { useTranslations } from "next-intl";
-import { Box, Paper, Stack, Typography, IconButton, Tooltip, useTheme, alpha } from "@mui/material";
+import { Box, Paper, Stack, Typography, IconButton, Tooltip, useTheme, alpha, Button } from "@mui/material";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import CarRepairIcon from "@mui/icons-material/CarRepair";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
@@ -139,6 +139,26 @@ export default function TodayTaskCard({ task }: TodayTaskCardProps) {
 
         {/* Action buttons — independent, stop propagation */}
         <Stack direction="row" spacing={1} sx={{ justifyContent: "flex-end" }}>
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            onClick={e => {
+              stopBubble(e);
+              handleCardClick();
+            }}
+            sx={{
+              mr: "auto",
+              textTransform: "none",
+              fontWeight: 700,
+              px: 2,
+              borderRadius: 2,
+              boxShadow: theme.palette.shadow?.button,
+            }}
+          >
+            {t("card.startInspection", { fallback: "Start Inspection" }) as string}
+          </Button>
+
           <Tooltip title={t("card.callTooltip", { customerName: task.customerName })} arrow>
             <IconButton
               component="a"

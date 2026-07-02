@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography, useTheme, Grid } from "@mui/material";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import CarRepairIcon from "@mui/icons-material/CarRepair";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
@@ -10,26 +10,39 @@ import CheckCircleOutlinedIcon from "@mui/icons-material/CheckCircleOutlined";
 import {
   getInspectorTodayStats,
   getInspectorTasks,
+  getInspectionHistory,
   type InspectorTodayStats,
   type InspectorTask,
+  type InspectionSummary,
 } from "@/api-clients/inspections/inspections";
 import { logger } from "@/utils/logger";
 import VehicleStats from "@/app/[locale]/(dashboard)/_components/VehicleStats";
 import TodayTasksList from "./_components/TodayTasksList";
+import RecentActivityList from "./_components/RecentActivityList";
+import UpcomingTasksList from "./_components/UpcomingTasksList";
 
 export default function InspectorDashboardPage() {
   const theme = useTheme();
   const t = useTranslations("dashboardInspector.inspections");
   const [tasks, setTasks] = useState<InspectorTask[]>([]);
   const [stats, setStats] = useState<InspectorTodayStats | null>(null);
+  const [history, setHistory] = useState<InspectionSummary[]>([]);
+  const [upcoming, setUpcoming] = useState<InspectorTask[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const [tasksData, statsData] = await Promise.all([getInspectorTasks(), getInspectorTodayStats()]);
+      const [tasksData, statsData, historyData, upcomingData] = await Promise.all([
+        getInspectorTasks("today"),
+        getInspectorTodayStats(),
+        getInspectionHistory(),
+        getInspectorTasks("upcoming"),
+      ]);
       setTasks(tasksData);
       setStats(statsData);
+      setHistory(historyData);
+      setUpcoming(upcomingData);
     } catch (err) {
       logger.error("Failed to load dashboard data", err);
     } finally {
@@ -52,7 +65,7 @@ export default function InspectorDashboardPage() {
     {
       label: t("checkIns"),
       value: stats?.checkInsCount ?? 0,
-      color: "error",
+      color: "info",
       icon: <CarRepairIcon fontSize="small" />,
       subtitle: t("checkInsSubtitle"),
     },
@@ -66,7 +79,7 @@ export default function InspectorDashboardPage() {
     {
       label: t("completedToday"),
       value: stats?.completedTodayCount ?? 0,
-      color: "info",
+      color: "secondary",
       icon: <CheckCircleOutlinedIcon fontSize="small" />,
       subtitle: t("completedTodaySubtitle"),
     },
@@ -110,6 +123,50 @@ export default function InspectorDashboardPage() {
 
         <TodayTasksList tasks={tasks} loading={loading} />
       </Box>
+
+      {/* Bottom Section: Recent Activity & Upcoming */}
+      <Grid container spacing={3} sx={{ mt: 0 }}>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Box
+            sx={{
+              p: { xs: 2, sm: 3 },
+              borderRadius: 3,
+              border: "1px solid",
+              borderColor: "divider",
+              bgcolor: "background.paper",
+              boxShadow: theme.palette.shadow?.card,
+              height: "100%",
+            }}
+          >
+            <Box sx={{ mb: 2.5 }}>
+              <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                {t("recentActivityTitle", { fallback: "Recent Activity" })}
+              </Typography>
+            </Box>
+            <RecentActivityList history={history} loading={loading} />
+          </Box>
+        </Grid>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Box
+            sx={{
+              p: { xs: 2, sm: 3 },
+              borderRadius: 3,
+              border: "1px solid",
+              borderColor: "divider",
+              bgcolor: "background.paper",
+              boxShadow: theme.palette.shadow?.card,
+              height: "100%",
+            }}
+          >
+            <Box sx={{ mb: 2.5 }}>
+              <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                {t("upcomingTitle", { fallback: "Upcoming Inspections" })}
+              </Typography>
+            </Box>
+            <UpcomingTasksList tasks={upcoming} loading={loading} />
+          </Box>
+        </Grid>
+      </Grid>
     </Box>
   );
 }
