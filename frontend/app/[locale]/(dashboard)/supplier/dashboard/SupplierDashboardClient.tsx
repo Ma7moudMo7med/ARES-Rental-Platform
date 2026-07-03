@@ -14,55 +14,14 @@
  */
 
 import { useEffect, useMemo, useState } from "react";
-import {
-  Box,
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Avatar,
-  Chip,
-  IconButton,
-  Stack,
-  Button,
-  Divider,
-  Alert,
-  alpha,
-  useTheme,
-} from "@mui/material";
+import { Box, Grid, Typography, Alert, useTheme } from "@mui/material";
 import { motion } from "framer-motion";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import HourglassTopIcon from "@mui/icons-material/HourglassTop";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
-import PaymentIcon from "@mui/icons-material/Payment";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import VerifiedOutlinedIcon from "@mui/icons-material/VerifiedOutlined";
-import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import { DirectionsCarFilledTwoTone as CarIcon } from "@mui/icons-material";
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-  PieChart,
-  Pie,
-  // eslint-disable-next-line sonarjs/deprecation
-  Cell,
-} from "recharts";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import Image from "next/image";
-import { toImageUrl } from "@/utils/image-url";
-import DemoDataBadge from "../_components/DemoDataBadge";
 import {
   getSupplierDashboardStats,
   getSupplierDashboardBookingsByStatus,
@@ -77,6 +36,14 @@ import {
 } from "@/api-clients/supplier-earnings/supplier-earnings";
 import { logger } from "@/utils/logger";
 import VehicleStats, { type StatItem } from "@/app/[locale]/(dashboard)/_components/VehicleStats";
+
+// New Extracted Components
+import EarningsChart from "./_components/EarningsChart";
+import BookingsChart from "./_components/BookingsChart";
+import TopVehiclesList from "./_components/TopVehiclesList";
+import VehicleStatusChart from "./_components/VehicleStatusChart";
+import RecentActivity from "./_components/RecentActivity";
+import PendingActions from "./_components/PendingActions";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -95,37 +62,6 @@ const itemVariants = {
   },
 };
 
-interface ActivityItem {
-  id: string;
-  type: "booking" | "payment" | "user" | "vehicle";
-  messageKey: string;
-  timeKey: string;
-}
-
-interface PendingAction {
-  id: string;
-  titleKey: string;
-  descriptionKey: string;
-  severity: "warning" | "info" | "error";
-  actionLabelKey: string;
-}
-
-const ACTIVITY_META: Record<
-  ActivityItem["type"],
-  { color: "primary" | "success" | "warning" | "info"; icon: React.ReactNode }
-> = {
-  booking: { color: "primary", icon: <EventAvailableOutlinedIcon fontSize="small" /> },
-  payment: { color: "success", icon: <PaymentIcon fontSize="small" /> },
-  user: { color: "info", icon: <PersonAddIcon fontSize="small" /> },
-  vehicle: { color: "warning", icon: <DirectionsCarIcon fontSize="small" /> },
-};
-
-const ACTION_META: Record<PendingAction["severity"], { color: "warning" | "info" | "error"; icon: React.ReactNode }> = {
-  warning: { color: "warning", icon: <HourglassTopIcon fontSize="small" /> },
-  info: { color: "info", icon: <VerifiedOutlinedIcon fontSize="small" /> },
-  error: { color: "error", icon: <PriorityHighIcon fontSize="small" /> },
-};
-
 function formatCount(value: number): string {
   return Number.isFinite(value) ? Math.trunc(value).toLocaleString() : "0";
 }
@@ -137,44 +73,6 @@ function formatCurrency(value: number): string {
     maximumFractionDigits: 2,
   })}`;
 }
-
-const DEMO_ACTIVITY_ITEMS: { id: string; type: ActivityItem["type"]; messageKey: string; timeKey: string }[] = [
-  { id: "a1", type: "booking", messageKey: "newBooking", timeKey: "minutesAgo" },
-  { id: "a2", type: "payment", messageKey: "payoutProcessed", timeKey: "hoursAgo" },
-  { id: "a3", type: "vehicle", messageKey: "listingApproved", timeKey: "fiveHoursAgo" },
-  { id: "a4", type: "booking", messageKey: "bookingCompleted", timeKey: "yesterday" },
-  { id: "a5", type: "user", messageKey: "customerReview", timeKey: "yesterday" },
-];
-
-const DEMO_PENDING_ACTION_ITEMS: {
-  id: string;
-  severity: PendingAction["severity"];
-  titleKey: string;
-  descriptionKey: string;
-  actionLabelKey: string;
-}[] = [
-  {
-    id: "p1",
-    severity: "warning",
-    titleKey: "vehiclesAwaitingApproval.title",
-    descriptionKey: "vehiclesAwaitingApproval.description",
-    actionLabelKey: "vehiclesAwaitingApproval.actionLabel",
-  },
-  {
-    id: "p2",
-    severity: "error",
-    titleKey: "bookingNeedsConfirmation.title",
-    descriptionKey: "bookingNeedsConfirmation.description",
-    actionLabelKey: "bookingNeedsConfirmation.actionLabel",
-  },
-  {
-    id: "p3",
-    severity: "info",
-    titleKey: "completeProfile.title",
-    descriptionKey: "completeProfile.description",
-    actionLabelKey: "completeProfile.actionLabel",
-  },
-];
 
 export default function SupplierDashboardClient() {
   const theme = useTheme();
@@ -345,139 +243,13 @@ export default function SupplierDashboardClient() {
         <Grid container spacing={3} sx={{ mb: 3 }}>
           <Grid size={{ xs: 12, lg: 7 }}>
             <motion.div variants={itemVariants} style={{ height: "100%", width: "100%" }}>
-              <Card
-                elevation={0}
-                sx={theme => ({
-                  borderRadius: 2,
-                  border: "1px solid",
-                  borderColor: theme.palette.border.main,
-                  height: "100%",
-                  boxShadow: theme.palette.shadow.card,
-                })}
-              >
-                <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
-                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2.5, gap: 1 }}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
-                      <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                        {t("charts.earningsOverview")}
-                      </Typography>
-                    </Box>
-                    <IconButton size="small">
-                      <MoreVertIcon />
-                    </IconButton>
-                  </Box>
-                  <Box sx={{ width: "100%", height: 280, minWidth: 0, position: "relative", overflow: "hidden" }}>
-                    {mounted && earningsChartData && (
-                      <ResponsiveContainer width="100%" height={280} minWidth={0}>
-                        <AreaChart data={earningsChartData} margin={{ top: 10, right: 16, left: -8, bottom: 0 }}>
-                          <defs>
-                            <linearGradient id="supplierEarningsFill" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor={theme.palette.primary.main} stopOpacity={0.45} />
-                              <stop offset="100%" stopColor={theme.palette.primary.main} stopOpacity={0} />
-                            </linearGradient>
-                          </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} vertical={false} />
-                          <XAxis
-                            dataKey="month"
-                            tick={{ fill: theme.palette.text.secondary, fontSize: 12 }}
-                            axisLine={false}
-                            tickLine={false}
-                          />
-                          <YAxis
-                            tick={{ fill: theme.palette.text.secondary, fontSize: 12 }}
-                            axisLine={false}
-                            tickLine={false}
-                            tickFormatter={(value: number) => `$${value.toLocaleString()}`}
-                          />
-                          <Tooltip
-                            formatter={(value: unknown) => [
-                              `$${(value as number).toLocaleString()}`,
-                              t("charts.earnings"),
-                            ]}
-                            contentStyle={{
-                              borderRadius: 8,
-                              border: `1px solid ${theme.palette.divider}`,
-                              background: theme.palette.background.paper,
-                              boxShadow: theme.shadows[3],
-                            }}
-                          />
-                          <Area
-                            type="monotone"
-                            dataKey="revenue"
-                            stroke={theme.palette.primary.main}
-                            strokeWidth={2.5}
-                            fill="url(#supplierEarningsFill)"
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
-                    )}
-                  </Box>
-                </CardContent>
-              </Card>
+              <EarningsChart data={earningsChartData} mounted={mounted} />
             </motion.div>
           </Grid>
 
           <Grid size={{ xs: 12, lg: 5 }}>
             <motion.div variants={itemVariants} style={{ height: "100%", width: "100%" }}>
-              <Card
-                elevation={0}
-                sx={theme => ({
-                  borderRadius: 2,
-                  border: "1px solid",
-                  borderColor: theme.palette.border.main,
-                  height: "100%",
-                  boxShadow: theme.palette.shadow.card,
-                })}
-              >
-                <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
-                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2.5, gap: 1 }}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
-                      <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                        {t("charts.bookingsByStatus")}
-                      </Typography>
-                    </Box>
-                    <IconButton size="small">
-                      <MoreVertIcon />
-                    </IconButton>
-                  </Box>
-                  <Box sx={{ width: "100%", height: 280, minWidth: 0, position: "relative", overflow: "hidden" }}>
-                    {mounted && bookingsChartData && (
-                      <ResponsiveContainer width="100%" height={280} minWidth={0}>
-                        <BarChart data={bookingsChartData} margin={{ top: 10, right: 16, left: -8, bottom: 0 }}>
-                          <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} vertical={false} />
-                          <XAxis
-                            dataKey="status"
-                            tick={{ fill: theme.palette.text.secondary, fontSize: 12 }}
-                            axisLine={false}
-                            tickLine={false}
-                          />
-                          <YAxis
-                            tick={{ fill: theme.palette.text.secondary, fontSize: 12 }}
-                            axisLine={false}
-                            tickLine={false}
-                            allowDecimals={false}
-                          />
-                          <Tooltip
-                            cursor={{ fill: alpha(theme.palette.primary.main, 0.06) }}
-                            contentStyle={{
-                              borderRadius: 8,
-                              border: `1px solid ${theme.palette.divider}`,
-                              background: theme.palette.background.paper,
-                              boxShadow: theme.shadows[3],
-                            }}
-                          />
-                          <Bar
-                            dataKey="count"
-                            fill={theme.palette.primary.main}
-                            radius={[8, 8, 0, 0]}
-                            maxBarSize={42}
-                          />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    )}
-                  </Box>
-                </CardContent>
-              </Card>
+              <BookingsChart data={bookingsChartData} mounted={mounted} />
             </motion.div>
           </Grid>
         </Grid>
@@ -485,157 +257,13 @@ export default function SupplierDashboardClient() {
         <Grid container spacing={3}>
           <Grid size={{ xs: 12, lg: 7 }}>
             <motion.div variants={itemVariants} style={{ height: "100%" }}>
-              <Card
-                elevation={0}
-                sx={theme => ({
-                  borderRadius: 2,
-                  border: "1px solid",
-                  borderColor: theme.palette.border.main,
-                  height: "100%",
-                  boxShadow: theme.palette.shadow.card,
-                })}
-              >
-                <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
-                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2.5, gap: 1 }}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
-                      <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                        {t("topVehicles.heading")}
-                      </Typography>
-                    </Box>
-                    <IconButton size="small">
-                      <MoreVertIcon />
-                    </IconButton>
-                  </Box>
-
-                  <Stack divider={<Divider flexItem />} spacing={0}>
-                    {topVehicles?.map(vehicle => (
-                      <Box
-                        key={vehicle.vehicleId}
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 2,
-                          py: 1.5,
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            width: 56,
-                            height: 56,
-                            borderRadius: 2,
-                            overflow: "hidden",
-                            flexShrink: 0,
-                            bgcolor: th => alpha(th.palette.primary.main, 0.08),
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          {vehicle.imageUrl ? (
-                            <Image
-                              src={(toImageUrl(vehicle.imageUrl) as string) || vehicle.imageUrl}
-                              alt={`${vehicle.make} ${vehicle.model}`}
-                              width={120}
-                              height={90}
-                              style={{ objectFit: "cover", width: "100%", height: "100%" }}
-                            />
-                          ) : (
-                            <CarIcon fontSize="small" />
-                          )}
-                        </Box>
-                        <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                          <Typography variant="body2" sx={{ fontWeight: 600, color: "text.primary" }}>
-                            {vehicle.make} {vehicle.model}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
-                            {formatCount(vehicle.completedBookingsCount)} {t("topVehicles.completedBookings")}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    ))}
-                    {topVehicles?.length === 0 && (
-                      <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: "center" }}>
-                        {t("topVehicles.noCompletedBookings")}
-                      </Typography>
-                    )}
-                  </Stack>
-                </CardContent>
-              </Card>
+              <TopVehiclesList topVehicles={topVehicles} />
             </motion.div>
           </Grid>
 
-          <Grid size={{ xs: 12, lg: 5 }}>
+          <Grid size={{ xs: 12, lg: 5 }} sx={{ mb: 3 }}>
             <motion.div variants={itemVariants} style={{ height: "100%" }}>
-              <Card
-                elevation={0}
-                sx={theme => ({
-                  borderRadius: 2,
-                  border: "1px solid",
-                  borderColor: theme.palette.border.main,
-                  height: "100%",
-                  boxShadow: theme.palette.shadow.card,
-                })}
-              >
-                <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
-                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2.5, gap: 1 }}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
-                      <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                        {t("vehicleStatus.heading")}
-                      </Typography>
-                    </Box>
-                  </Box>
-
-                  <Box sx={{ width: "100%", height: 280, minWidth: 0, position: "relative", overflow: "hidden" }}>
-                    {mounted && vehicleStatusChartData && (
-                      <ResponsiveContainer width="100%" height={280} minWidth={0}>
-                        <PieChart>
-                          <Pie
-                            data={vehicleStatusChartData}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={70}
-                            outerRadius={100}
-                            paddingAngle={2}
-                            dataKey="value"
-                            stroke="none"
-                          >
-                            {vehicleStatusChartData.map((entry, index) => (
-                              // eslint-disable-next-line @typescript-eslint/no-deprecated, sonarjs/deprecation
-                              <Cell key={`cell-${index}`} fill={entry.color} />
-                            ))}
-                          </Pie>
-                          <Tooltip
-                            contentStyle={{
-                              borderRadius: 8,
-                              border: `1px solid ${theme.palette.divider}`,
-                              background: theme.palette.background.paper,
-                              boxShadow: theme.shadows[3],
-                            }}
-                            itemStyle={{
-                              fontWeight: 600,
-                            }}
-                          />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    )}
-                  </Box>
-
-                  {mounted && vehicleStatusChartData && (
-                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, justifyContent: "center", mt: 1 }}>
-                      {vehicleStatusChartData
-                        .filter(v => v.value > 0)
-                        .map((status, idx) => (
-                          <Box key={idx} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                            <Box sx={{ width: 12, height: 12, borderRadius: "50%", bgcolor: status.color }} />
-                            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-                              {status.name} ({status.value})
-                            </Typography>
-                          </Box>
-                        ))}
-                    </Box>
-                  )}
-                </CardContent>
-              </Card>
+              <VehicleStatusChart data={vehicleStatusChartData} mounted={mounted} />
             </motion.div>
           </Grid>
         </Grid>
@@ -643,152 +271,13 @@ export default function SupplierDashboardClient() {
         <Grid container spacing={3} sx={{ mt: 0 }}>
           <Grid size={{ xs: 12, lg: 7 }}>
             <motion.div variants={itemVariants} style={{ height: "100%" }}>
-              <Card
-                elevation={0}
-                sx={theme => ({
-                  borderRadius: 2,
-                  border: "1px solid",
-                  borderColor: theme.palette.border.main,
-                  height: "100%",
-                  boxShadow: theme.palette.shadow.card,
-                })}
-              >
-                <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
-                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2.5, gap: 1 }}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
-                      <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                        {t("recentActivity")}
-                      </Typography>
-                      <DemoDataBadge />
-                    </Box>
-                    <IconButton size="small">
-                      <MoreVertIcon />
-                    </IconButton>
-                  </Box>
-
-                  <Stack divider={<Divider flexItem />} spacing={0}>
-                    {DEMO_ACTIVITY_ITEMS.map(item => {
-                      const meta = ACTIVITY_META[item.type];
-                      return (
-                        <Box
-                          key={item.id}
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 2,
-                            py: 1.5,
-                          }}
-                        >
-                          <Avatar
-                            sx={{
-                              width: 40,
-                              height: 40,
-                              bgcolor: alpha(theme.palette[meta.color].main, 0.12),
-                              color: `${meta.color}.main`,
-                            }}
-                          >
-                            {meta.icon}
-                          </Avatar>
-                          <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                            <Typography variant="body2" sx={{ fontWeight: 600, color: "text.primary" }}>
-                              {t(`demoActivity.${item.messageKey}`)}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
-                              {t(`demoActivityTime.${item.timeKey}`)}
-                            </Typography>
-                          </Box>
-                        </Box>
-                      );
-                    })}
-                  </Stack>
-                </CardContent>
-              </Card>
+              <RecentActivity />
             </motion.div>
           </Grid>
 
           <Grid size={{ xs: 12, lg: 5 }}>
             <motion.div variants={itemVariants} style={{ height: "100%" }}>
-              <Card
-                elevation={0}
-                sx={theme => ({
-                  borderRadius: 2,
-                  border: "1px solid",
-                  borderColor: theme.palette.border.main,
-                  height: "100%",
-                  boxShadow: theme.palette.shadow.card,
-                })}
-              >
-                <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
-                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2.5, gap: 1 }}>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
-                      <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                        {t("pendingActions")}
-                      </Typography>
-                      <DemoDataBadge />
-                    </Box>
-                    <Chip
-                      label={DEMO_PENDING_ACTION_ITEMS.length.toString()}
-                      size="small"
-                      color="warning"
-                      sx={{ fontWeight: 700, borderRadius: 2 }}
-                    />
-                  </Box>
-
-                  <Stack spacing={1.5}>
-                    {DEMO_PENDING_ACTION_ITEMS.map(action => {
-                      const meta = ACTION_META[action.severity];
-                      return (
-                        <Box
-                          key={action.id}
-                          sx={{
-                            display: "flex",
-                            alignItems: "flex-start",
-                            gap: 1.5,
-                            p: 1.75,
-                            borderRadius: 2,
-                            border: "1px solid",
-                            borderColor: alpha(theme.palette[meta.color].main, 0.25),
-                            bgcolor: alpha(theme.palette[meta.color].main, 0.05),
-                          }}
-                        >
-                          <Avatar
-                            sx={{
-                              width: 36,
-                              height: 36,
-                              bgcolor: alpha(theme.palette[meta.color].main, 0.18),
-                              color: `${meta.color}.main`,
-                            }}
-                          >
-                            {meta.icon}
-                          </Avatar>
-                          <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                            <Typography variant="body2" sx={{ fontWeight: 700, color: "text.primary" }}>
-                              {t(`demoPendingActions.${action.titleKey}`)}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 0.25 }}>
-                              {t(`demoPendingActions.${action.descriptionKey}`)}
-                            </Typography>
-                          </Box>
-                          <Button
-                            size="small"
-                            color={meta.color}
-                            endIcon={<ChevronRightIcon />}
-                            disabled
-                            sx={{
-                              flexShrink: 0,
-                              fontWeight: 700,
-                              textTransform: "none",
-                              borderRadius: 2,
-                            }}
-                          >
-                            {t(`demoPendingActions.${action.actionLabelKey}`)}
-                          </Button>
-                        </Box>
-                      );
-                    })}
-                  </Stack>
-                </CardContent>
-              </Card>
+              <PendingActions />
             </motion.div>
           </Grid>
         </Grid>

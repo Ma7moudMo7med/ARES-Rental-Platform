@@ -150,6 +150,30 @@ function UserMobileCard({ u, theme, fetchUsers, onRequestDelete, activeTab }: Us
             Availability: <strong>{(u.driverDetails?.availability as string) || "—"}</strong>
           </Typography>
         </Stack>
+      ) : activeTab === "inspectors" ? (
+        <Stack spacing={0.5} sx={{ mb: 1.5 }}>
+          <Typography variant="caption" color="text.secondary">
+            Code: <strong>{(u.inspectorDetails?.employeeCode as string) || "—"}</strong>
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            Completed: <strong>{u.inspectorDetails?.completedInspections ?? 0}</strong>
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            Availability: <strong>{(u.inspectorDetails?.availability as string) || "—"}</strong>
+          </Typography>
+        </Stack>
+      ) : activeTab === "users" ? (
+        <Stack spacing={0.5} sx={{ mb: 1.5 }}>
+          <Typography variant="caption" color="text.secondary">
+            Bookings: <strong>{u.customerDetails?.totalBookings ?? 0}</strong>
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            Spent: <strong>{u.customerDetails?.totalSpent != null ? `$${u.customerDetails.totalSpent}` : "—"}</strong>
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            Last Booking: <strong>{(u.customerDetails?.lastBookingDate as string) || "—"}</strong>
+          </Typography>
+        </Stack>
       ) : (
         <Typography
           variant="caption"
@@ -281,6 +305,42 @@ function UserTableRow({ u, activeTab, isActive, handleStatusToggle, requestDelet
           <TableCell sx={{ py: 2 }}>
             <Typography variant="body2" color="text.secondary">
               {(u.driverDetails?.availability as string) || "—"}
+            </Typography>
+          </TableCell>
+        </>
+      ) : activeTab === "inspectors" ? (
+        <>
+          <TableCell sx={{ py: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              {(u.inspectorDetails?.employeeCode as string) || "—"}
+            </Typography>
+          </TableCell>
+          <TableCell sx={{ py: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              {(u.inspectorDetails?.completedInspections as number | null | undefined) ?? 0}
+            </Typography>
+          </TableCell>
+          <TableCell sx={{ py: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              {(u.inspectorDetails?.availability as string) || "—"}
+            </Typography>
+          </TableCell>
+        </>
+      ) : activeTab === "users" ? (
+        <>
+          <TableCell sx={{ py: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              {(u.customerDetails?.totalBookings as number | null | undefined) ?? 0}
+            </Typography>
+          </TableCell>
+          <TableCell sx={{ py: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              {u.customerDetails?.totalSpent != null ? `$${u.customerDetails.totalSpent}` : "—"}
+            </Typography>
+          </TableCell>
+          <TableCell sx={{ py: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              {(u.customerDetails?.lastBookingDate as string) || "—"}
             </Typography>
           </TableCell>
         </>
@@ -701,6 +761,18 @@ export default function UsersTab({ activeTab, onStatsUpdated }: UsersTabProps) {
                         <TableCell>License</TableCell>
                         <TableCell>Completed Trips</TableCell>
                         <TableCell>Availability</TableCell>
+                      </>
+                    ) : activeTab === "inspectors" ? (
+                      <>
+                        <TableCell>Employee Code</TableCell>
+                        <TableCell>Completed</TableCell>
+                        <TableCell>Availability</TableCell>
+                      </>
+                    ) : activeTab === "users" ? (
+                      <>
+                        <TableCell>Total Bookings</TableCell>
+                        <TableCell>Total Spent</TableCell>
+                        <TableCell>Last Booking</TableCell>
                       </>
                     ) : (
                       <>

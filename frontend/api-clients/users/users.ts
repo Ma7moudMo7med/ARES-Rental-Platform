@@ -18,6 +18,21 @@ export interface SupplierDetails {
   totalBookings: number;
 }
 
+export interface CustomerDetails {
+  totalBookings: number;
+  completedBookings: number;
+  cancelledBookings: number;
+  totalSpent: number;
+  lastBookingDate?: string | null;
+}
+
+export interface InspectorDetails {
+  employeeCode?: string | null;
+  assignedInspections: number;
+  completedInspections: number;
+  availability?: string | null;
+}
+
 export interface User {
   id: string;
   firstName: string;
@@ -28,6 +43,8 @@ export interface User {
   roles: string[];
   driverDetails?: DriverDetails | null;
   supplierDetails?: SupplierDetails | null;
+  customerDetails?: CustomerDetails | null;
+  inspectorDetails?: InspectorDetails | null;
   [key: string]: unknown;
 }
 
@@ -122,6 +139,8 @@ export async function updateUser(
     status: string;
     roles: string[];
     dateOfBirth?: string;
+    employeeCode?: string;
+    availability?: string;
   }
 ): Promise<UserResponse> {
   const session = await getSession();

@@ -24,6 +24,8 @@ public class UserManagementService : IUserManagementService
     private readonly IApplicationDbContext _context;
     private readonly ISupplierService? _supplierService;
     private readonly IDriverService? _driverService;
+    private readonly ICustomerService? _customerService;
+    private readonly IInspectorService? _inspectorService;
 
     private string? FormatDateOfBirth(DateTime? date) =>
         date.HasValue ? date.Value.ToString("yyyy-MM-dd") : null;
@@ -56,7 +58,9 @@ public class UserManagementService : IUserManagementService
         IHttpContextAccessor httpContextAccessor,
         IApplicationDbContext context,
         ISupplierService? supplierService = null,
-        IDriverService? driverService = null)
+        IDriverService? driverService = null,
+        ICustomerService? customerService = null,
+        IInspectorService? inspectorService = null)
     {
         _userRepository = userRepository;
         _userManager = userManager;
@@ -67,6 +71,8 @@ public class UserManagementService : IUserManagementService
         _context = context;
         _supplierService = supplierService;
         _driverService = driverService;
+        _customerService = customerService;
+        _inspectorService = inspectorService;
     }
 
     public async Task<UserStatsDto> GetUserStatsAsync(CancellationToken cancellationToken = default)
@@ -226,6 +232,16 @@ public class UserManagementService : IUserManagementService
             userDtos = await _driverService.EnrichDriversAsync(userDtos, cancellationToken);
         }
 
+        if (filter != null && !string.IsNullOrWhiteSpace(filter.Role) && filter.Role.Equals("Customer", StringComparison.OrdinalIgnoreCase) && _customerService != null)
+        {
+            userDtos = await _customerService.EnrichCustomersAsync(userDtos, cancellationToken);
+        }
+
+        if (filter != null && !string.IsNullOrWhiteSpace(filter.Role) && filter.Role.Equals("Inspector", StringComparison.OrdinalIgnoreCase) && _inspectorService != null)
+        {
+            userDtos = await _inspectorService.EnrichInspectorsAsync(userDtos, cancellationToken);
+        }
+
         return new UserManagementListResponse(
             userDtos,
             pagedUsers.Page,
@@ -280,6 +296,18 @@ public class UserManagementService : IUserManagementService
         if (roles.Contains("Driver", StringComparer.OrdinalIgnoreCase) && _driverService != null)
         {
             var enrichedList = await _driverService.EnrichDriversAsync(new List<UserManagementDto> { userDto }, cancellationToken);
+            userDto = enrichedList.FirstOrDefault() ?? userDto;
+        }
+
+        if (roles.Contains("Customer", StringComparer.OrdinalIgnoreCase) && _customerService != null)
+        {
+            var enrichedList = await _customerService.EnrichCustomersAsync(new List<UserManagementDto> { userDto }, cancellationToken);
+            userDto = enrichedList.FirstOrDefault() ?? userDto;
+        }
+
+        if (roles.Contains("Inspector", StringComparer.OrdinalIgnoreCase) && _inspectorService != null)
+        {
+            var enrichedList = await _inspectorService.EnrichInspectorsAsync(new List<UserManagementDto> { userDto }, cancellationToken);
             userDto = enrichedList.FirstOrDefault() ?? userDto;
         }
 
@@ -472,6 +500,11 @@ public class UserManagementService : IUserManagementService
                     await _supplierRestrictionService.RemoveRestrictionAsync(user.Id, adminId, cancellationToken);
                 }
             }
+        }
+
+        if (await _userManager.IsInRoleAsync(user, "Inspector") && _inspectorService != null)
+        {
+            await _inspectorService.UpdateInspectorProfileAsync(user.Id, request.EmployeeCode, request.Availability, cancellationToken);
         }
 
         _logger.LogInformation("Successfully updated user {UserId}", userId);
