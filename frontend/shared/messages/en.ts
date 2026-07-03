@@ -91,6 +91,8 @@ import loadingPage from "./en/root/loading";
 import notFound from "./en/root/not-found";
 import type { MessageSchema } from "./types/message";
 
+import inspectorNotifications from "./en/dashboard/inspector/notifications";
+
 const en: MessageSchema = {
   common,
   auth,
@@ -173,6 +175,7 @@ const en: MessageSchema = {
     inspections: inspectorInspections,
     inspectionDetail: inspectorInspectionDetail,
     profile: inspectorProfile,
+    notifications: inspectorNotifications,
   },
   deleteNotificationDialog,
   publicPages: {

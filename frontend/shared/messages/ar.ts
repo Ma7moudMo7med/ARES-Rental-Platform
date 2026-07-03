@@ -91,6 +91,8 @@ import loadingPage from "./ar/root/loading";
 import notFound from "./ar/root/not-found";
 import type { MessageSchema } from "./types/message";
 
+import inspectorNotifications from "./ar/dashboard/inspector/notifications";
+
 const ar: MessageSchema = {
   common,
   auth,
@@ -173,6 +175,7 @@ const ar: MessageSchema = {
     inspections: inspectorInspections,
     inspectionDetail: inspectorInspectionDetail,
     profile: inspectorProfile,
+    notifications: inspectorNotifications,
   },
   deleteNotificationDialog,
   publicPages: {

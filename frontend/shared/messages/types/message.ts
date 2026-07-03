@@ -52,6 +52,7 @@ import type { DriverTripsLabels } from "./dashboard/driver-trips";
 import type { InspectorHistoryLabels } from "./dashboard/inspector/history";
 import type { InspectorInspectionDetailLabels } from "./dashboard/inspector/inspection-detail";
 import type { InspectorInspectionsLabels } from "./dashboard/inspector/inspections";
+import type { InspectorNotificationsLabels } from "./dashboard/inspector/notifications";
 import type { InspectorProfileLabels } from "./dashboard/inspector/profile";
 import type { InspectorSidebarLabels } from "./dashboard/inspector-sidebar";
 import type { LogoutDialogLabels } from "./dashboard/logout-dialog";
@@ -135,6 +136,7 @@ export type {
   InspectorHistoryLabels,
   InspectorInspectionDetailLabels,
   InspectorInspectionsLabels,
+  InspectorNotificationsLabels,
   InspectorProfileLabels,
   InspectorSidebarLabels,
   LoadingPageLabels,
@@ -248,6 +250,7 @@ export type DashboardInspectorSchema = {
   readonly inspections: InspectorInspectionsLabels;
   readonly inspectionDetail: InspectorInspectionDetailLabels;
   readonly profile: InspectorProfileLabels;
+  readonly notifications: InspectorNotificationsLabels;
 };
 
 export type PublicBookingsSchema = {
