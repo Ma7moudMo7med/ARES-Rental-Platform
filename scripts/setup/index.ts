@@ -16,7 +16,7 @@ import {
   startSpinner,
   stopSpinner,
 } from "./lib/logger";
-import { getOSType, getArch } from "./lib/utils";
+import { getOSType, getArch, askYesNo } from "./lib/utils";
 import {
   detectOS,
   isSupportedOS,
@@ -41,7 +41,6 @@ import {
   setupBackendServer,
   verifyBackendAccessibility,
   stopBackendServer,
-  restorePackages,
 } from "./backend";
 import {
   setupFrontendDependencies,
@@ -426,14 +425,25 @@ async function main(): Promise<void> {
     logInfo("");
   }
 
-  // Early Restore: Ensure backend projects are restored before any dotnet calls
-  // This is especially important for EF Core commands during database setup
-  if (!options.skipBackend || !options.skipDb) {
+  // Backend setup
+  if (!options.skipBackend) {
     logStep("Backend Preparation");
-    const restoreResult = await restorePackages();
-    if (!restoreResult.success) {
-      logError("Initial backend restore failed. Please check your .NET installation.");
-      process.exit(1);
+    const backendReady = await setupBackendBuild();
+    if (!backendReady) {
+      logError("Backend setup failed. Please check the error messages above.");
+            
+      // For CI/CD environments, exit with error
+      if (process.env.CI || process.env.NODE_ENV === "production") {
+          process.exit(1);
+      }
+      // For interactive environments, prompt if user wants to continue
+      else {
+          logInfo("");
+          const shouldContinue = await askYesNo("Continue with setup despite backend issues?", false);
+          if (!shouldContinue) {
+              process.exit(1);
+          }
+      }
     }
     logInfo("");
   }

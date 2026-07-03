@@ -20,6 +20,7 @@ export async function checkDotnet(): Promise<DotnetInfo> {
   const dotnetExists = await commandExists("dotnet");
 
   if (!dotnetExists) {
+    logDebug(".NET SDK not found in PATH");
     return {
       installed: false,
       efToolInstalled: false,
@@ -28,15 +29,24 @@ export async function checkDotnet(): Promise<DotnetInfo> {
   }
 
   try {
-    // Get .NET version
-    const versionOutput = await $`dotnet --version`.text();
+    // Check if we can execute dotnet commands
+    const versionOutput = await $`dotnet --version`.text().catch(() => "");
     const version = versionOutput.trim();
+
+    if (!version) {
+      logDebug("User not allowed to run dotnet --version");
+      return {
+          installed: false,
+          efToolInstalled: false,
+          scriptToolInstalled: false,
+      };
+    }
 
     logDebug(`.NET SDK version: ${version}`);
 
-    // Check for dotnet ef tool
-    const efToolInstalled = await checkDotnetEfTool();
-    const scriptToolInstalled = await checkDotnetScriptTool();
+    // Check for dotnet tools (only if version check succeeded)
+    const efToolInstalled = await checkDotnetEfTool().catch(() => false);
+    const scriptToolInstalled = await checkDotnetScriptTool().catch(() => false);
 
     return {
       installed: true,
@@ -56,18 +66,24 @@ export async function checkDotnet(): Promise<DotnetInfo> {
 
 async function checkDotnetEfTool(): Promise<boolean> {
   try {
-    const toolListOutput = await $`dotnet tool list --global`.text();
+    // Check if user has permission to run dotnet tool commands
+    await $`dotnet tool list --global`.quiet();
+    const toolListOutput = await $`dotnet tool list --global`.text().catch(() => "");
     return toolListOutput.includes("dotnet-ef");
   } catch {
+    logDebug("User may not have permission to check dotnet-ef tool");
     return false;
   }
 }
 
 async function checkDotnetScriptTool(): Promise<boolean> {
   try {
-    const toolListOutput = await $`dotnet tool list --global`.text();
+    // Check if user has permission to run dotnet tool commands
+    await $`dotnet tool list --global`.quiet();
+    const toolListOutput = await $`dotnet tool list --global`.text().catch(() => "");
     return toolListOutput.includes("dotnet-script");
   } catch {
+    logDebug("User may not have permission to check dotnet-script tool");
     return false;
   }
 }
@@ -75,11 +91,26 @@ async function checkDotnetScriptTool(): Promise<boolean> {
 export async function installDotnetEfTool(): Promise<boolean> {
   try {
     logInfo("Installing dotnet-ef tool...");
-    await $`dotnet tool install --global dotnet-ef`.quiet();
+    const result = await $`dotnet tool install --global dotnet-ef`.quiet();
+        
+    // Verify installation succeeded
+    if (result.exitCode !== 0) {
+        logError("dotnet-ef installation failed (permission denied or other error)");
+        return false;
+    }
+        
     logInfo("dotnet-ef tool installed successfully");
     return true;
   } catch (error) {
-    logError(`Failed to install dotnet-ef: ${error instanceof Error ? error.message : "Unknown error"}`);
+    const errorMsg = error instanceof Error ? error.message : "Unknown error";
+    logError(`Failed to install dotnet-ef: ${errorMsg}`);
+        
+    // Provide more specific guidance for common errors
+    if (errorMsg.includes("permission") || errorMsg.includes("access denied")) {
+        logWarn("Try running: sudo -E dotnet tool install --global dotnet-ef");
+        logWarn("Or visit: https://aka.ms/dotnet-tools for manual installation");
+    }
+        
     return false;
   }
 }
@@ -87,11 +118,26 @@ export async function installDotnetEfTool(): Promise<boolean> {
 export async function installDotnetScriptTool(): Promise<boolean> {
   try {
     logInfo("Installing dotnet-script tool...");
-    await $`dotnet tool install --global dotnet-script`.quiet();
+    const result = await $`dotnet tool install --global dotnet-script`.quiet();
+        
+    // Verify installation succeeded
+    if (result.exitCode !== 0) {
+        logError("dotnet-script installation failed (permission denied or other error)");
+        return false;
+    }
+        
     logInfo("dotnet-script tool installed successfully");
     return true;
   } catch (error) {
-    logError(`Failed to install dotnet-script: ${error instanceof Error ? error.message : "Unknown error"}`);
+    const errorMsg = error instanceof Error ? error.message : "Unknown error";
+    logError(`Failed to install dotnet-script: ${errorMsg}`);
+        
+    // Provide more specific guidance for common errors
+    if (errorMsg.includes("permission") || errorMsg.includes("access denied")) {
+        logWarn("Try running: sudo -E dotnet tool install --global dotnet-script");
+        logWarn("Or visit: https://github.com/filipw/dotnet-script for manual installation");
+    }
+        
     return false;
   }
 }

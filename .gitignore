@@ -54,3 +54,5 @@ frontend/.eslintcache
 .opencode
 scripts/docs
 docs
+
+.generated
