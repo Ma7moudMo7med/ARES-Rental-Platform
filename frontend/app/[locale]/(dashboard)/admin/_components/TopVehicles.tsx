@@ -2,10 +2,13 @@ import { Link } from "@/shared/i18n/routing";
 import Image from "next/image";
 import { Card, CardContent, Typography, Box, Stack, Button } from "@mui/material";
 import { DirectionsCarFilledTwoTone as CarIcon } from "@mui/icons-material";
+import { useTranslations } from "next-intl";
 import { TopVehicle } from "./mockData";
 import { toImageUrl } from "@/utils/image-url";
 
 export default function TopVehicles({ vehicles }: Readonly<{ readonly vehicles: readonly TopVehicle[] }>) {
+  const t = useTranslations("dashboardAdmin.dashboard");
+
   return (
     <Card
       elevation={0}
@@ -26,7 +29,7 @@ export default function TopVehicles({ vehicles }: Readonly<{ readonly vehicles: 
           }}
         >
           <Typography variant="h6" sx={{ fontWeight: 700, fontSize: "1.125rem" }}>
-            Top Vehicles by Bookings
+            {t("topVehicles.title")}
           </Typography>
           <Button
             component={Link}
@@ -39,7 +42,7 @@ export default function TopVehicles({ vehicles }: Readonly<{ readonly vehicles: 
               color: "primary.main",
             }}
           >
-            View All
+            {t("topVehicles.viewAll")}
           </Button>
         </Box>
         <Stack spacing={1}>
@@ -102,7 +105,7 @@ export default function TopVehicles({ vehicles }: Readonly<{ readonly vehicles: 
                     {vehicle.make} {vehicle.model}
                   </Typography>
                   <Typography variant="body2" color="text.secondary" noWrap>
-                    {vehicle.bookingsCount} bookings
+                    {vehicle.bookingsCount} {t("topVehicles.bookings")}
                   </Typography>
                 </Box>
                 <Typography variant="subtitle2" sx={{ fontWeight: 700, color: trendColor, flexShrink: 0 }}>
