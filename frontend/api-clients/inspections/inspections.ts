@@ -24,6 +24,7 @@ export interface InspectionSummary {
   inspectionDate: string;
   submittedAt: string | null;
   imageCount: number;
+  inspectionType: string;
 }
 
 export interface PendingAssignment {
@@ -54,6 +55,8 @@ export interface InspectionDetails {
   submittedAt: string | null;
   createdAt: string;
   images: InspectionImage[];
+  customerName?: string | null;
+  inspectionType?: string | null;
 }
 
 export interface AssignInspectorPayload {

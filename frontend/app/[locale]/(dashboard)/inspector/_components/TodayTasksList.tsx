@@ -71,48 +71,17 @@ export default function TodayTasksList({ tasks, loading }: TodaysTasksListProps)
   return (
     <Box>
       {/* Search and Filters Header */}
-      <Stack
-        direction={{ xs: "column", sm: "row" }}
-        spacing={2}
-        sx={{ justifyContent: "space-between", alignItems: { xs: "stretch", sm: "center" }, mb: 3 }}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          flexWrap: "wrap",
+          gap: 2,
+          alignItems: "center",
+          width: "100%",
+          mb: 2,
+        }}
       >
-        {/* Filter tabs */}
-        <Stack direction="row" sx={{ gap: 1, flexWrap: "wrap" }}>
-          {FILTER_TABS.map(tab => {
-            const isActive = activeFilter === tab.value;
-            return (
-              <Box
-                key={tab.value}
-                component="button"
-                onClick={() => {
-                  setActiveFilter(tab.value);
-                }}
-                sx={{
-                  px: 2,
-                  py: 0.75,
-                  borderRadius: 99,
-                  border: "1px solid",
-                  borderColor: isActive ? "primary.main" : "divider",
-                  bgcolor: isActive ? "primary.main" : "background.paper",
-                  color: isActive ? "primary.contrastText" : "text.secondary",
-                  fontWeight: 600,
-                  fontSize: "0.8125rem",
-                  cursor: "pointer",
-                  transition: "all 0.18s ease",
-                  boxShadow: isActive ? theme.palette.shadow.button : "none",
-                  "&:hover": {
-                    borderColor: "primary.main",
-                    bgcolor: isActive ? "primary.main" : alpha(theme.palette.primary.main, 0.06),
-                    color: isActive ? "primary.contrastText" : "primary.main",
-                  },
-                }}
-              >
-                {tab.label}
-              </Box>
-            );
-          })}
-        </Stack>
-
         {/* Plate number search */}
         <TextField
           id="plate-search"
@@ -122,7 +91,16 @@ export default function TodayTasksList({ tasks, loading }: TodaysTasksListProps)
             setPlateSearch(e.target.value);
           }}
           size="small"
-          sx={{ minWidth: { xs: "100%", sm: 260 } }}
+          sx={{
+            flexGrow: 1,
+            width: { xs: "100%", sm: "auto" },
+            minWidth: { sm: 200 },
+            "& .MuiOutlinedInput-root": {
+              height: 40,
+              borderRadius: 2,
+              bgcolor: "background.paper",
+            },
+          }}
           slotProps={{
             input: {
               startAdornment: (
@@ -134,11 +112,59 @@ export default function TodayTasksList({ tasks, loading }: TodaysTasksListProps)
           }}
           aria-label={t("searchAriaLabel")}
         />
-      </Stack>
+
+        {/* Filter buttons styled as segmented pills */}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            gap: 2,
+            width: { xs: "100%", sm: "auto" },
+            overflowX: "auto",
+            "&::-webkit-scrollbar": { display: "none" },
+            scrollbarWidth: "none",
+          }}
+        >
+          {FILTER_TABS.map(tab => {
+            const isActive = activeFilter === tab.value;
+            return (
+              <Button
+                key={tab.value}
+                onClick={() => {
+                  setActiveFilter(tab.value);
+                }}
+                variant={isActive ? "contained" : "outlined"}
+                disableElevation
+                sx={{
+                  flex: { xs: "1 0 auto", sm: "initial" },
+                  height: 40,
+                  borderRadius: 2,
+                  px: 3,
+                  textTransform: "none",
+                  fontWeight: 600,
+                  fontSize: "0.875rem",
+                  borderColor: isActive ? "transparent" : "divider",
+                  color: isActive ? "primary.contrastText" : "text.secondary",
+                  bgcolor: isActive ? "primary.main" : "background.paper",
+                  boxShadow: isActive ? theme.palette.shadow.button : "none",
+                  whiteSpace: "nowrap",
+                  "&:hover": {
+                    bgcolor: isActive ? "primary.dark" : alpha(theme.palette.primary.main, 0.04),
+                    borderColor: isActive ? "transparent" : "primary.main",
+                    color: isActive ? "primary.contrastText" : "primary.main",
+                  },
+                }}
+              >
+                {tab.label}
+              </Button>
+            );
+          })}
+        </Box>
+      </Box>
 
       {/* Task list */}
       {loading ? (
-        <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 3 }} />
+        <Skeleton variant="rectangular" height={300} sx={{ borderRadius: 2 }} />
       ) : filteredTasks.length === 0 ? (
         <EmptyState hasSearch={plateSearch.length > 0 || activeFilter !== "All"} />
       ) : (
@@ -148,52 +174,35 @@ export default function TodayTasksList({ tasks, loading }: TodaysTasksListProps)
           sx={{
             borderRadius: 2,
             border: "1px solid",
-            borderColor: theme.palette.border.main,
-            boxShadow: theme.palette.shadow.card,
+            borderColor: "divider",
+            boxShadow: "none",
+            overflow: "hidden",
           }}
         >
           <Table sx={{ minWidth: 800 }} aria-label="today's tasks table">
             <TableHead>
-              <TableRow>
-                <TableCell
-                  sx={{ color: "text.secondary", fontWeight: "600", borderBottom: "2px solid", borderColor: "divider" }}
-                >
-                  {t("table.time", { fallback: "Time" })}
-                </TableCell>
-                <TableCell
-                  sx={{ color: "text.secondary", fontWeight: "600", borderBottom: "2px solid", borderColor: "divider" }}
-                >
-                  {t("table.vehicle", { fallback: "Vehicle" })}
-                </TableCell>
-                <TableCell
-                  sx={{ color: "text.secondary", fontWeight: "600", borderBottom: "2px solid", borderColor: "divider" }}
-                >
-                  {t("table.customer", { fallback: "Customer" })}
-                </TableCell>
-                <TableCell
-                  sx={{ color: "text.secondary", fontWeight: "600", borderBottom: "2px solid", borderColor: "divider" }}
-                >
-                  {t("table.inspectionType", { fallback: "Inspection Type" })}
-                </TableCell>
-                <TableCell
-                  sx={{ color: "text.secondary", fontWeight: "600", borderBottom: "2px solid", borderColor: "divider" }}
-                >
-                  {t("table.status", { fallback: "Status" })}
-                </TableCell>
-                <TableCell
-                  sx={{ color: "text.secondary", fontWeight: "600", borderBottom: "2px solid", borderColor: "divider" }}
-                >
-                  {t("table.quickActions", { fallback: "Quick Actions" })}
-                </TableCell>
-                <TableCell
-                  sx={{
+              <TableRow
+                sx={{
+                  bgcolor: t => alpha(t.palette.primary.main, 0.04),
+                  "& .MuiTableCell-head": {
+                    fontWeight: 700,
+                    fontSize: 12,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
                     color: "text.secondary",
-                    fontWeight: "600",
-                    borderBottom: "2px solid",
+                    borderBottom: "1px solid",
                     borderColor: "divider",
-                    textAlign: "right",
-                  }}
-                >
+                    py: 1.5,
+                  },
+                }}
+              >
+                <TableCell>{t("table.time", { fallback: "Time" })}</TableCell>
+                <TableCell>{t("table.vehicle", { fallback: "Vehicle" })}</TableCell>
+                <TableCell>{t("table.customer", { fallback: "Customer" })}</TableCell>
+                <TableCell>{t("table.inspectionType", { fallback: "Inspection Type" })}</TableCell>
+                <TableCell>{t("table.status", { fallback: "Status" })}</TableCell>
+                <TableCell>{t("table.quickActions", { fallback: "Quick Actions" })}</TableCell>
+                <TableCell sx={{ textAlign: "right" }}>
                   {t("table.action", { fallback: "Action" })}
                 </TableCell>
               </TableRow>
@@ -217,7 +226,14 @@ export default function TodayTasksList({ tasks, loading }: TodaysTasksListProps)
                   : theme.palette.status.pending.main;
 
                 return (
-                  <TableRow key={task.inspectionId} hover sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+                  <TableRow
+                    key={task.inspectionId}
+                    hover
+                    sx={{
+                      "& .MuiTableCell-root": { py: 1.75 },
+                      "&:last-child td, &:last-child th": { border: 0 },
+                    }}
+                  >
                     <TableCell sx={{ fontWeight: "600", whiteSpace: "nowrap" }}>{formattedTime}</TableCell>
                     <TableCell>
                       <Box sx={{ display: "flex", flexDirection: "column" }}>
@@ -259,7 +275,9 @@ export default function TodayTasksList({ tasks, loading }: TodaysTasksListProps)
                           <IconButton
                             component="a"
                             href={`tel:${task.customerPhone}`}
-                            onClick={e => e.stopPropagation()}
+                            onClick={e => {
+                              e.stopPropagation();
+                            }}
                             size="small"
                             sx={{
                               bgcolor: alpha(theme.palette.icon.phone.color, 0.1),
@@ -282,7 +300,9 @@ export default function TodayTasksList({ tasks, loading }: TodaysTasksListProps)
                             href={mapsHref}
                             target="_blank"
                             rel="noopener noreferrer"
-                            onClick={e => e.stopPropagation()}
+                            onClick={e => {
+                              e.stopPropagation();
+                            }}
                             size="small"
                             sx={{
                               bgcolor: alpha(theme.palette.info.main, 0.1),
@@ -311,7 +331,8 @@ export default function TodayTasksList({ tasks, loading }: TodaysTasksListProps)
                         sx={{
                           textTransform: "none",
                           fontWeight: 700,
-                          px: 2,
+                          px: 2.5,
+                          py: 0.75,
                           borderRadius: 2,
                           boxShadow: theme.palette.shadow.button,
                           bgcolor: isCompleted ? "background.paper" : "primary.main",
