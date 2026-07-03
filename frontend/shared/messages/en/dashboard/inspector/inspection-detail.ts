@@ -57,6 +57,18 @@ const inspectionDetail: InspectorInspectionDetailLabels = {
     finalNotes: "Final Inspection Notes (Required)",
     finalNotesPlaceholder: "Detailed observations to support your final decision...",
     finalDecision: "Final Decision",
+    customer: "Customer",
+    inspectionType: "Inspection Type",
+    scheduledDateTime: "Scheduled Date & Time",
+    assignedInspector: "Assigned Inspector",
+    pickupInspection: "Pickup Inspection",
+    returnInspection: "Return Inspection",
+    minPhotos: "Minimum: {min} Photo",
+    maxPhotos: "Maximum: {max} Photos",
+    photoCount: "Photos Uploaded",
+    damageReportTitle: "1. Damage Report",
+    finalNotesTitle: "2. Final Inspection Notes",
+    submitInfoBox: "Please review all inspection information before submitting. Once submitted, the inspection report cannot be edited.",
   },
 };
 

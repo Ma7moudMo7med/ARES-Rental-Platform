@@ -4,6 +4,14 @@ export type InspectorHistoryLabels = {
   readonly searchPlaceholder: string;
   readonly filterStatusLabel: string;
   readonly filterAllStatuses: string;
+  readonly filterTypeLabel: string;
+  readonly filterAllTypes: string;
+  readonly filterDateFrom: string;
+  readonly filterDateTo: string;
+  readonly filterReset: string;
+  readonly typePickup: string;
+  readonly typeReturn: string;
+  readonly typeRoutine: string;
   readonly noResults: {
     readonly title: string;
     readonly description: string;
