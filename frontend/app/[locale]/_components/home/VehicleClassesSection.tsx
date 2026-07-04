@@ -139,7 +139,7 @@ export default function VehicleClassesSection({ defaultLocationId }: VehicleClas
 
               // Handle special cases where the category name differs from the translation key
               const translationKey = nameLower === "suv" ? "suvs" : nameLower;
-              
+
               const classNameKey = `classNames.${translationKey}` as any;
               const translatedClassName = t.has(classNameKey) ? t(classNameKey) : cat.name;
 
