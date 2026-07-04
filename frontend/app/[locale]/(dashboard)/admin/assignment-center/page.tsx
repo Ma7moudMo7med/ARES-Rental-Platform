@@ -1,17 +1,19 @@
-import { Metadata } from "next";
+import { getLocale, getTranslations } from "next-intl/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "@/shared/i18n/routing";
-import { getLocale } from "next-intl/server";
 import { getPendingAssignments } from "@/api-clients/inspections/inspections";
 import { listInspectors } from "@/api-clients/inspectors/inspectors";
 import { logger } from "@/utils/logger";
 import AssignmentCenterClient from "./_components/AssignmentCenterClient";
 
-export const metadata: Metadata = {
-  title: "Inspector Assignment Center | ARES Admin",
-  description: "Quickly assign inspectors to bookings",
-};
+export async function generateMetadata({ params: { locale } }: { readonly params: { readonly locale: string } }) {
+  const t = await getTranslations({ locale, namespace: "dashboardAdmin.assignmentCenter" });
+  return {
+    title: `${t("title")} | ARES Admin`,
+    description: t("description"),
+  };
+}
 
 export default async function AssignmentCenterPage() {
   const locale = await getLocale();

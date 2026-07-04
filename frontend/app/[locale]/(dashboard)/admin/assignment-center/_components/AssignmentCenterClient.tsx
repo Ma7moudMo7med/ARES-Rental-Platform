@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, type JSX } from "react";
+import { useTranslations } from "next-intl";
 import {
   Box,
   Typography,
@@ -48,6 +49,7 @@ interface Props {
 
 export default function AssignmentCenterClient({ initialAssignments, inspectors }: Props): JSX.Element {
   const theme = useTheme();
+  const t = useTranslations("dashboardAdmin.assignmentCenter");
 
   const [assignments, setAssignments] = useState<PendingAssignment[]>(initialAssignments);
   const [loading, setLoading] = useState(false);
@@ -73,9 +75,9 @@ export default function AssignmentCenterClient({ initialAssignments, inspectors 
     try {
       const data = await getPendingAssignments();
       setAssignments(data || []);
-      setSuccessMsg("Assignments refreshed successfully.");
+      setSuccessMsg(t("refreshSuccess"));
     } catch (error) {
-      setErrorMsg("Failed to refresh assignments.");
+      setErrorMsg(t("refreshError"));
     } finally {
       setLoading(false);
     }
@@ -90,11 +92,11 @@ export default function AssignmentCenterClient({ initialAssignments, inspectors 
     setAssigningIds(prev => ({ ...prev, [bookingId]: true }));
     try {
       await assignInspectorToBooking(bookingId, { inspectorUserId: inspectorId });
-      setSuccessMsg("Inspector assigned successfully.");
+      setSuccessMsg(t("assignSuccess"));
       // Remove from table
       setAssignments(prev => prev.filter(a => a.bookingId !== bookingId));
     } catch (error: any) {
-      setErrorMsg(error.message || "Failed to assign inspector.");
+      setErrorMsg(error.message || t("assignError"));
     } finally {
       setAssigningIds(prev => ({ ...prev, [bookingId]: false }));
     }
@@ -116,10 +118,10 @@ export default function AssignmentCenterClient({ initialAssignments, inspectors 
       <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center", mb: 3 }}>
         <Box>
           <Typography variant="h4" color="text.primary" sx={{ fontWeight: 800, mb: 1 }}>
-            Inspector Assignment Center
+            {t("title")}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Quickly assign inspectors to pending bookings.
+            {t("description")}
           </Typography>
         </Box>
         <Button
@@ -128,7 +130,7 @@ export default function AssignmentCenterClient({ initialAssignments, inspectors 
           onClick={handleRefresh}
           disabled={loading}
         >
-          Refresh
+          {t("refresh")}
         </Button>
       </Stack>
 
@@ -158,7 +160,7 @@ export default function AssignmentCenterClient({ initialAssignments, inspectors 
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid size={{ xs: 12, sm: 6, md: 6, lg: 3 }}>
           <StatCard
-            title="Pending Pickups"
+            title={t("pendingPickups")}
             value={pendingPickups.toString()}
             color="warning"
             icon={<DirectionsCarIcon fontSize="small" />}
@@ -166,7 +168,7 @@ export default function AssignmentCenterClient({ initialAssignments, inspectors 
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 6, lg: 3 }}>
           <StatCard
-            title="Pending Returns"
+            title={t("pendingReturns")}
             value={pendingReturns.toString()}
             color="success"
             icon={<AssignmentReturnIcon fontSize="small" />}
@@ -174,7 +176,7 @@ export default function AssignmentCenterClient({ initialAssignments, inspectors 
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 6, lg: 3 }}>
           <StatCard
-            title="Available Inspectors"
+            title={t("availableInspectors")}
             value={availableInspectors.toString()}
             color="info"
             icon={<EngineeringIcon fontSize="small" />}
@@ -182,7 +184,7 @@ export default function AssignmentCenterClient({ initialAssignments, inspectors 
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 6, lg: 3 }}>
           <StatCard
-            title="Total Pending"
+            title={t("totalPending")}
             value={assignments.length.toString()}
             color="primary"
             icon={<PendingActionsIcon fontSize="small" />}
@@ -196,7 +198,7 @@ export default function AssignmentCenterClient({ initialAssignments, inspectors 
             <TextField
               fullWidth
               size="small"
-              placeholder="Search booking, customer, vehicle..."
+              placeholder={t("searchPlaceholder")}
               value={search}
               onChange={e => {
                 setSearch(e.target.value);
@@ -214,17 +216,17 @@ export default function AssignmentCenterClient({ initialAssignments, inspectors 
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <FormControl fullWidth size="small">
-              <InputLabel>Inspection Type</InputLabel>
+              <InputLabel>{t("inspectionType")}</InputLabel>
               <Select
                 value={typeFilter}
-                label="Inspection Type"
+                label={t("inspectionType")}
                 onChange={e => {
                   setTypeFilter(e.target.value);
                 }}
               >
-                <MenuItem value="All">All</MenuItem>
-                <MenuItem value="Pickup">Pickup</MenuItem>
-                <MenuItem value="Return">Return</MenuItem>
+                <MenuItem value="All">{t("all")}</MenuItem>
+                <MenuItem value="Pickup">{t("pickup")}</MenuItem>
+                <MenuItem value="Return">{t("return")}</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -239,13 +241,13 @@ export default function AssignmentCenterClient({ initialAssignments, inspectors 
         <Table sx={{ minWidth: 800 }}>
           <TableHead sx={{ bgcolor: alpha(theme.palette.primary.main, 0.03) }}>
             <TableRow>
-              <TableCell sx={{ fontWeight: 600 }}>Booking Number</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>Customer</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>Vehicle</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>Type</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>Date</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>Current Inspector</TableCell>
-              <TableCell sx={{ fontWeight: 600, width: "300px" }}>Action</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>{t("bookingNumber")}</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>{t("customer")}</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>{t("vehicle")}</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>{t("type")}</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>{t("date")}</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>{t("currentInspector")}</TableCell>
+              <TableCell sx={{ fontWeight: 600, width: "300px" }}>{t("action")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -253,7 +255,7 @@ export default function AssignmentCenterClient({ initialAssignments, inspectors 
               <TableRow>
                 <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
                   <Typography variant="body1" color="text.secondary">
-                    No pending assignments found.
+                    {t("noPendingAssignments")}
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -265,7 +267,7 @@ export default function AssignmentCenterClient({ initialAssignments, inspectors 
                   <TableCell>{row.vehicleDisplayName}</TableCell>
                   <TableCell>
                     <Chip
-                      label={row.inspectionType}
+                      label={row.inspectionType === "Pickup" ? t("pickup") : t("return")}
                       size="small"
                       sx={{
                         bgcolor:
@@ -283,7 +285,7 @@ export default function AssignmentCenterClient({ initialAssignments, inspectors 
                   <TableCell>{new Date(row.inspectionDate).toLocaleDateString()}</TableCell>
                   <TableCell>
                     <Typography variant="body2" color="text.secondary" sx={{ fontStyle: "italic" }}>
-                      Not Assigned
+                      {t("notAssigned")}
                     </Typography>
                   </TableCell>
                   <TableCell>
@@ -299,19 +301,19 @@ export default function AssignmentCenterClient({ initialAssignments, inspectors 
                             if (!selected)
                               return (
                                 <Typography variant="body2" color="text.secondary">
-                                  Select Inspector
+                                  {t("selectInspector")}
                                 </Typography>
                               );
                             const insp = inspectors.find(i => i.userId === selected);
                             return (
                               <Typography variant="body2">
-                                {insp ? `${insp.firstName} ${insp.lastName}` : "Unknown"}
+                                {insp ? `${insp.firstName} ${insp.lastName}` : t("unknown")}
                               </Typography>
                             );
                           }}
                         >
                           <MenuItem disabled value="">
-                            Select Inspector
+                            {t("selectInspector")}
                           </MenuItem>
                           {inspectors.map(insp => (
                             <MenuItem key={insp.userId} value={insp.userId}>
@@ -333,7 +335,7 @@ export default function AssignmentCenterClient({ initialAssignments, inspectors 
                         disabled={!selections[row.bookingId] || assigningIds[row.bookingId]}
                         onClick={() => handleAssign(row.bookingId)}
                       >
-                        Assign
+                        {t("assign")}
                       </Button>
                     </Stack>
                   </TableCell>
