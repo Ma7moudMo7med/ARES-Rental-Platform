@@ -35,6 +35,29 @@ export const supplierDashboard: SupplierDashboardLabels = {
   },
   recentActivity: "Recent Activity",
   noRecentActivity: "No recent activity.",
+  demoPendingActions: {
+    vehiclesAwaitingApproval: {
+      title: "Vehicles Awaiting Approval",
+      description: "You have 2 vehicles waiting for admin review.",
+      actionLabel: "View Vehicles",
+    },
+    bookingNeedsConfirmation: {
+      title: "Booking Needs Confirmation",
+      description: "Booking #B-9871 requires your approval.",
+      actionLabel: "Review Booking",
+    },
+    completeProfile: {
+      title: "Complete Your Profile",
+      description: "Add payout details to receive payments.",
+      actionLabel: "Go to Profile",
+    },
+  },
+  liveActivity: {
+    bookingCreatedByUser: "Booking #{id} created by {name}",
+    bookingCreated: "Booking #{id} created",
+    paymentCompleted: "Payment completed for Booking #{id}",
+    vehicleAdded: "Vehicle added: {label}",
+  },
   errors: {
     notSignedIn: "You must be signed in to view dashboard stats.",
     loadFailed: "Could not load your dashboard stats. Please try again shortly.",

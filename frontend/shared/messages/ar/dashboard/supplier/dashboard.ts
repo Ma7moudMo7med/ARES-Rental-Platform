@@ -35,6 +35,29 @@ export const supplierDashboard: SupplierDashboardLabels = {
   },
   recentActivity: "النشاط الأخير",
   noRecentActivity: "لا يوجد نشاط أخير.",
+  demoPendingActions: {
+    vehiclesAwaitingApproval: {
+      title: "مركبات في انتظار الموافقة",
+      description: "لديك مركبتان في انتظار مراجعة المسؤول.",
+      actionLabel: "عرض المركبات",
+    },
+    bookingNeedsConfirmation: {
+      title: "حجز بحاجة للتأكيد",
+      description: "الحجز #B-9871 يتطلب موافقتك.",
+      actionLabel: "مراجعة الحجز",
+    },
+    completeProfile: {
+      title: "أكمل ملفك الشخصي",
+      description: "أضف تفاصيل الدفع لتلقي المدفوعات.",
+      actionLabel: "الذهاب للملف الشخصي",
+    },
+  },
+  liveActivity: {
+    bookingCreatedByUser: "تم إنشاء الحجز #{id} بواسطة {name}",
+    bookingCreated: "تم إنشاء الحجز #{id}",
+    paymentCompleted: "تم اكتمال الدفع للحجز #{id}",
+    vehicleAdded: "تمت إضافة المركبة: {label}",
+  },
   errors: {
     notSignedIn: "يجب تسجيل الدخول لعرض إحصائيات لوحة التحكم.",
     loadFailed: "تعذر تحميل إحصائيات لوحة التحكم. يرجى المحاولة مرة أخرى قريبًا.",
