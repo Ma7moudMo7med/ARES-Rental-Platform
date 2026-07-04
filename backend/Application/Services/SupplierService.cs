@@ -73,7 +73,7 @@ public class SupplierService : ISupplierService
         foreach (var supplier in pagedSuppliers.Data)
         {
             var roles = userRolesMap != null ? userRolesMap.GetValueOrDefault(supplier.Id, new List<string>()) : new List<string>();
-            CompanyProfile companyProfile = null;
+            CompanyProfile? companyProfile = null;
             if (companyProfilesMap != null)
             {
                 companyProfilesMap.TryGetValue(supplier.Id, out companyProfile);
@@ -183,7 +183,7 @@ public class SupplierService : ISupplierService
 
         foreach (var supplier in pagedSuppliers.Data)
         {
-            CompanyProfile companyProfile = null;
+            CompanyProfile? companyProfile = null;
             if (companyProfilesMap != null)
             {
                 companyProfilesMap.TryGetValue(supplier.Id, out companyProfile);
