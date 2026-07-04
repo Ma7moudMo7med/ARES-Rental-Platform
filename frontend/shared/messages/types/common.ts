@@ -63,4 +63,5 @@ export type CommonLabels = {
   readonly hoursAgo: string;
   readonly daysAgo: string;
   readonly na: string;
+  readonly date: string;
 };
