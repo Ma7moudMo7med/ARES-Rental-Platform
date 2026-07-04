@@ -14,7 +14,7 @@ const users: AdminUsersLabels = {
     suppliers: "Suppliers",
   },
   tabs: {
-    users: "Users",
+    users: "Customers",
     suppliers: "Suppliers",
     drivers: "Drivers",
     inspectors: "Inspectors",

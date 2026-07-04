@@ -100,9 +100,10 @@ export default function CategoryDetailsPage({ params }: { readonly params: Promi
   const displayName = translatedName.startsWith("categoryValues.names.") ? category.name : translatedName;
 
   const translatedDesc = category.description ? t(`categoryValues.descriptions.${nameKey}` as any) : "";
-  const displayDesc = (translatedDesc.startsWith("categoryValues.descriptions.") || !category.description)
-    ? (category.description || "—")
-    : translatedDesc;
+  const displayDesc =
+    translatedDesc.startsWith("categoryValues.descriptions.") || !category.description
+      ? category.description || "—"
+      : translatedDesc;
 
   return (
     <Box sx={{ pb: 6, minHeight: "100vh" }}>
@@ -331,7 +332,8 @@ export default function CategoryDetailsPage({ params }: { readonly params: Promi
                             {t("promotions.form.discount")}
                           </Typography>
                           <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                            {activePromo.discountPercentage}{t("promotions.percentOff")}
+                            {activePromo.discountPercentage}
+                            {t("promotions.percentOff")}
                           </Typography>
                         </Box>
                         <Box>
@@ -494,7 +496,10 @@ export default function CategoryDetailsPage({ params }: { readonly params: Promi
                     }}
                   >
                     <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
-                      {t("vehiclesTable.showingCount", { count: category.vehicles.length, total: category.vehicles.length })}
+                      {t("vehiclesTable.showingCount", {
+                        count: category.vehicles.length,
+                        total: category.vehicles.length,
+                      })}
                     </Typography>
                     <Button
                       variant="text"

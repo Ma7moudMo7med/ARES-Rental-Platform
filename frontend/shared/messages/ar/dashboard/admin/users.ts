@@ -14,7 +14,7 @@ const users: AdminUsersLabels = {
     suppliers: "الموردين",
   },
   tabs: {
-    users: "المستخدمين",
+    users: "العملاء",
     suppliers: "الموردين",
     drivers: "السائقين",
     inspectors: "المفتشين",

@@ -61,6 +61,7 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
   const { data: session } = useSession();
   const token = session?.accessToken as string;
   const t = useTranslations("dashboardAdmin.categoryDetails");
+  const tc = useTranslations("common");
 
   const [category, setCategory] = useState<CategoryDetails | null>(null);
   const [loading, setLoading] = useState(true);
@@ -122,7 +123,7 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (!formData.name.trim()) {
-      setError("Category Name is required.");
+      setError(t("errors.nameRequired"));
       return;
     }
 
@@ -137,7 +138,7 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
       });
       router.push(`/admin/categories/${resolvedParams.id}`);
     } catch (err: any) {
-      setError(err?.response?.data?.message || err?.message || "Failed to update category.");
+      setError(err?.response?.data?.message || err?.message || t("errors.updateFailed"));
     } finally {
       setSaving(false);
     }
@@ -151,14 +152,14 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
       await uploadCategoryImage(resolvedParams.id, file);
       await fetchCategoryDetails();
     } catch (err: any) {
-      setError(err?.message || "Failed to upload image.");
+      setError(err?.message || t("errors.uploadImageFailed"));
       setLoading(false);
     }
   };
 
   const handlePromoSubmit = async () => {
     if (!promoForm.name.trim() || !promoForm.startDate || !promoForm.endDate) {
-      setPromoError("Please fill in all required fields.");
+      setPromoError(t("promotions.alerts.requiredFields"));
       return;
     }
 
@@ -194,14 +195,14 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
       const data = await getCategoryDetails(resolvedParams.id);
       setActivePromotion(data.activePromotion || null);
     } catch (err: any) {
-      setPromoError(err?.message || "Failed to save promotion");
+      setPromoError(err?.message || t("promotions.alerts.saveError"));
     } finally {
       setPromoSaving(false);
     }
   };
 
   const handleDeletePromotion = async (promoId: string) => {
-    if (!window.confirm("Are you sure you want to delete this promotion?")) return;
+    if (!window.confirm(t("promotions.deleteConfirm"))) return;
     try {
       await deleteDiscountCode(promoId, true, token);
       const data = await getCategoryDetails(resolvedParams.id);
@@ -256,11 +257,11 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
               <BackIcon fontSize="small" />
             </IconButton>
             <Typography variant="h5" sx={{ fontWeight: 700, color: "text.primary" }}>
-              Edit Category
+              {t("editTitle")}
             </Typography>
           </Stack>
           <Typography variant="body2" color="text.secondary" sx={{ ml: 6 }}>
-            Update category information and manage promotions.
+            {t("editSubtitle")}
           </Typography>
         </Stack>
 
@@ -285,7 +286,7 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
               <CardContent sx={{ p: 4 }}>
                 <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "flex-start", mb: 3 }}>
                   <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "text.primary" }}>
-                    Category Information
+                    {t("infoCardTitle")}
                   </Typography>
                   <Button
                     type="submit"
@@ -294,7 +295,7 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
                     startIcon={saving ? <CircularProgress size={16} color="inherit" /> : <SaveIcon />}
                     sx={{ borderRadius: 2, fontWeight: 600 }}
                   >
-                    Save Changes
+                    {t("saveChangesBtn")}
                   </Button>
                 </Stack>
                 <Divider sx={{ mb: 3 }} />
@@ -338,7 +339,7 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
                       startIcon={<UploadIcon />}
                       sx={{ fontWeight: 600, borderRadius: 2 }}
                     >
-                      Upload Image
+                      {t("uploadImageBtn")}
                       <input
                         type="file"
                         hidden
@@ -352,7 +353,7 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
                     <Grid container spacing={3}>
                       <Grid size={{ xs: 12, sm: 6 }}>
                         <TextField
-                          label="Category Name"
+                          label={t("fieldName")}
                           name="name"
                           value={formData.name}
                           onChange={handleChange}
@@ -375,7 +376,7 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
                           }
                           label={
                             <Typography sx={{ fontWeight: 600, color: "text.primary" }}>
-                              {formData.isActive ? "Category Active" : "Category Inactive"}
+                              {formData.isActive ? t("fieldStatusActive") : t("fieldStatusInactive")}
                             </Typography>
                           }
                           sx={{ ml: 1 }}
@@ -383,7 +384,7 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
                       </Grid>
                       <Grid size={{ xs: 12, sm: 6 }}>
                         <TextField
-                          label="Commission Percentage"
+                          label={t("fieldCommission")}
                           name="commissionPercentage"
                           type="number"
                           value={formData.commissionPercentage}
@@ -401,7 +402,7 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
                       </Grid>
                       <Grid size={{ xs: 12 }}>
                         <TextField
-                          label="Description"
+                          label={t("fieldDescription")}
                           name="description"
                           value={formData.description}
                           onChange={handleChange}
@@ -444,7 +445,7 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
             />
             <CardContent sx={{ p: 4 }}>
               <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "text.primary", mb: 3 }}>
-                Promotion
+                {t("promotions.title")}
               </Typography>
 
               {!activePromotion ? (
@@ -459,7 +460,7 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
                   }}
                 >
                   <Typography variant="body1" sx={{ color: "text.secondary", mb: 1, fontWeight: 600 }}>
-                    No Active Promotion
+                    {t("promotions.empty")}
                   </Typography>
                   <Button
                     variant="outlined"
@@ -469,7 +470,7 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
                     }}
                     sx={{ mt: 2, borderRadius: 2, fontWeight: 600 }}
                   >
-                    + Add Promotion
+                    + {t("promotions.addBtn")}
                   </Button>
                 </Box>
               ) : (
@@ -493,7 +494,13 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
                           {activePromotion.name}
                         </Typography>
                         <Chip
-                          label={activePromotion.status}
+                          label={
+                            activePromotion.status === "Active"
+                              ? t("promotions.form.statusOptions.active")
+                              : activePromotion.status === "Inactive"
+                                ? t("promotions.form.statusOptions.inactive")
+                                : t("promotions.form.statusOptions.expired")
+                          }
                           size="small"
                           color={activePromotion.status === "Active" ? "success" : "default"}
                           sx={{ fontWeight: 700 }}
@@ -506,10 +513,11 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
                             color="text.secondary"
                             sx={{ fontWeight: 600, display: "block" }}
                           >
-                            Discount
+                            {t("promotions.form.discount")}
                           </Typography>
                           <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                            {activePromotion.discountPercentage}% OFF
+                            {activePromotion.discountPercentage}
+                            {t("promotions.percentOff")}
                           </Typography>
                         </Box>
                         <Box>
@@ -518,7 +526,7 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
                             color="text.secondary"
                             sx={{ fontWeight: 600, display: "block" }}
                           >
-                            Duration
+                            {t("promotions.duration")}
                           </Typography>
                           <Typography variant="body2" sx={{ fontWeight: 600 }}>
                             {new Date(activePromotion.startDate).toLocaleDateString()} &mdash;{" "}
@@ -543,7 +551,7 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
                         }}
                         sx={{ borderRadius: 2, fontWeight: 600 }}
                       >
-                        Edit Promotion
+                        {t("promotions.editBtn")}
                       </Button>
                       <Button
                         variant="outlined"
@@ -552,7 +560,7 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
                         onClick={() => handleDeletePromotion(activePromotion.id)}
                         sx={{ borderRadius: 2, fontWeight: 600 }}
                       >
-                        Delete Promotion
+                        {t("promotions.deleteBtn")}
                       </Button>
                     </Stack>
                   </Stack>
@@ -580,7 +588,7 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
             <CardContent sx={{ p: { xs: 2, sm: 4 } }}>
               <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center", mb: 3 }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "text.primary" }}>
-                  Vehicles
+                  {t("vehiclesTable.title")}
                 </Typography>
               </Stack>
 
@@ -592,14 +600,14 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
                   <Table sx={{ minWidth: 700 }}>
                     <TableHead>
                       <TableRow sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
-                        <TableCell sx={{ fontWeight: 600, width: 80 }}>Image</TableCell>
-                        <TableCell sx={{ fontWeight: 600 }}>Vehicle Name</TableCell>
-                        <TableCell sx={{ fontWeight: 600 }}>License Plate</TableCell>
-                        <TableCell sx={{ fontWeight: 600 }}>Daily Price</TableCell>
-                        <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
-                        <TableCell sx={{ fontWeight: 600 }}>Availability</TableCell>
+                        <TableCell sx={{ fontWeight: 600, width: 80 }}>{t("vehiclesTable.headers.image")}</TableCell>
+                        <TableCell sx={{ fontWeight: 600 }}>{t("vehiclesTable.headers.makeModel")}</TableCell>
+                        <TableCell sx={{ fontWeight: 600 }}>{t("vehiclesTable.headers.licensePlate")}</TableCell>
+                        <TableCell sx={{ fontWeight: 600 }}>{t("vehiclesTable.headers.dailyPrice")}</TableCell>
+                        <TableCell sx={{ fontWeight: 600 }}>{t("vehiclesTable.headers.status")}</TableCell>
+                        <TableCell sx={{ fontWeight: 600 }}>{t("vehiclesTable.headers.availability")}</TableCell>
                         <TableCell align="right" sx={{ fontWeight: 600 }}>
-                          Actions
+                          {t("vehiclesTable.headers.actions")}
                         </TableCell>
                       </TableRow>
                     </TableHead>
@@ -665,7 +673,7 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
                                 }}
                                 sx={{ fontWeight: 600, borderRadius: 2 }}
                               >
-                                View
+                                {t("vehiclesTable.viewButton")}
                               </Button>
                             </TableCell>
                           </TableRow>
@@ -675,10 +683,10 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
                           <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
                             <Box sx={{ textAlign: "center", py: 2 }}>
                               <Typography color="text.secondary" sx={{ mb: 1, fontWeight: 600 }}>
-                                No Vehicles Found
+                                {t("vehiclesTable.emptyTitle")}
                               </Typography>
                               <Typography variant="body2" color="text.secondary">
-                                This category doesn't have any vehicles assigned yet.
+                                {t("vehiclesTable.empty")}
                               </Typography>
                             </Box>
                           </TableCell>
@@ -700,7 +708,10 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
                     }}
                   >
                     <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
-                      Showing {category.vehicles.length} of {category.vehicles.length} Vehicles
+                      {t("vehiclesTable.showingCount", {
+                        count: category.vehicles.length,
+                        total: category.vehicles.length,
+                      })}
                     </Typography>
                     <Button
                       variant="text"
@@ -710,7 +721,7 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
                       }}
                       sx={{ fontWeight: 600 }}
                     >
-                      View All Vehicles
+                      {t("vehiclesTable.viewAll")}
                     </Button>
                   </Box>
                 )}
@@ -727,7 +738,9 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
           fullWidth
           sx={{ "& .MuiDialog-paper": { borderRadius: 3 } }}
         >
-          <DialogTitle sx={{ fontWeight: 700 }}>{promoForm.id ? "Edit Promotion" : "Create Promotion"}</DialogTitle>
+          <DialogTitle sx={{ fontWeight: 700 }}>
+            {promoForm.id ? t("promotions.form.editTitle") : t("promotions.form.addTitle")}
+          </DialogTitle>
           <DialogContent dividers>
             {promoError && (
               <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
@@ -737,7 +750,7 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
             <Grid container spacing={3} sx={{ mt: 0 }}>
               <Grid size={{ xs: 12 }}>
                 <TextField
-                  label="Promotion Name"
+                  label={t("promotions.form.name")}
                   fullWidth
                   required
                   value={promoForm.name}
@@ -745,12 +758,12 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
                     setPromoForm({ ...promoForm, name: e.target.value });
                   }}
                   disabled={promoSaving || !!promoForm.id}
-                  placeholder="e.g., Summer Sale"
+                  placeholder={t("promotions.form.namePlaceholder")}
                 />
               </Grid>
               <Grid size={{ xs: 12 }}>
                 <TextField
-                  label="Discount Percentage"
+                  label={t("promotions.form.discount")}
                   type="number"
                   fullWidth
                   required
@@ -767,7 +780,7 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
-                  label="Start Date"
+                  label={t("promotions.form.startDate")}
                   type="date"
                   fullWidth
                   required
@@ -781,7 +794,7 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
-                  label="End Date"
+                  label={t("promotions.form.endDate")}
                   type="date"
                   fullWidth
                   required
@@ -803,7 +816,7 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
               disabled={promoSaving}
               sx={{ fontWeight: 600 }}
             >
-              Cancel
+              {tc("cancel")}
             </Button>
             <Button
               variant="contained"
@@ -812,7 +825,7 @@ export default function EditCategoryPage({ params }: { readonly params: Promise<
               startIcon={promoSaving && <CircularProgress size={20} color="inherit" />}
               sx={{ fontWeight: 700, borderRadius: 2 }}
             >
-              {promoForm.id ? "Save Changes" : "Create Promotion"}
+              {promoForm.id ? t("saveChangesBtn") : t("promotions.addBtn")}
             </Button>
           </DialogActions>
         </Dialog>

@@ -124,6 +124,16 @@ export function CategoryTable({
               {categories.length > 0 ? (
                 categories.map(c => {
                   const daysRemaining = getRemainingDays(c.offerEndDate);
+                  const nameKey = c.name.toLowerCase().replace(/\s+/g, "");
+                  const translatedName = t(`categoryValues.names.${nameKey}` as any);
+                  const displayName = translatedName.startsWith("categoryValues.names.") ? c.name : translatedName;
+
+                  const translatedDesc = c.description ? t(`categoryValues.descriptions.${nameKey}` as any) : "";
+                  const displayDesc =
+                    translatedDesc.startsWith("categoryValues.descriptions.") || !c.description
+                      ? c.description || ""
+                      : translatedDesc;
+
                   return (
                     <TableRow
                       key={c.id}
@@ -173,10 +183,10 @@ export function CategoryTable({
                           )}
                           <Box sx={{ minWidth: 0, maxWidth: 250 }}>
                             <Typography sx={{ fontWeight: 600 }} noWrap>
-                              {c.name}
+                              {displayName}
                             </Typography>
-                            {c.description && (
-                              <Tooltip title={c.description} arrow placement="bottom-start">
+                            {displayDesc && (
+                              <Tooltip title={displayDesc} arrow placement="bottom-start">
                                 <Typography
                                   variant="caption"
                                   color="text.secondary"
@@ -188,7 +198,7 @@ export function CategoryTable({
                                     lineHeight: 1.2,
                                   }}
                                 >
-                                  {c.description}
+                                  {displayDesc}
                                 </Typography>
                               </Tooltip>
                             )}
