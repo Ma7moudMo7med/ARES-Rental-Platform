@@ -3,6 +3,8 @@ import type { InspectorInspectionsLabels } from "../../../types/dashboard/inspec
 const inspections: InspectorInspectionsLabels = {
   title: "Inspector Dashboard",
   description: "Overview of your assignments and today's metrics.",
+  recentActivityTitle: "Recent Activity",
+  upcomingTitle: "Upcoming Inspections",
   checkOuts: "Check-Outs",
   checkOutsSubtitle: "Deliveries today",
   checkIns: "Check-Ins",
@@ -25,6 +27,8 @@ const inspections: InspectorInspectionsLabels = {
     allCaughtUp: "All caught up!",
     adjustFilter: "Try adjusting the filter or search term.",
     noPendingTasks: "You have no pending tasks for today.",
+    noUpcoming: "No upcoming inspections scheduled.",
+    noRecentActivity: "No recent activity.",
   },
   card: {
     checkOutBadge: "Check-Out 🟢",
@@ -33,11 +37,22 @@ const inspections: InspectorInspectionsLabels = {
     callAriaLabel: "Call {customerName}",
     mapsTooltip: "Open in Google Maps",
     mapsAriaLabel: "Open location in Google Maps",
+    startInspection: "Start Inspection",
+    view: "View",
   },
   status: {
     pending: "Pending",
     approved: "Approved",
     rejected: "Rejected",
+  },
+  table: {
+    time: "Time",
+    vehicle: "Vehicle",
+    customer: "Customer",
+    inspectionType: "Inspection Type",
+    status: "Status",
+    quickActions: "Quick Actions",
+    action: "Action",
   },
 };
 

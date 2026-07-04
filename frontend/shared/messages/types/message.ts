@@ -33,7 +33,8 @@ import type { AdminDriversLabels } from "./dashboard/admin/drivers";
 import type { AdminInspectorsLabels } from "./dashboard/admin/inspectors";
 import type { FinancialReportsLabels } from "./dashboard/admin/financial-reports";
 import type { AdminLocationsFormLabels } from "./dashboard/admin/locations/form";
-import type { AdminNotificationsLabels } from "./dashboard/admin/notifications";
+import type { AdminNotificationsLabels } from "./admin/notifications";
+import type { AdminDashboardLabels } from "./admin/dashboard";
 import type { PromotionsLabels } from "./dashboard/admin/promotions";
 import type { AdminSchedulerLabels } from "./dashboard/admin/scheduler";
 import type { AdminSettingsLabels } from "./dashboard/admin/settings";
@@ -51,6 +52,7 @@ import type { DriverTripsLabels } from "./dashboard/driver-trips";
 import type { InspectorHistoryLabels } from "./dashboard/inspector/history";
 import type { InspectorInspectionDetailLabels } from "./dashboard/inspector/inspection-detail";
 import type { InspectorInspectionsLabels } from "./dashboard/inspector/inspections";
+import type { InspectorNotificationsLabels } from "./dashboard/inspector/notifications";
 import type { InspectorProfileLabels } from "./dashboard/inspector/profile";
 import type { InspectorSidebarLabels } from "./dashboard/inspector-sidebar";
 import type { LogoutDialogLabels } from "./dashboard/logout-dialog";
@@ -134,6 +136,7 @@ export type {
   InspectorHistoryLabels,
   InspectorInspectionDetailLabels,
   InspectorInspectionsLabels,
+  InspectorNotificationsLabels,
   InspectorProfileLabels,
   InspectorSidebarLabels,
   LoadingPageLabels,
@@ -217,6 +220,7 @@ export type DashboardAdminAdminSchema = {
 
 export type DashboardAdminSchema = {
   readonly admin: DashboardAdminAdminSchema;
+  readonly dashboard: AdminDashboardLabels;
   readonly bankDetails: BankDetailsLabels;
   readonly bookings: AdminBookingsLabels;
   readonly createBooking: CreateBookingLabels;
@@ -246,6 +250,7 @@ export type DashboardInspectorSchema = {
   readonly inspections: InspectorInspectionsLabels;
   readonly inspectionDetail: InspectorInspectionDetailLabels;
   readonly profile: InspectorProfileLabels;
+  readonly notifications: InspectorNotificationsLabels;
 };
 
 export type PublicBookingsSchema = {

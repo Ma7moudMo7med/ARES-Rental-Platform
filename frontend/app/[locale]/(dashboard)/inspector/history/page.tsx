@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
 import {
@@ -32,160 +32,40 @@ import HistoryIcon from "@mui/icons-material/History";
 import SearchIcon from "@mui/icons-material/Search";
 import VisibilityOutlinedIcon from "@mui/icons-material/LaunchOutlined";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import { type InspectionSummary } from "@/api-clients/inspections/inspections";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
+import CarRepairIcon from "@mui/icons-material/CarRepair";
+
+import { type InspectionSummary, getInspectionHistory } from "@/api-clients/inspections/inspections";
 import { logger } from "@/utils/logger";
 import { formatUtcDateTime } from "@/utils/dateTime";
 import InspectionStatusBadge from "../_components/InspectionStatusBadge";
-
-const MOCK_HISTORY: readonly InspectionSummary[] = [
-  {
-    inspectionId: "insp-001",
-    bookingId: "bkg-001",
-    bookingNumber: "BKG-A1B2",
-    vehicleId: "veh-001",
-    vehicleDisplayName: "Toyota Camry",
-    inspectorId: "ins-001",
-    inspectorFullName: "John Doe",
-    status: "Approved",
-    isSubmitted: true,
-    inspectionDate: "2026-06-25T10:30:00Z",
-    submittedAt: "2026-06-25T11:00:00Z",
-    imageCount: 4,
-  },
-  {
-    inspectionId: "insp-002",
-    bookingId: "bkg-002",
-    bookingNumber: "BKG-C3D4",
-    vehicleId: "veh-002",
-    vehicleDisplayName: "Tesla Model 3",
-    inspectorId: "ins-001",
-    inspectorFullName: "John Doe",
-    status: "Rejected",
-    isSubmitted: true,
-    inspectionDate: "2026-06-24T14:15:00Z",
-    submittedAt: "2026-06-24T15:00:00Z",
-    imageCount: 6,
-  },
-  {
-    inspectionId: "insp-003",
-    bookingId: "bkg-003",
-    bookingNumber: "BKG-E5F6",
-    vehicleId: "veh-003",
-    vehicleDisplayName: "Ford Explorer",
-    inspectorId: "ins-001",
-    inspectorFullName: "John Doe",
-    status: "Pending",
-    isSubmitted: false,
-    inspectionDate: "2026-06-23T09:00:00Z",
-    submittedAt: null,
-    imageCount: 2,
-  },
-  {
-    inspectionId: "insp-004",
-    bookingId: "bkg-004",
-    bookingNumber: "BKG-G7H8",
-    vehicleId: "veh-004",
-    vehicleDisplayName: "BMW 3 Series",
-    inspectorId: "ins-001",
-    inspectorFullName: "John Doe",
-    status: "Approved",
-    isSubmitted: true,
-    inspectionDate: "2026-06-22T16:45:00Z",
-    submittedAt: "2026-06-22T17:15:00Z",
-    imageCount: 5,
-  },
-  {
-    inspectionId: "insp-005",
-    bookingId: "bkg-005",
-    bookingNumber: "BKG-I9J0",
-    vehicleId: "veh-005",
-    vehicleDisplayName: "Hyundai Elantra",
-    inspectorId: "ins-001",
-    inspectorFullName: "John Doe",
-    status: "Approved",
-    isSubmitted: true,
-    inspectionDate: "2026-06-21T11:20:00Z",
-    submittedAt: "2026-06-21T11:50:00Z",
-    imageCount: 3,
-  },
-  {
-    inspectionId: "insp-006",
-    bookingId: "bkg-006",
-    bookingNumber: "BKG-K1L2",
-    vehicleId: "veh-006",
-    vehicleDisplayName: "Chevrolet Tahoe",
-    inspectorId: "ins-001",
-    inspectorFullName: "John Doe",
-    status: "Pending",
-    isSubmitted: false,
-    inspectionDate: "2026-06-20T08:30:00Z",
-    submittedAt: null,
-    imageCount: 0,
-  },
-];
-
-interface PaginatedHistoryResponse {
-  items: InspectionSummary[];
-  totalCount: number;
-  page: number;
-  totalPages: number;
-}
-
-async function mockFetchPaginatedData(
-  page: number,
-  pageSize: number,
-  search: string,
-  status: string
-): Promise<PaginatedHistoryResponse> {
-  // Simulate database/network delay
-  await new Promise(resolve => setTimeout(resolve, 300));
-
-  const q = search.toLowerCase();
-  const filtered = MOCK_HISTORY.filter(i => {
-    const matchesSearch =
-      !q ||
-      (i.bookingNumber && i.bookingNumber.toLowerCase().includes(q)) ||
-      i.bookingId.toLowerCase().includes(q) ||
-      (i.vehicleDisplayName && i.vehicleDisplayName.toLowerCase().includes(q)) ||
-      i.status.toLowerCase().includes(q);
-
-    const matchesStatus = status === "All" || i.status === status;
-
-    return matchesSearch && matchesStatus;
-  });
-
-  const totalCount = filtered.length;
-  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
-
-  // Slice for the requested page (page is 1-indexed)
-  const startIndex = (page - 1) * pageSize;
-  const sliced = filtered.slice(startIndex, startIndex + pageSize);
-
-  return {
-    items: sliced,
-    totalCount,
-    page,
-    totalPages,
-  };
-}
 
 export default function InspectionHistoryPage() {
   const theme = useTheme();
   const t = useTranslations("dashboardInspector.history");
   const locale = useLocale();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const [items, setItems] = useState<InspectionSummary[]>([]);
+
+  const [allHistory, setAllHistory] = useState<InspectionSummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [typeFilter, setTypeFilter] = useState("All");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const pageSize = 10;
 
   // Setup debouncing for search input
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(search);
+      setPage(1);
     }, 500);
     return () => {
       clearTimeout(handler);
@@ -195,20 +75,69 @@ export default function InspectionHistoryPage() {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      // Call local simulated paginated fetch (pageSize = 5 to demonstrate pagination)
-      const res = await mockFetchPaginatedData(page, 5, debouncedSearch, statusFilter);
-      setItems(res.items);
-      setTotalPages(res.totalPages);
+      setError(null);
+      const res = await getInspectionHistory();
+      setAllHistory(res);
     } catch (err) {
       logger.error("Failed to load inspection history", err);
+      setError("Failed to load history.");
     } finally {
       setLoading(false);
     }
-  }, [page, debouncedSearch, statusFilter]);
+  }, []);
 
   useEffect(() => {
     void fetchData();
   }, [fetchData]);
+
+  const handleResetFilters = () => {
+    setSearch("");
+    setDebouncedSearch("");
+    setStatusFilter("All");
+    setTypeFilter("All");
+    setDateFrom("");
+    setDateTo("");
+    setPage(1);
+  };
+
+  const filteredItems = useMemo(() => {
+    return allHistory.filter(i => {
+      // Search
+      const q = debouncedSearch.toLowerCase();
+      const matchesSearch =
+        !q ||
+        (i.bookingNumber && i.bookingNumber.toLowerCase().includes(q)) ||
+        i.bookingId.toLowerCase().includes(q) ||
+        (i.vehicleDisplayName && i.vehicleDisplayName.toLowerCase().includes(q)) ||
+        i.status.toLowerCase().includes(q);
+
+      // Status
+      const matchesStatus = statusFilter === "All" || i.status === statusFilter;
+
+      // Type
+      const matchesType = typeFilter === "All" || i.inspectionType === typeFilter;
+
+      // Date
+      let matchesDate = true;
+      if (dateFrom && i.submittedAt) {
+        if (new Date(i.submittedAt) < new Date(dateFrom)) matchesDate = false;
+      }
+      if (dateTo && i.submittedAt) {
+        const toDate = new Date(dateTo);
+        toDate.setHours(23, 59, 59, 999);
+        if (new Date(i.submittedAt) > toDate) matchesDate = false;
+      }
+
+      return matchesSearch && matchesStatus && matchesType && matchesDate;
+    });
+  }, [allHistory, debouncedSearch, statusFilter, typeFilter, dateFrom, dateTo]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredItems.length / pageSize));
+
+  const paginatedItems = useMemo(() => {
+    const startIndex = (page - 1) * pageSize;
+    return filteredItems.slice(startIndex, startIndex + pageSize);
+  }, [filteredItems, page, pageSize]);
 
   return (
     <Box sx={{ maxWidth: 1200, mx: "auto" }}>
@@ -221,80 +150,205 @@ export default function InspectionHistoryPage() {
         </Typography>
       </Box>
 
-      {(items.length > 0 || search !== "" || statusFilter !== "All") && (
-        <Paper
-          elevation={0}
-          sx={{
-            p: 2,
-            mb: 3,
-            borderRadius: 3,
-            border: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
-          }}
-        >
-          <Stack direction={{ xs: "column", md: "row" }} spacing={2} sx={{ alignItems: "stretch" }}>
-            <Box sx={{ flexGrow: 1 }}>
+      {/* Filter Section */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 2.5,
+          mb: 2,
+          borderRadius: 2,
+          border: "1px solid",
+          borderColor: "divider",
+          bgcolor: "background.paper",
+        }}
+      >
+        <Stack spacing={2.5}>
+          {/* Top Row: Search & Reset */}
+          <Stack direction={{ xs: "column", md: "row" }} spacing={2} sx={{ alignItems: "center" }}>
+            <Box sx={{ flexGrow: 1, width: "100%" }}>
               <TextField
                 fullWidth
+                size="small"
                 placeholder={t("searchPlaceholder")}
                 value={search}
                 onChange={e => {
                   setSearch(e.target.value);
-                  setPage(1);
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    height: 40,
+                    borderRadius: 2,
+                    bgcolor: "background.default",
+                  },
                 }}
                 slotProps={{
                   input: {
                     startAdornment: (
                       <InputAdornment position="start">
-                        <SearchIcon color="action" />
+                        <SearchIcon color="action" fontSize="small" />
                       </InputAdornment>
                     ),
-                    sx: { borderRadius: 2, bgcolor: "background.default" },
                   },
                 }}
               />
             </Box>
-            <Box sx={{ minWidth: { xs: "100%", md: 240 } }}>
-              <FormControl fullWidth>
-                <InputLabel id="status-filter-label" sx={{ color: "text.secondary" }}>
-                  {t("filterStatusLabel")}
-                </InputLabel>
-                <Select
-                  labelId="status-filter-label"
-                  id="status-filter"
-                  value={statusFilter}
-                  label={t("filterStatusLabel")}
-                  onChange={(e: SelectChangeEvent) => {
-                    setStatusFilter(e.target.value);
-                    setPage(1);
-                  }}
-                  startAdornment={
-                    <InputAdornment position="start">
-                      <FilterListIcon sx={{ color: "text.secondary" }} />
-                    </InputAdornment>
-                  }
-                  sx={{ borderRadius: 2, bgcolor: "background.default" }}
-                >
-                  <MenuItem value="All">{t("filterAllStatuses")}</MenuItem>
-                  <MenuItem value="Approved">{t("status.approved")}</MenuItem>
-                  <MenuItem value="Rejected">{t("status.rejected")}</MenuItem>
-                  <MenuItem value="Pending">{t("status.pending")}</MenuItem>
-                </Select>
-              </FormControl>
-            </Box>
+            <Button
+              variant="outlined"
+              color="inherit"
+              startIcon={<RestartAltIcon />}
+              onClick={handleResetFilters}
+              sx={{ borderRadius: 2, minWidth: { xs: "100%", md: 140 }, height: 40 }}
+            >
+              {t("filterReset")}
+            </Button>
           </Stack>
+
+          {/* Bottom Row: Dropdowns */}
+          <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+            {/* Status */}
+            <FormControl fullWidth size="small" sx={{ flex: 1 }}>
+              <InputLabel id="status-filter-label" sx={{ color: "text.secondary" }}>
+                {t("filterStatusLabel")}
+              </InputLabel>
+              <Select
+                labelId="status-filter-label"
+                id="status-filter"
+                value={statusFilter}
+                label={t("filterStatusLabel")}
+                onChange={(e: SelectChangeEvent) => {
+                  setStatusFilter(e.target.value);
+                  setPage(1);
+                }}
+                startAdornment={
+                  <InputAdornment position="start">
+                    <FilterListIcon sx={{ color: "text.secondary", fontSize: 18, ml: 1 }} />
+                  </InputAdornment>
+                }
+                sx={{ borderRadius: 2, bgcolor: "background.default", height: 40 }}
+              >
+                <MenuItem value="All">{t("filterAllStatuses")}</MenuItem>
+                <MenuItem value="Approved">{t("status.approved")}</MenuItem>
+                <MenuItem value="Rejected">{t("status.rejected")}</MenuItem>
+                <MenuItem value="Pending">{t("status.pending")}</MenuItem>
+              </Select>
+            </FormControl>
+
+            {/* Type */}
+            <FormControl fullWidth size="small" sx={{ flex: 1 }}>
+              <InputLabel id="type-filter-label" sx={{ color: "text.secondary" }}>
+                {t("filterTypeLabel")}
+              </InputLabel>
+              <Select
+                labelId="type-filter-label"
+                id="type-filter"
+                value={typeFilter}
+                label={t("filterTypeLabel")}
+                onChange={(e: SelectChangeEvent) => {
+                  setTypeFilter(e.target.value);
+                  setPage(1);
+                }}
+                startAdornment={
+                  <InputAdornment position="start">
+                    <FilterListIcon sx={{ color: "text.secondary", fontSize: 18, ml: 1 }} />
+                  </InputAdornment>
+                }
+                sx={{ borderRadius: 2, bgcolor: "background.default", height: 40 }}
+              >
+                <MenuItem value="All">{t("filterAllTypes")}</MenuItem>
+                <MenuItem value="Pickup">{t("typePickup")}</MenuItem>
+                <MenuItem value="Return">{t("typeReturn")}</MenuItem>
+                <MenuItem value="Routine">{t("typeRoutine")}</MenuItem>
+              </Select>
+            </FormControl>
+
+            {/* Date From */}
+            <TextField
+              type="date"
+              size="small"
+              fullWidth
+              label={t("filterDateFrom")}
+              value={dateFrom}
+              onChange={e => {
+                setDateFrom(e.target.value);
+                setPage(1);
+              }}
+              sx={{
+                flex: 1,
+                "& .MuiOutlinedInput-root": {
+                  height: 40,
+                  borderRadius: 2,
+                  bgcolor: "background.default",
+                },
+              }}
+              slotProps={{
+                inputLabel: { shrink: true },
+              }}
+            />
+
+            {/* Date To */}
+            <TextField
+              type="date"
+              size="small"
+              fullWidth
+              label={t("filterDateTo")}
+              value={dateTo}
+              onChange={e => {
+                setDateTo(e.target.value);
+                setPage(1);
+              }}
+              sx={{
+                flex: 1,
+                "& .MuiOutlinedInput-root": {
+                  height: 40,
+                  borderRadius: 2,
+                  bgcolor: "background.default",
+                },
+              }}
+              slotProps={{
+                inputLabel: { shrink: true },
+              }}
+            />
+          </Stack>
+        </Stack>
+      </Paper>
+
+      {/* Error State */}
+      {error && !loading && (
+        <Paper
+          elevation={0}
+          sx={{
+            p: 4,
+            borderRadius: 3,
+            border: "1px solid",
+            borderColor: "error.main",
+            bgcolor: alpha(theme.palette.error.main, 0.05),
+            textAlign: "center",
+          }}
+        >
+          <Typography color="error.main">{error}</Typography>
+          <Button
+            variant="outlined"
+            color="error"
+            sx={{ mt: 2 }}
+            onClick={() => {
+              void fetchData();
+            }}
+          >
+            Retry
+          </Button>
         </Paper>
       )}
 
+      {/* Loading State */}
       {loading ? (
         <Stack spacing={2}>
           {[1, 2, 3, 4].map(n => (
             <Skeleton key={n} variant="rectangular" height={80} sx={{ borderRadius: 3 }} />
           ))}
         </Stack>
-      ) : items.length === 0 ? (
-        search !== "" || statusFilter !== "All" ? (
+      ) : !error && filteredItems.length === 0 ? (
+        // Empty State
+        search !== "" || statusFilter !== "All" || typeFilter !== "All" || dateFrom !== "" || dateTo !== "" ? (
           <Paper
             elevation={0}
             sx={{
@@ -334,9 +388,10 @@ export default function InspectionHistoryPage() {
             </Typography>
           </Paper>
         )
-      ) : isMobile ? (
+      ) : !error && isMobile ? (
+        // Mobile View
         <Stack spacing={2}>
-          {items.map(i => (
+          {paginatedItems.map(i => (
             <Paper
               key={i.inspectionId}
               elevation={0}
@@ -358,6 +413,24 @@ export default function InspectionHistoryPage() {
                 {i.vehicleDisplayName}
               </Typography>
               <Stack spacing={0.5} sx={{ mb: 2 }}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                >
+                  {i.inspectionType === "Pickup" || i.inspectionType === "CheckOut" ? (
+                    <DirectionsCarIcon sx={{ fontSize: 16, color: "status.active.main" }} />
+                  ) : (
+                    <CarRepairIcon sx={{ fontSize: 16, color: "status.cancelled.main" }} />
+                  )}
+                  {i.inspectionType === "Pickup"
+                    ? t("typePickup")
+                    : i.inspectionType === "Return"
+                      ? t("typeReturn")
+                      : i.inspectionType === "Routine"
+                        ? t("typeRoutine")
+                        : i.inspectionType || "—"}
+                </Typography>
                 <Typography variant="caption" color="text.secondary">
                   {t("mobileCard.photosCount", { count: i.imageCount })}
                 </Typography>
@@ -381,54 +454,102 @@ export default function InspectionHistoryPage() {
           ))}
         </Stack>
       ) : (
-        <Paper sx={{ borderRadius: 3, overflow: "hidden", border: "1px solid", borderColor: "divider", elevation: 0 }}>
-          <Table>
-            <TableHead sx={{ bgcolor: alpha(theme.palette.primary.main, 0.05) }}>
-              <TableRow>
-                <TableCell sx={{ fontWeight: 700 }}>{t("table.booking")}</TableCell>
-                <TableCell sx={{ fontWeight: 700 }}>{t("table.vehicle")}</TableCell>
-                <TableCell sx={{ fontWeight: 700 }}>{t("table.submittedAt")}</TableCell>
-                <TableCell sx={{ fontWeight: 700 }}>{t("table.photos")}</TableCell>
-                <TableCell sx={{ fontWeight: 700 }}>{t("table.status")}</TableCell>
-                <TableCell align="right" sx={{ fontWeight: 700 }}>
-                  {t("table.action")}
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {items.map(i => (
-                <TableRow key={i.inspectionId} hover sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-                  <TableCell sx={{ fontWeight: 800 }}>
-                    {i.bookingNumber || `BKG-${i.bookingId.split("-")[0].toUpperCase()}`}
-                  </TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>{i.vehicleDisplayName}</TableCell>
-                  <TableCell color="text.secondary">
-                    {i.submittedAt ? formatUtcDateTime(i.submittedAt, locale) : t("mobileCard.submittedFallback")}
-                  </TableCell>
-                  <TableCell>{i.imageCount}</TableCell>
-                  <TableCell>
-                    <InspectionStatusBadge status={i.status} />
-                  </TableCell>
-                  <TableCell align="right">
-                    <Button
-                      component={Link}
-                      href={`/inspector/inspections/${i.inspectionId}`}
-                      size="small"
-                      variant="outlined"
-                      startIcon={<VisibilityOutlinedIcon />}
-                      sx={{ borderRadius: 2, fontWeight: 600 }}
-                    >
-                      {t("table.viewDetails")}
-                    </Button>
-                  </TableCell>
+        // Desktop Table
+        !error && (
+          <Paper
+            sx={{ borderRadius: 2, overflow: "hidden", border: "1px solid", borderColor: "divider", elevation: 0 }}
+          >
+            <Table>
+              <TableHead sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
+                <TableRow
+                  sx={{
+                    "& .MuiTableCell-head": {
+                      fontWeight: 700,
+                      fontSize: 12,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                      color: "text.secondary",
+                      borderBottom: "1px solid",
+                      borderColor: "divider",
+                      py: 1.5,
+                    },
+                  }}
+                >
+                  <TableCell>{t("table.booking")}</TableCell>
+                  <TableCell>{t("table.vehicle")}</TableCell>
+                  <TableCell>{t("table.submittedAt")}</TableCell>
+                  <TableCell>{t("filterTypeLabel")}</TableCell>
+                  <TableCell>{t("table.photos")}</TableCell>
+                  <TableCell>{t("table.status")}</TableCell>
+                  <TableCell align="right">{t("table.action")}</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Paper>
+              </TableHead>
+              <TableBody>
+                {paginatedItems.map(i => (
+                  <TableRow
+                    key={i.inspectionId}
+                    hover
+                    sx={{
+                      "& .MuiTableCell-root": { py: 1.75 },
+                      "&:last-child td, &:last-child th": { border: 0 },
+                    }}
+                  >
+                    <TableCell sx={{ fontWeight: 800 }}>
+                      {i.bookingNumber || `BKG-${i.bookingId.split("-")[0].toUpperCase()}`}
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{i.vehicleDisplayName}</TableCell>
+                    <TableCell color="text.secondary">
+                      {i.submittedAt ? formatUtcDateTime(i.submittedAt, locale) : t("mobileCard.submittedFallback")}
+                    </TableCell>
+                    <TableCell>
+                      <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+                        {i.inspectionType === "Pickup" || i.inspectionType === "CheckOut" ? (
+                          <DirectionsCarIcon sx={{ fontSize: 16, color: "status.active.main" }} />
+                        ) : (
+                          <CarRepairIcon sx={{ fontSize: 16, color: "status.cancelled.main" }} />
+                        )}
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                          {i.inspectionType === "Pickup"
+                            ? t("typePickup")
+                            : i.inspectionType === "Return"
+                              ? t("typeReturn")
+                              : i.inspectionType === "Routine"
+                                ? t("typeRoutine")
+                                : i.inspectionType || "—"}
+                        </Typography>
+                      </Stack>
+                    </TableCell>
+                    <TableCell>{i.imageCount}</TableCell>
+                    <TableCell>
+                      <InspectionStatusBadge status={i.status} />
+                    </TableCell>
+                    <TableCell align="right">
+                      <Button
+                        component={Link}
+                        href={`/inspector/inspections/${i.inspectionId}`}
+                        size="small"
+                        variant="outlined"
+                        startIcon={<VisibilityOutlinedIcon />}
+                        sx={{
+                          borderRadius: 2,
+                          fontWeight: 600,
+                          px: 2,
+                          py: 0.75,
+                        }}
+                      >
+                        {t("table.viewDetails")}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Paper>
+        )
       )}
 
-      {totalPages > 1 && (
+      {/* Pagination */}
+      {!loading && !error && totalPages > 1 && (
         <Stack direction="row" sx={{ justifyContent: "center", mt: 4 }}>
           <Pagination
             count={totalPages}

@@ -7,6 +7,8 @@ import AddBoxIcon from "@mui/icons-material/AddBox";
 import { QuickAction } from "./mockData";
 import { Link } from "@/shared/i18n/routing";
 
+import { useTranslations } from "next-intl";
+
 const IconMap = {
   Car: DirectionsCarIcon,
   Shield: VerifiedUserIcon,
@@ -27,6 +29,17 @@ const getActionColor = (theme: Theme, label: string) => {
 
 export default function QuickActions({ actions }: Readonly<{ actions: readonly QuickAction[] }>) {
   const theme = useTheme();
+  const t = useTranslations("dashboardAdmin.dashboard");
+
+  const getActionLabelTranslation = (label: string) => {
+    const lower = label.toLowerCase();
+    if (lower.includes("create booking")) return t("quickActions.createBooking");
+    if (lower.includes("add user")) return t("quickActions.addUser");
+    if (lower.includes("add vehicle")) return t("quickActions.addVehicle");
+    if (lower.includes("review")) return t("quickActions.reviewVerifications");
+    if (lower.includes("assign")) return t("quickActions.assignInspector");
+    return label;
+  };
 
   return (
     <Card
@@ -43,7 +56,7 @@ export default function QuickActions({ actions }: Readonly<{ actions: readonly Q
     >
       <CardContent sx={{ p: { xs: 2, sm: 2.5 }, "&:last-child": { pb: { xs: 2, sm: 2.5 } } }}>
         <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, fontSize: "1.1rem" }}>
-          Quick Actions
+          {t("quickActions.title")}
         </Typography>
         <Grid container spacing={1.5}>
           {actions.map((action, i) => {
@@ -104,7 +117,7 @@ export default function QuickActions({ actions }: Readonly<{ actions: readonly Q
                       overflow: "hidden",
                     }}
                   >
-                    {action.label}
+                    {getActionLabelTranslation(action.label)}
                   </Typography>
                 </Box>
               </Grid>

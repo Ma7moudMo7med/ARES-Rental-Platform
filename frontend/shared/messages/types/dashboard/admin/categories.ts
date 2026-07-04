@@ -98,4 +98,22 @@ export type CategoriesLabels = {
   readonly pagination: {
     readonly showing: string;
   };
+  readonly categoryValues: {
+    readonly names: {
+      readonly suv: string;
+      readonly sedan: string;
+      readonly luxury: string;
+      readonly electric: string;
+      readonly sports: string;
+      readonly business: string;
+    };
+    readonly descriptions: {
+      readonly suv: string;
+      readonly sedan: string;
+      readonly luxury: string;
+      readonly electric: string;
+      readonly sports: string;
+      readonly business: string;
+    };
+  };
 };

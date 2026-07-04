@@ -116,9 +116,9 @@ namespace Backend.Tests.UnitTests
             Assert.Equal(inspector.UserId, updatedBooking.AssignedInspectorId);
             Assert.Equal(InspectionStatus.Pending, updatedBooking.InspectionStatus);
 
-            // Check notification sent to inspector
+            // Check notification sent to inspector (metadata added by recent commits)
             notificationServiceMock.Verify(
-                n => n.CreateNotificationAsync(inspector.UserId, "New inspection assigned", It.IsAny<string>(), "InspectionAssigned", It.IsAny<CancellationToken>()),
+                n => n.CreateNotificationAsync(inspector.UserId, "New inspection assigned", It.IsAny<string>(), "InspectionAssigned", It.IsAny<CancellationToken>(), It.IsAny<string?>()),
                 Times.Once);
         }
 

@@ -21,7 +21,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import LaunchOutlinedIcon from "@mui/icons-material/LaunchOutlined";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { formatUtcDateTime } from "@/utils/dateTime";
 
 export interface BookingListItem {
@@ -40,6 +40,19 @@ interface RecentBookingsProps {
 
 export default function RecentBookings({ bookings = [] }: RecentBookingsProps) {
   const locale = useLocale();
+  const t = useTranslations("dashboardAdmin.dashboard");
+  const statusT = useTranslations("customer.bookings.list.status");
+
+  const getStatusTranslation = (status: string) => {
+    const s = status.toLowerCase();
+    if (s === "active") return statusT("active") || "Active";
+    if (s === "completed") return statusT("completed") || "Completed";
+    if (s === "pending" || s === "paymentpending") return statusT("paymentPending") || statusT("pending") || "Pending";
+    if (s === "confirmed") return statusT("confirmed") || "Confirmed";
+    if (s === "cancelled") return statusT("cancelled") || "Cancelled";
+    return status;
+  };
+
   return (
     <Card
       elevation={0}
@@ -64,7 +77,7 @@ export default function RecentBookings({ bookings = [] }: RecentBookingsProps) {
           }}
         >
           <Typography variant="h6" sx={{ fontWeight: "700" }}>
-            Recent Bookings
+            {t("recentBookings.title")}
           </Typography>
           <Button
             component={Link}
@@ -78,7 +91,7 @@ export default function RecentBookings({ bookings = [] }: RecentBookingsProps) {
               alignSelf: { xs: "flex-end", sm: "auto" },
             }}
           >
-            View All
+            {t("recentBookings.viewAll")}
           </Button>
         </Box>
         <TableContainer>
@@ -93,7 +106,7 @@ export default function RecentBookings({ bookings = [] }: RecentBookingsProps) {
                     borderColor: "divider",
                   }}
                 >
-                  Booking Number
+                  {t("recentBookings.columns.bookingNumber")}
                 </TableCell>
                 <TableCell
                   sx={{
@@ -103,7 +116,7 @@ export default function RecentBookings({ bookings = [] }: RecentBookingsProps) {
                     borderColor: "divider",
                   }}
                 >
-                  Customer
+                  {t("recentBookings.columns.customer")}
                 </TableCell>
                 <TableCell
                   sx={{
@@ -113,7 +126,7 @@ export default function RecentBookings({ bookings = [] }: RecentBookingsProps) {
                     borderColor: "divider",
                   }}
                 >
-                  Vehicle
+                  {t("recentBookings.columns.vehicle")}
                 </TableCell>
                 <TableCell
                   sx={{
@@ -123,7 +136,7 @@ export default function RecentBookings({ bookings = [] }: RecentBookingsProps) {
                     borderColor: "divider",
                   }}
                 >
-                  Date
+                  {t("recentBookings.columns.date")}
                 </TableCell>
                 <TableCell
                   sx={{
@@ -134,7 +147,7 @@ export default function RecentBookings({ bookings = [] }: RecentBookingsProps) {
                     textAlign: "right",
                   }}
                 >
-                  Status
+                  {t("recentBookings.columns.status")}
                 </TableCell>
                 <TableCell
                   sx={{
@@ -173,7 +186,7 @@ export default function RecentBookings({ bookings = [] }: RecentBookingsProps) {
                   <TableCell>{formatUtcDateTime(row.bookingDate, locale)}</TableCell>
                   <TableCell sx={{ textAlign: "right" }}>
                     <Chip
-                      label={row.status}
+                      label={getStatusTranslation(row.status)}
                       size="small"
                       sx={theme => {
                         const status = row.status.toLowerCase();
@@ -201,7 +214,7 @@ export default function RecentBookings({ bookings = [] }: RecentBookingsProps) {
                     />
                   </TableCell>
                   <TableCell sx={{ textAlign: "right" }}>
-                    <Tooltip title="View Details">
+                    <Tooltip title={t("recentBookings.tooltip.viewDetails")}>
                       <IconButton
                         component={Link}
                         href={`/admin/bookings/${row.bookingId}`}

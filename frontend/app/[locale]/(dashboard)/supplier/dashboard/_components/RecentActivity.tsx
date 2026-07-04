@@ -1,41 +1,99 @@
 "use client";
 
-import { Avatar, Box, Card, CardContent, Divider, Stack, Typography, alpha, useTheme } from "@mui/material";
+import { useEffect, useState } from "react";
+import {
+  Avatar,
+  Box,
+  Card,
+  CardContent,
+  Divider,
+  Stack,
+  Typography,
+  alpha,
+  useTheme,
+  Skeleton,
+  Alert,
+} from "@mui/material";
 import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
 import PaymentIcon from "@mui/icons-material/Payment";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
+import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
+import GppGoodIcon from "@mui/icons-material/GppGood";
 import { useTranslations } from "next-intl";
-import DemoDataBadge from "../../_components/DemoDataBadge";
-
-interface ActivityItem {
-  id: string;
-  type: "booking" | "payment" | "user" | "vehicle";
-  messageKey: string;
-  timeKey: string;
-}
+import { useSession } from "next-auth/react";
+import { formatDistanceToNow } from "date-fns";
+import {
+  getSupplierRecentActivity,
+  type RecentActivityItem,
+} from "@/api-clients/supplier-dashboard/supplier-dashboard";
+import { logger } from "@/utils/logger";
 
 const ACTIVITY_META: Record<
-  ActivityItem["type"],
-  { color: "primary" | "success" | "warning" | "info"; icon: React.ReactNode }
+  string,
+  { color: "primary" | "success" | "warning" | "info" | "secondary"; icon: React.ReactNode }
 > = {
   booking: { color: "primary", icon: <EventAvailableOutlinedIcon fontSize="small" /> },
   payment: { color: "success", icon: <PaymentIcon fontSize="small" /> },
   user: { color: "info", icon: <PersonAddIcon fontSize="small" /> },
   vehicle: { color: "warning", icon: <DirectionsCarIcon fontSize="small" /> },
+  verification: { color: "secondary", icon: <GppGoodIcon fontSize="small" /> },
 };
-
-const DEMO_ACTIVITY_ITEMS: { id: string; type: ActivityItem["type"]; messageKey: string; timeKey: string }[] = [
-  { id: "a1", type: "booking", messageKey: "newBooking", timeKey: "minutesAgo" },
-  { id: "a2", type: "payment", messageKey: "payoutProcessed", timeKey: "hoursAgo" },
-  { id: "a3", type: "vehicle", messageKey: "listingApproved", timeKey: "fiveHoursAgo" },
-  { id: "a4", type: "booking", messageKey: "bookingCompleted", timeKey: "yesterday" },
-  { id: "a5", type: "user", messageKey: "customerReview", timeKey: "yesterday" },
-];
 
 export default function RecentActivity() {
   const theme = useTheme();
   const t = useTranslations("dashboard.supplierDashboard");
+  const { data: session, status: sessionStatus } = useSession();
+
+  const [activities, setActivities] = useState<RecentActivityItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchActivities = async () => {
+      if (sessionStatus === "loading") return;
+      if (!session?.accessToken) {
+        if (sessionStatus === "unauthenticated") {
+          setLoading(false);
+        }
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await getSupplierRecentActivity(session.accessToken);
+        if (!cancelled) {
+          setActivities(data);
+        }
+      } catch (err: unknown) {
+        if (cancelled) return;
+        logger.error("Failed to load recent activities", err);
+        setError(t("errors.loadFailed"));
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void fetchActivities();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [session?.accessToken, sessionStatus, t]);
+
+  const getRelativeTime = (isoString: string) => {
+    try {
+      const date = new Date(isoString);
+      return formatDistanceToNow(date, { addSuffix: true });
+    } catch {
+      return "";
+    }
+  };
 
   return (
     <Card
@@ -46,52 +104,92 @@ export default function RecentActivity() {
         borderColor: th.palette.border.main,
         height: "100%",
         boxShadow: th.palette.shadow.card,
+        display: "flex",
+        flexDirection: "column",
       })}
     >
-      <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+      <CardContent sx={{ p: { xs: 2, sm: 3 }, flexGrow: 1, display: "flex", flexDirection: "column" }}>
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2.5, gap: 1 }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
             <Typography variant="h6" sx={{ fontWeight: 700 }}>
               {t("recentActivity")}
             </Typography>
-            <DemoDataBadge />
           </Box>
         </Box>
 
-        <Stack divider={<Divider flexItem />} spacing={0}>
-          {DEMO_ACTIVITY_ITEMS.map(item => {
-            const meta = ACTIVITY_META[item.type];
-            return (
-              <Box
-                key={item.id}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 2,
-                  py: 1.5,
-                }}
-              >
-                <Avatar
-                  sx={{
-                    width: 40,
-                    height: 40,
-                    bgcolor: alpha(theme.palette[meta.color].main, 0.12),
-                    color: `${meta.color}.main`,
-                  }}
-                >
-                  {meta.icon}
-                </Avatar>
+        {error && (
+          <Alert severity="warning" variant="outlined" sx={{ mb: 2, borderRadius: 2 }}>
+            {error}
+          </Alert>
+        )}
+
+        <Stack divider={<Divider flexItem />} spacing={0} sx={{ flexGrow: 1 }}>
+          {loading ? (
+            Array.from(new Array(3)).map((_, i) => (
+              <Box key={i} sx={{ display: "flex", alignItems: "center", gap: 2, py: 1.5 }}>
+                <Skeleton variant="circular" width={40} height={40} />
                 <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                  <Typography variant="body2" sx={{ fontWeight: 600, color: "text.primary" }}>
-                    {t(`demoActivity.${item.messageKey}`)}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
-                    {t(`demoActivityTime.${item.timeKey}`)}
-                  </Typography>
+                  <Skeleton variant="text" width="80%" height={24} />
+                  <Skeleton variant="text" width="40%" height={20} />
                 </Box>
               </Box>
-            );
-          })}
+            ))
+          ) : activities.length === 0 && !error ? (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                py: 4,
+                px: 2,
+                flexGrow: 1,
+                textAlign: "center",
+              }}
+            >
+              <NotificationsNoneIcon sx={{ fontSize: 48, color: "text.disabled", mb: 1.5 }} />
+              <Typography variant="body1" sx={{ color: "text.secondary", fontWeight: 500 }}>
+                {t("noRecentActivity")}
+              </Typography>
+            </Box>
+          ) : (
+            activities.map((item, index) => {
+              const meta = ACTIVITY_META[item.type] || {
+                color: "info",
+                icon: <NotificationsNoneIcon fontSize="small" />,
+              };
+              return (
+                <Box
+                  key={`${item.type}-${index}`}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 2,
+                    py: 1.5,
+                  }}
+                >
+                  <Avatar
+                    sx={{
+                      width: 40,
+                      height: 40,
+                      bgcolor: alpha(theme.palette[meta.color].main, 0.12),
+                      color: `${meta.color}.main`,
+                    }}
+                  >
+                    {meta.icon}
+                  </Avatar>
+                  <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 600, color: "text.primary" }}>
+                      {item.message}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
+                      {getRelativeTime(item.createdAt)}
+                    </Typography>
+                  </Box>
+                </Box>
+              );
+            })
+          )}
         </Stack>
       </CardContent>
     </Card>

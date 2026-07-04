@@ -18,6 +18,7 @@ import {
 import { ResponsiveContainer, ComposedChart, Area, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 import axios from "axios";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { toApiUrl } from "@/utils/api-client";
 
 export interface ChartDataPointDto {
@@ -55,6 +56,8 @@ export interface CustomTooltipProps {
 
 const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   const theme = useTheme();
+  const t = useTranslations("dashboardAdmin.dashboard");
+  const commonT = useTranslations("common");
   if (active && payload && payload.length) {
     return (
       <Box
@@ -67,13 +70,16 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
           minWidth: 200,
         }}
       >
-        <Typography sx={{ fontWeight: 700, mb: 1.5, color: theme.palette.text.primary }}>Date: {label}</Typography>
+        <Typography sx={{ fontWeight: 700, mb: 1.5, color: theme.palette.text.primary }}>
+          {commonT("date") || "Date"}: {label}
+        </Typography>
         <Stack sx={{ gap: 1 }}>
           <Typography sx={{ color: theme.palette.primary.main, fontSize: "0.875rem" }}>
-            ● Gross Revenue: ${payload.find(p => p.dataKey === "revenue")?.value.toLocaleString() || 0}
+            ● {t("revenue.grossRevenue")}: ${payload.find(p => p.dataKey === "revenue")?.value.toLocaleString() || 0}
           </Typography>
           <Typography sx={{ color: theme.palette.status.active.main, fontSize: "0.875rem" }}>
-            ■ Platform Revenue: ${payload.find(p => p.dataKey === "platformRevenue")?.value.toLocaleString() || 0}
+            ■ {t("revenue.platformRevenue")}: $
+            {payload.find(p => p.dataKey === "platformRevenue")?.value.toLocaleString() || 0}
           </Typography>
         </Stack>
       </Box>
@@ -85,6 +91,7 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
 export default function RevenueChart() {
   const { data: session } = useSession();
   const theme = useTheme();
+  const t = useTranslations("dashboardAdmin.dashboard");
   const [mounted, setMounted] = useState(false);
   const [filter, setFilter] = useState("ThisMonth");
   const [data, setData] = useState<RevenueOverviewDto | null>(null);
@@ -165,7 +172,7 @@ export default function RevenueChart() {
           }}
         >
           <Typography variant="h5" sx={{ fontWeight: 700, color: theme.palette.text.primary }}>
-            Revenue Overview
+            {t("revenue.title")}
           </Typography>
           <FormControl size="small" sx={{ width: { xs: "100%", sm: "auto" } }}>
             <Select
@@ -180,9 +187,9 @@ export default function RevenueChart() {
                 },
               }}
             >
-              <MenuItem value="ThisMonth">This Month</MenuItem>
-              <MenuItem value="LastMonth">Last Month</MenuItem>
-              <MenuItem value="ThisYear">This Year</MenuItem>
+              <MenuItem value="ThisMonth">{t("revenue.thisMonth")}</MenuItem>
+              <MenuItem value="LastMonth">{t("revenue.lastMonth")}</MenuItem>
+              <MenuItem value="ThisYear">{t("revenue.thisYear")}</MenuItem>
             </Select>
           </FormControl>
         </Box>
@@ -208,7 +215,7 @@ export default function RevenueChart() {
             }}
           >
             <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 1, fontWeight: 500 }}>
-              Gross Revenue
+              {t("revenue.grossRevenue")}
             </Typography>
             <Typography variant="h4" sx={{ color: theme.palette.primary.main, fontWeight: 800 }}>
               {loading ? <Skeleton width={120} /> : `$${(data?.totalRevenue || 0).toLocaleString()}`}
@@ -228,7 +235,7 @@ export default function RevenueChart() {
             }}
           >
             <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 1, fontWeight: 500 }}>
-              Platform Revenue
+              {t("revenue.platformRevenue")}
             </Typography>
             <Typography variant="h4" sx={{ color: theme.palette.status.active.main, fontWeight: 800 }}>
               {loading ? <Skeleton width={120} /> : `$${(data?.platformRevenue || 0).toLocaleString()}`}
@@ -248,7 +255,7 @@ export default function RevenueChart() {
             }}
           >
             <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 1, fontWeight: 500 }}>
-              Supplier Revenue
+              {t("revenue.supplierRevenue")}
             </Typography>
             <Typography variant="h4" sx={{ color: theme.palette.info.main, fontWeight: 800 }}>
               {loading ? <Skeleton width={120} /> : `$${(data?.supplierRevenue || 0).toLocaleString()}`}
@@ -268,7 +275,7 @@ export default function RevenueChart() {
             }}
           >
             <Typography variant="body2" sx={{ color: theme.palette.text.secondary, mb: 1, fontWeight: 500 }}>
-              Refunds
+              {t("revenue.refunds")}
             </Typography>
             <Typography variant="h4" sx={{ color: theme.palette.status.cancelled.main, fontWeight: 800 }}>
               {loading ? <Skeleton width={120} /> : `$${(data?.totalRefunds || 0).toLocaleString()}`}

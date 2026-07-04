@@ -32,37 +32,7 @@ export interface SupplierDashboardLabels {
     heading: string;
   };
   recentActivity: string;
-  pendingActions: string;
-  demoActivity: {
-    newBooking: string;
-    payoutProcessed: string;
-    listingApproved: string;
-    bookingCompleted: string;
-    customerReview: string;
-  };
-  demoActivityTime: {
-    minutesAgo: string;
-    hoursAgo: string;
-    fiveHoursAgo: string;
-    yesterday: string;
-  };
-  demoPendingActions: {
-    vehiclesAwaitingApproval: {
-      title: string;
-      description: string;
-      actionLabel: string;
-    };
-    bookingNeedsConfirmation: {
-      title: string;
-      description: string;
-      actionLabel: string;
-    };
-    completeProfile: {
-      title: string;
-      description: string;
-      actionLabel: string;
-    };
-  };
+  noRecentActivity: string;
   errors: {
     notSignedIn: string;
     loadFailed: string;

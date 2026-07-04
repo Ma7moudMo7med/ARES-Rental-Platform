@@ -24,6 +24,7 @@ export interface InspectionSummary {
   inspectionDate: string;
   submittedAt: string | null;
   imageCount: number;
+  inspectionType: string;
 }
 
 export interface PendingAssignment {
@@ -54,6 +55,8 @@ export interface InspectionDetails {
   submittedAt: string | null;
   createdAt: string;
   images: InspectionImage[];
+  customerName?: string | null;
+  inspectionType?: string | null;
 }
 
 export interface AssignInspectorPayload {
@@ -187,6 +190,7 @@ export interface InspectorTask {
   customerPhone: string;
   scheduledTime: string; // ISO datetime string
   address: string;
+  status?: string;
 }
 
 export async function getInspectorTasks(timeFilter: "today" | "upcoming" = "today"): Promise<InspectorTask[]> {

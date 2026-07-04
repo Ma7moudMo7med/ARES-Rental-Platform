@@ -417,7 +417,9 @@ public class InspectionService : IInspectionService
             InspectionDate: inspection.InspectionDate,
             SubmittedAt: inspection.SubmittedAt,
             CreatedAt: inspection.CreatedAt,
-            Images: images);
+            Images: images,
+            CustomerName: BuildPersonName(booking?.User),
+            InspectionType: inspection.InspectionType);
     }
 
     private async Task<IReadOnlyList<InspectionDto>> ToDtoListAsync(
@@ -454,7 +456,8 @@ public class InspectionService : IInspectionService
                 IsSubmitted: inspection.IsSubmitted,
                 InspectionDate: inspection.InspectionDate,
                 SubmittedAt: inspection.SubmittedAt,
-                ImageCount: allImages.TryGetValue(inspection.InspectionId, out var c) ? c : 0));
+                ImageCount: allImages.TryGetValue(inspection.InspectionId, out var c) ? c : 0,
+                InspectionType: inspection.InspectionType));
         }
 
         return dtos;

@@ -40,7 +40,8 @@ public interface INotificationService
         string title,
         string message,
         string? type,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default,
+        string? metadata = null);
 
     /// <summary>
     /// Creates the same notification for every user in the "Admin" role.
@@ -53,7 +54,8 @@ public interface INotificationService
         string title,
         string message,
         string? type,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default,
+        string? metadata = null);
 
     Task<bool> DeleteNotificationForUserAsync(
         Guid notificationId,

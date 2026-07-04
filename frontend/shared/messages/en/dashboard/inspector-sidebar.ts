@@ -3,6 +3,7 @@ import type { InspectorSidebarLabels } from "../../types/dashboard/inspector-sid
 const inspectorSidebar: InspectorSidebarLabels = {
   dashboard: "Dashboard",
   inspectionHistory: "Inspection History",
+  notifications: "Notifications",
   profile: "Profile",
   sidebarLabel: "Inspector",
   userFallbackName: "Inspector",

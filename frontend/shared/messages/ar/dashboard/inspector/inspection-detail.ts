@@ -57,6 +57,18 @@ const inspectionDetail: InspectorInspectionDetailLabels = {
     finalNotes: "الملاحظات النهائية للفحص (مطلوب)",
     finalNotesPlaceholder: "ملاحظات تفصيلية لدعم قرارك النهائي...",
     finalDecision: "القرار النهائي",
+    customer: "العميل",
+    inspectionType: "نوع الفحص",
+    scheduledDateTime: "التاريخ والوقت المجدول",
+    assignedInspector: "المفتش المعين",
+    pickupInspection: "فحص الاستلام",
+    returnInspection: "فحص التسليم",
+    minPhotos: "الحد الأدنى: {min} صورة واحدة",
+    maxPhotos: "الحد الأقصى: {max} صور",
+    photoCount: "الصور المحملة",
+    damageReportTitle: "١. تقرير الأضرار",
+    finalNotesTitle: "٢. ملاحظات الفحص النهائية",
+    submitInfoBox: "يرجى مراجعة كافة معلومات الفحص قبل التقديم. بمجرد التقديم، لا يمكن تعديل تقرير الفحص.",
   },
 };
 

@@ -54,5 +54,17 @@ export type InspectorInspectionDetailLabels = {
     readonly finalNotes: string;
     readonly finalNotesPlaceholder: string;
     readonly finalDecision: string;
+    readonly customer: string;
+    readonly inspectionType: string;
+    readonly scheduledDateTime: string;
+    readonly assignedInspector: string;
+    readonly pickupInspection: string;
+    readonly returnInspection: string;
+    readonly minPhotos: string;
+    readonly maxPhotos: string;
+    readonly photoCount: string;
+    readonly damageReportTitle: string;
+    readonly finalNotesTitle: string;
+    readonly submitInfoBox: string;
   };
 };

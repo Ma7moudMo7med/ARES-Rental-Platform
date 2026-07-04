@@ -4,6 +4,7 @@ import React, { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useRouter, Link } from "@/shared/i18n/routing";
 import { Box, Tabs, Tab, CircularProgress, Paper, useTheme, useMediaQuery } from "@mui/material";
+import { useTranslations } from "next-intl";
 import PeopleIcon from "@mui/icons-material/People";
 import StorefrontIcon from "@mui/icons-material/Storefront";
 import AirlineSeatReclineNormalIcon from "@mui/icons-material/AirlineSeatReclineNormal";
@@ -17,18 +18,12 @@ type TabKey = "users" | "suppliers" | "drivers" | "inspectors";
 
 const TAB_ORDER: TabKey[] = ["users", "suppliers", "drivers", "inspectors"];
 
-const TAB_META: Record<TabKey, { label: string; icon: React.ReactElement }> = {
-  users: { label: "Customers", icon: <PeopleIcon fontSize="small" /> },
-  suppliers: { label: "Suppliers", icon: <StorefrontIcon fontSize="small" /> },
-  drivers: { label: "Drivers", icon: <AirlineSeatReclineNormalIcon fontSize="small" /> },
-  inspectors: { label: "Inspectors", icon: <ManageSearchIcon fontSize="small" /> },
-};
-
 function UsersHubInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const t = useTranslations("dashboardAdmin.users");
 
   const rawTab = searchParams.get("tab") as TabKey | null;
   const activeTab: TabKey = rawTab && TAB_ORDER.includes(rawTab) ? rawTab : "users";
@@ -51,13 +46,25 @@ function UsersHubInner() {
   const totalUsers = counts.totalUsers;
 
   const statCards = [
-    { title: "Total Users", value: totalUsers, icon: <PeopleIcon />, color: "primary" as const },
-    { title: "Customers", value: counts.customers, icon: <PeopleIcon />, color: "success" as const },
-    { title: "Suppliers", value: counts.suppliers, icon: <StorefrontIcon />, color: "warning" as const },
-    { title: "Drivers", value: counts.drivers, icon: <AirlineSeatReclineNormalIcon />, color: "info" as const },
-    { title: "Inspectors", value: counts.inspectors, icon: <ManageSearchIcon />, color: "primary" as const },
-    { title: "Blocked Users", value: counts.blockedUsers, icon: <PeopleIcon />, color: "error" as const },
+    { title: t("stats.totalUsers"), value: totalUsers, icon: <PeopleIcon />, color: "primary" as const },
+    { title: t("stats.customers"), value: counts.customers, icon: <PeopleIcon />, color: "success" as const },
+    { title: t("stats.suppliers"), value: counts.suppliers, icon: <StorefrontIcon />, color: "warning" as const },
+    {
+      title: t("stats.drivers"),
+      value: counts.drivers,
+      icon: <AirlineSeatReclineNormalIcon />,
+      color: "info" as const,
+    },
+    { title: t("stats.inspectors"), value: counts.inspectors, icon: <ManageSearchIcon />, color: "primary" as const },
+    { title: t("stats.blockedUsers"), value: counts.blockedUsers, icon: <PeopleIcon />, color: "error" as const },
   ];
+
+  const tabMeta: Record<TabKey, { label: string; icon: React.ReactElement }> = {
+    users: { label: t("tabs.users"), icon: <PeopleIcon fontSize="small" /> },
+    suppliers: { label: t("tabs.suppliers"), icon: <StorefrontIcon fontSize="small" /> },
+    drivers: { label: t("tabs.drivers"), icon: <AirlineSeatReclineNormalIcon fontSize="small" /> },
+    inspectors: { label: t("tabs.inspectors"), icon: <ManageSearchIcon fontSize="small" /> },
+  };
 
   return (
     <Box sx={{ p: { xs: 2, sm: 3, md: 4 }, maxWidth: 1400, mx: "auto" }}>
@@ -68,10 +75,10 @@ function UsersHubInner() {
       >
         <Box>
           <Typography variant="h3" sx={{ fontWeight: 800, fontSize: { xs: "2rem", sm: "2.25rem" } }}>
-            Users Management
+            {t("page.title")}
           </Typography>
           <Typography variant="subtitle1" color="text.secondary" sx={{ mt: 1 }}>
-            Manage customers, suppliers, drivers and inspectors across the platform.
+            {t("page.subtitle")}
           </Typography>
         </Box>
         <Stack direction="row" spacing={2} sx={{ alignSelf: { xs: "stretch", sm: "auto" } }}>
@@ -83,7 +90,7 @@ function UsersHubInner() {
             startIcon={<AddIcon />}
             sx={{ flex: { xs: 1, sm: "none" }, borderRadius: 2, fontWeight: 700 }}
           >
-            Add User
+            {t("page.addUser")}
           </Button>
         </Stack>
       </Stack>
@@ -145,8 +152,8 @@ function UsersHubInner() {
               key={key}
               id={`user-hub-tab-${key}`}
               aria-controls={`user-hub-panel-${key}`}
-              label={`${TAB_META[key].label} ${counts[key === "users" ? "customers" : key] > 0 ? `(${counts[key === "users" ? "customers" : key]})` : ""}`}
-              icon={TAB_META[key].icon}
+              label={`${tabMeta[key].label} ${counts[key === "users" ? "customers" : key] > 0 ? `(${counts[key === "users" ? "customers" : key]})` : ""}`}
+              icon={tabMeta[key].icon}
               iconPosition="start"
             />
           ))}

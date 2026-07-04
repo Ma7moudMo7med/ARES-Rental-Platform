@@ -191,6 +191,14 @@ namespace Backend.Application.Features.VehicleInspections.Commands.AssignInspect
                 {
                     try
                     {
+                        var metadata = System.Text.Json.JsonSerializer.Serialize(new
+                        {
+                            BookingNumber = booking.BookingNumber ?? booking.Id.ToString(),
+                            VehicleName = booking.Vehicle?.Name ?? "Unknown Vehicle",
+                            InspectionType = request.InspectionType,
+                            ActionUrl = $"/inspector/inspections/{inspectionId}"
+                        });
+
                         // Notify new inspector
                         if (previousInspectorId != selectedInspectorUserId)
                         {
@@ -199,7 +207,8 @@ namespace Backend.Application.Features.VehicleInspections.Commands.AssignInspect
                                 "New inspection assigned",
                                 $"You have been assigned to inspect booking {booking.BookingNumber ?? booking.Id.ToString()} ({request.InspectionType}).",
                                 "InspectionAssigned",
-                                cancellationToken);
+                                cancellationToken,
+                                metadata);
                         }
 
                         // Notify previous inspector of reassignment
@@ -210,7 +219,8 @@ namespace Backend.Application.Features.VehicleInspections.Commands.AssignInspect
                                 "Inspection Reassigned",
                                 $"Your assignment for booking {booking.BookingNumber ?? booking.Id.ToString()} ({request.InspectionType}) has been reassigned to another inspector.",
                                 "InspectionReassigned",
-                                cancellationToken);
+                                cancellationToken,
+                                metadata);
                         }
                     }
                     catch (Exception ex)

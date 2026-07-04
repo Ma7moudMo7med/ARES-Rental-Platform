@@ -95,6 +95,16 @@ export default function CategoryDetailsPage({ params }: { readonly params: Promi
 
   const activePromo = category.activePromotion;
 
+  const nameKey = category.name.toLowerCase().replace(/\s+/g, "");
+  const translatedName = t(`categoryValues.names.${nameKey}` as any);
+  const displayName = translatedName.startsWith("categoryValues.names.") ? category.name : translatedName;
+
+  const translatedDesc = category.description ? t(`categoryValues.descriptions.${nameKey}` as any) : "";
+  const displayDesc =
+    translatedDesc.startsWith("categoryValues.descriptions.") || !category.description
+      ? category.description || "—"
+      : translatedDesc;
+
   return (
     <Box sx={{ pb: 6, minHeight: "100vh" }}>
       <Container maxWidth="lg">
@@ -116,11 +126,11 @@ export default function CategoryDetailsPage({ params }: { readonly params: Promi
               <BackIcon fontSize="small" />
             </IconButton>
             <Typography variant="h5" sx={{ fontWeight: 700, color: "text.primary" }}>
-              Category Details
+              {t("title")}
             </Typography>
           </Stack>
           <Typography variant="body2" color="text.secondary" sx={{ ml: 6 }}>
-            View category information, promotion and assigned vehicles.
+            {t("viewSubtitle")}
           </Typography>
         </Stack>
 
@@ -144,7 +154,7 @@ export default function CategoryDetailsPage({ params }: { readonly params: Promi
             <CardContent sx={{ p: 4 }}>
               <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "flex-start", mb: 3 }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "text.primary" }}>
-                  Category Information
+                  {t("infoCardTitle")}
                 </Typography>
                 <Button
                   variant="outlined"
@@ -155,7 +165,7 @@ export default function CategoryDetailsPage({ params }: { readonly params: Promi
                   }}
                   sx={{ borderRadius: 2, fontWeight: 600 }}
                 >
-                  Edit Category
+                  {t("editBtn")}
                 </Button>
               </Stack>
               <Divider sx={{ mb: 3 }} />
@@ -195,18 +205,18 @@ export default function CategoryDetailsPage({ params }: { readonly params: Promi
                   <Grid container spacing={3}>
                     <Grid size={{ xs: 12, sm: 6 }}>
                       <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600, mb: 0.5 }}>
-                        Category Name
+                        {t("fieldName")}
                       </Typography>
                       <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                        {category.name}
+                        {displayName}
                       </Typography>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6 }}>
                       <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600, mb: 0.5 }}>
-                        Status
+                        {t("fieldStatus")}
                       </Typography>
                       <Chip
-                        label={category.isActive ? "Active" : "Inactive"}
+                        label={category.isActive ? t("statusActive") : t("statusInactive")}
                         size="small"
                         sx={{
                           bgcolor: alpha(
@@ -220,7 +230,7 @@ export default function CategoryDetailsPage({ params }: { readonly params: Promi
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6 }}>
                       <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600, mb: 0.5 }}>
-                        Commission Percentage
+                        {t("fieldCommission")}
                       </Typography>
                       <Typography variant="body1" sx={{ fontWeight: 600 }}>
                         {category.commissionPercentage}%
@@ -228,10 +238,10 @@ export default function CategoryDetailsPage({ params }: { readonly params: Promi
                     </Grid>
                     <Grid size={{ xs: 12 }}>
                       <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600, mb: 0.5 }}>
-                        Description
+                        {t("fieldDescription")}
                       </Typography>
                       <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                        {category.description || "—"}
+                        {displayDesc}
                       </Typography>
                     </Grid>
                   </Grid>
@@ -258,7 +268,7 @@ export default function CategoryDetailsPage({ params }: { readonly params: Promi
             />
             <CardContent sx={{ p: 4 }}>
               <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "text.primary", mb: 3 }}>
-                Promotion
+                {t("promotions.title")}
               </Typography>
 
               {!activePromo ? (
@@ -273,10 +283,10 @@ export default function CategoryDetailsPage({ params }: { readonly params: Promi
                   }}
                 >
                   <Typography variant="body1" sx={{ color: "text.secondary", mb: 1, fontWeight: 600 }}>
-                    No Active Promotion
+                    {t("promotions.empty")}
                   </Typography>
                   <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                    This category currently has no active promotion. Edit the category to add one.
+                    {t("promotions.emptyDesc")}
                   </Typography>
                 </Box>
               ) : (
@@ -300,7 +310,13 @@ export default function CategoryDetailsPage({ params }: { readonly params: Promi
                           {activePromo.name}
                         </Typography>
                         <Chip
-                          label={activePromo.status}
+                          label={
+                            activePromo.status === "Active"
+                              ? t("promotions.form.statusOptions.active")
+                              : activePromo.status === "Inactive"
+                                ? t("promotions.form.statusOptions.inactive")
+                                : t("promotions.form.statusOptions.expired")
+                          }
                           size="small"
                           color={activePromo.status === "Active" ? "success" : "default"}
                           sx={{ fontWeight: 700 }}
@@ -313,10 +329,11 @@ export default function CategoryDetailsPage({ params }: { readonly params: Promi
                             color="text.secondary"
                             sx={{ fontWeight: 600, display: "block" }}
                           >
-                            Discount
+                            {t("promotions.form.discount")}
                           </Typography>
                           <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                            {activePromo.discountPercentage}% OFF
+                            {activePromo.discountPercentage}
+                            {t("promotions.percentOff")}
                           </Typography>
                         </Box>
                         <Box>
@@ -325,7 +342,7 @@ export default function CategoryDetailsPage({ params }: { readonly params: Promi
                             color="text.secondary"
                             sx={{ fontWeight: 600, display: "block" }}
                           >
-                            Duration
+                            {t("promotions.duration")}
                           </Typography>
                           <Typography variant="body2" sx={{ fontWeight: 600 }}>
                             {new Date(activePromo.startDate).toLocaleDateString()} &mdash;{" "}
@@ -359,7 +376,7 @@ export default function CategoryDetailsPage({ params }: { readonly params: Promi
             <CardContent sx={{ p: { xs: 2, sm: 4 } }}>
               <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center", mb: 3 }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "text.primary" }}>
-                  Vehicles
+                  {t("vehiclesTable.title")}
                 </Typography>
               </Stack>
 
@@ -371,14 +388,14 @@ export default function CategoryDetailsPage({ params }: { readonly params: Promi
                   <Table sx={{ minWidth: 700 }}>
                     <TableHead>
                       <TableRow sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
-                        <TableCell sx={{ fontWeight: 600, width: 80 }}>Image</TableCell>
-                        <TableCell sx={{ fontWeight: 600 }}>Vehicle Name</TableCell>
-                        <TableCell sx={{ fontWeight: 600 }}>License Plate</TableCell>
-                        <TableCell sx={{ fontWeight: 600 }}>Daily Price</TableCell>
-                        <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
-                        <TableCell sx={{ fontWeight: 600 }}>Availability</TableCell>
+                        <TableCell sx={{ fontWeight: 600, width: 80 }}>{t("vehiclesTable.headers.image")}</TableCell>
+                        <TableCell sx={{ fontWeight: 600 }}>{t("vehiclesTable.headers.makeModel")}</TableCell>
+                        <TableCell sx={{ fontWeight: 600 }}>{t("vehiclesTable.headers.licensePlate")}</TableCell>
+                        <TableCell sx={{ fontWeight: 600 }}>{t("vehiclesTable.headers.dailyPrice")}</TableCell>
+                        <TableCell sx={{ fontWeight: 600 }}>{t("vehiclesTable.headers.status")}</TableCell>
+                        <TableCell sx={{ fontWeight: 600 }}>{t("vehiclesTable.headers.availability")}</TableCell>
                         <TableCell align="right" sx={{ fontWeight: 600 }}>
-                          Actions
+                          {t("vehiclesTable.headers.actions")}
                         </TableCell>
                       </TableRow>
                     </TableHead>
@@ -444,7 +461,7 @@ export default function CategoryDetailsPage({ params }: { readonly params: Promi
                                 }}
                                 sx={{ fontWeight: 600, borderRadius: 2 }}
                               >
-                                View
+                                {t("vehiclesTable.viewButton")}
                               </Button>
                             </TableCell>
                           </TableRow>
@@ -454,10 +471,10 @@ export default function CategoryDetailsPage({ params }: { readonly params: Promi
                           <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
                             <Box sx={{ textAlign: "center", py: 2 }}>
                               <Typography color="text.secondary" sx={{ mb: 1, fontWeight: 600 }}>
-                                No Vehicles Found
+                                {t("vehiclesTable.emptyTitle")}
                               </Typography>
                               <Typography variant="body2" color="text.secondary">
-                                This category doesn't have any vehicles assigned yet.
+                                {t("vehiclesTable.empty")}
                               </Typography>
                             </Box>
                           </TableCell>
@@ -479,7 +496,10 @@ export default function CategoryDetailsPage({ params }: { readonly params: Promi
                     }}
                   >
                     <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
-                      Showing {category.vehicles.length} of {category.vehicles.length} Vehicles
+                      {t("vehiclesTable.showingCount", {
+                        count: category.vehicles.length,
+                        total: category.vehicles.length,
+                      })}
                     </Typography>
                     <Button
                       variant="text"
@@ -489,7 +509,7 @@ export default function CategoryDetailsPage({ params }: { readonly params: Promi
                       }}
                       sx={{ fontWeight: 600 }}
                     >
-                      View All Vehicles
+                      {t("vehiclesTable.viewAll")}
                     </Button>
                   </Box>
                 )}

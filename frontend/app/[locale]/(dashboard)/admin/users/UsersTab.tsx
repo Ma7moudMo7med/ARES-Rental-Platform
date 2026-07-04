@@ -41,6 +41,7 @@ import {
   type AlertColor,
 } from "@mui/material";
 
+import { useTranslations } from "next-intl";
 import { Link } from "@/shared/i18n/routing";
 import SearchIcon from "@mui/icons-material/Search";
 import VisibilityOutlinedIcon from "@mui/icons-material/LaunchOutlined";
@@ -62,8 +63,32 @@ interface UserMobileCardProps {
 }
 
 function UserMobileCard({ u, theme, fetchUsers, onRequestDelete, activeTab }: UserMobileCardProps) {
+  const t = useTranslations("dashboardAdmin.users");
   const status = (u.status || "").toLowerCase();
   const isActive = status === "active";
+
+  const getStatusLabel = useCallback(
+    (statusVal: string) => {
+      const s = (statusVal || "").toLowerCase();
+      if (s === "active" || s === "approved" || s === "verified") return t("details.statusActive");
+      if (s === "pending" || s === "pendingverification") return t("details.statusPending");
+      if (s === "blocked" || s === "rejected" || s === "suspended") return t("details.statusBlocked");
+      return statusVal;
+    },
+    [t]
+  );
+
+  const getAvailabilityLabel = useCallback(
+    (avail?: string | null) => {
+      if (!avail) return "—";
+      const lower = avail.toLowerCase();
+      if (lower === "available") return t("details.availabilities.available");
+      if (lower === "unavailable") return t("details.availabilities.unavailable");
+      if (lower === "reserved") return t("details.availabilities.reserved");
+      return avail;
+    },
+    [t]
+  );
 
   const handleToggleStatus = useCallback(async () => {
     try {
@@ -112,7 +137,7 @@ function UserMobileCard({ u, theme, fetchUsers, onRequestDelete, activeTab }: Us
         </Stack>
 
         <Chip
-          label={status}
+          label={getStatusLabel(status)}
           size="small"
           sx={{
             ml: 1,
@@ -129,49 +154,50 @@ function UserMobileCard({ u, theme, fetchUsers, onRequestDelete, activeTab }: Us
       {activeTab === "suppliers" ? (
         <Stack spacing={0.5} sx={{ mb: 1.5 }}>
           <Typography variant="caption" color="text.secondary">
-            Company: <strong>{(u.supplierDetails?.companyName as string) || "—"}</strong>
+            {t("table.company")}: <strong>{(u.supplierDetails?.companyName as string) || "—"}</strong>
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            Vehicles: <strong>{u.supplierDetails?.vehiclesCount ?? 0}</strong>
+            {t("details.vehiclesCount")}: <strong>{u.supplierDetails?.vehiclesCount ?? 0}</strong>
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            Total Bookings: <strong>{u.supplierDetails?.totalBookings ?? 0}</strong>
+            {t("details.totalBookings")}: <strong>{u.supplierDetails?.totalBookings ?? 0}</strong>
           </Typography>
         </Stack>
       ) : activeTab === "drivers" ? (
         <Stack spacing={0.5} sx={{ mb: 1.5 }}>
           <Typography variant="caption" color="text.secondary">
-            License: <strong>{(u.driverDetails?.licenseNumber as string) || "—"}</strong>
+            {t("details.licenseNumber")}: <strong>{(u.driverDetails?.licenseNumber as string) || "—"}</strong>
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            Completed Trips: <strong>{u.driverDetails?.completedTrips ?? 0}</strong>
+            {t("details.completedTrips")}: <strong>{u.driverDetails?.completedTrips ?? 0}</strong>
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            Availability: <strong>{(u.driverDetails?.availability as string) || "—"}</strong>
+            {t("details.availability")}: <strong>{getAvailabilityLabel(u.driverDetails?.availability)}</strong>
           </Typography>
         </Stack>
       ) : activeTab === "inspectors" ? (
         <Stack spacing={0.5} sx={{ mb: 1.5 }}>
           <Typography variant="caption" color="text.secondary">
-            Code: <strong>{(u.inspectorDetails?.employeeCode as string) || "—"}</strong>
+            {t("details.employeeCodeLabel")}: <strong>{(u.inspectorDetails?.employeeCode as string) || "—"}</strong>
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            Completed: <strong>{u.inspectorDetails?.completedInspections ?? 0}</strong>
+            {t("details.completedInspections")}: <strong>{u.inspectorDetails?.completedInspections ?? 0}</strong>
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            Availability: <strong>{(u.inspectorDetails?.availability as string) || "—"}</strong>
+            {t("details.availability")}: <strong>{getAvailabilityLabel(u.inspectorDetails?.availability)}</strong>
           </Typography>
         </Stack>
       ) : activeTab === "users" ? (
         <Stack spacing={0.5} sx={{ mb: 1.5 }}>
           <Typography variant="caption" color="text.secondary">
-            Bookings: <strong>{u.customerDetails?.totalBookings ?? 0}</strong>
+            {t("details.totalBookings")}: <strong>{u.customerDetails?.totalBookings ?? 0}</strong>
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            Spent: <strong>{u.customerDetails?.totalSpent != null ? `$${u.customerDetails.totalSpent}` : "—"}</strong>
+            {t("details.totalSpent")}:{" "}
+            <strong>{u.customerDetails?.totalSpent != null ? `$${u.customerDetails.totalSpent}` : "—"}</strong>
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            Last Booking: <strong>{(u.customerDetails?.lastBookingDate as string) || "—"}</strong>
+            {t("details.lastBookingDate")}: <strong>{(u.customerDetails?.lastBookingDate as string) || "—"}</strong>
           </Typography>
         </Stack>
       ) : (
@@ -180,24 +206,24 @@ function UserMobileCard({ u, theme, fetchUsers, onRequestDelete, activeTab }: Us
           color="text.secondary"
           sx={{ textTransform: "capitalize", display: "block", mb: 1.5 }}
         >
-          Role: <strong>{u.roles.join(", ") || "—"}</strong>
+          {t("details.role")}: <strong>{u.roles.join(", ") || "—"}</strong>
         </Typography>
       )}
 
       <Stack direction="row" spacing={1}>
-        <Tooltip title="View">
+        <Tooltip title={t("table.viewDetails")}>
           <IconButton component={Link} href={`/admin/users/${u.id}`} size="small">
             <VisibilityOutlinedIcon fontSize="small" />
           </IconButton>
         </Tooltip>
 
-        <Tooltip title="Edit">
+        <Tooltip title={t("table.editAccount")}>
           <IconButton component={Link} href={`/admin/users/${u.id}/edit`} size="small">
             <EditOutlinedIcon fontSize="small" />
           </IconButton>
         </Tooltip>
 
-        <Tooltip title={isActive ? "Block User" : "Activate User"}>
+        <Tooltip title={t("table.toggleStatus")}>
           <IconButton
             size="small"
             onClick={() => {
@@ -209,7 +235,7 @@ function UserMobileCard({ u, theme, fetchUsers, onRequestDelete, activeTab }: Us
           </IconButton>
         </Tooltip>
 
-        <Tooltip title="Delete User">
+        <Tooltip title={t("table.delete")}>
           <IconButton
             size="small"
             onClick={() => {
@@ -234,7 +260,31 @@ interface UserTableRowProps {
 }
 
 function UserTableRow({ u, activeTab, isActive, handleStatusToggle, requestDelete }: UserTableRowProps) {
+  const t = useTranslations("dashboardAdmin.users");
   const status = (u.status || "").toLowerCase();
+
+  const getStatusLabel = useCallback(
+    (statusVal: string) => {
+      const s = (statusVal || "").toLowerCase();
+      if (s === "active" || s === "approved" || s === "verified") return t("details.statusActive");
+      if (s === "pending" || s === "pendingverification") return t("details.statusPending");
+      if (s === "blocked" || s === "rejected" || s === "suspended") return t("details.statusBlocked");
+      return statusVal;
+    },
+    [t]
+  );
+
+  const getAvailabilityLabel = useCallback(
+    (avail?: string | null) => {
+      if (!avail) return "—";
+      const lower = avail.toLowerCase();
+      if (lower === "available") return t("details.availabilities.available");
+      if (lower === "unavailable") return t("details.availabilities.unavailable");
+      if (lower === "reserved") return t("details.availabilities.reserved");
+      return avail;
+    },
+    [t]
+  );
 
   return (
     <TableRow
@@ -250,7 +300,7 @@ function UserTableRow({ u, activeTab, isActive, handleStatusToggle, requestDelet
           <Avatar
             src={(u.avatarUrl as string) || undefined}
             sx={{
-              bgcolor: t => alpha(t.palette.primary.main, 0.08),
+              bgcolor: theme => alpha(theme.palette.primary.main, 0.08),
               color: "primary.main",
               fontWeight: 700,
               width: 44,
@@ -304,7 +354,7 @@ function UserTableRow({ u, activeTab, isActive, handleStatusToggle, requestDelet
           </TableCell>
           <TableCell sx={{ py: 2 }}>
             <Typography variant="body2" color="text.secondary">
-              {(u.driverDetails?.availability as string) || "—"}
+              {getAvailabilityLabel(u.driverDetails?.availability)}
             </Typography>
           </TableCell>
         </>
@@ -322,7 +372,7 @@ function UserTableRow({ u, activeTab, isActive, handleStatusToggle, requestDelet
           </TableCell>
           <TableCell sx={{ py: 2 }}>
             <Typography variant="body2" color="text.secondary">
-              {(u.inspectorDetails?.availability as string) || "—"}
+              {getAvailabilityLabel(u.inspectorDetails?.availability)}
             </Typography>
           </TableCell>
         </>
@@ -360,7 +410,7 @@ function UserTableRow({ u, activeTab, isActive, handleStatusToggle, requestDelet
                   size="small"
                   sx={{
                     textTransform: "capitalize",
-                    bgcolor: t => alpha(t.palette.info.main, 0.1),
+                    bgcolor: theme => alpha(theme.palette.info.main, 0.1),
                     color: "info.main",
                     fontWeight: 600,
                     fontSize: 12,
@@ -376,12 +426,14 @@ function UserTableRow({ u, activeTab, isActive, handleStatusToggle, requestDelet
 
       <TableCell sx={{ py: 2 }}>
         <Chip
-          label={status}
+          label={getStatusLabel(status)}
           size="small"
           sx={{
             textTransform: "capitalize",
             borderRadius: 1.5,
-            bgcolor: isActive ? t => alpha(t.palette.success.main, 0.15) : t => alpha(t.palette.error.main, 0.15),
+            bgcolor: isActive
+              ? theme => alpha(theme.palette.success.main, 0.15)
+              : theme => alpha(theme.palette.error.main, 0.15),
             color: isActive ? "success.main" : "error.main",
             fontWeight: 600,
             fontSize: 12,
@@ -397,13 +449,13 @@ function UserTableRow({ u, activeTab, isActive, handleStatusToggle, requestDelet
 
       <TableCell align="right" sx={{ pr: 3, py: 2 }}>
         <Stack direction="row" spacing={0.5} sx={{ justifyContent: "flex-end" }}>
-          <Tooltip title="View">
+          <Tooltip title={t("table.viewDetails")}>
             <IconButton component={Link} href={`/admin/users/${u.id}`} size="small">
               <VisibilityOutlinedIcon fontSize="small" />
             </IconButton>
           </Tooltip>
 
-          <Tooltip title="Edit">
+          <Tooltip title={t("table.editAccount")}>
             <IconButton
               component={Link}
               href={`/admin/users/${u.id}/edit`}
@@ -414,7 +466,7 @@ function UserTableRow({ u, activeTab, isActive, handleStatusToggle, requestDelet
             </IconButton>
           </Tooltip>
 
-          <Tooltip title={isActive ? "Block User" : "Activate User"}>
+          <Tooltip title={t("table.toggleStatus")}>
             <IconButton
               size="small"
               onClick={() => {
@@ -426,7 +478,7 @@ function UserTableRow({ u, activeTab, isActive, handleStatusToggle, requestDelet
             </IconButton>
           </Tooltip>
 
-          <Tooltip title="Delete User">
+          <Tooltip title={t("table.delete")}>
             <IconButton
               size="small"
               onClick={() => {
@@ -453,6 +505,7 @@ interface UsersTabProps {
 export default function UsersTab({ activeTab, onStatsUpdated }: UsersTabProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const t = useTranslations("dashboardAdmin.users");
 
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -554,7 +607,7 @@ export default function UsersTab({ activeTab, onStatsUpdated }: UsersTabProps) {
       await deleteUser(deleteTarget.id);
       setToast({
         open: true,
-        message: deleteTarget.firstName + " " + deleteTarget.lastName + " was permanently deleted.",
+        message: t("alerts.deleteSuccess"),
         severity: "success",
       });
       setDeleteTarget(null);
@@ -562,7 +615,7 @@ export default function UsersTab({ activeTab, onStatsUpdated }: UsersTabProps) {
     } catch (err) {
       logger.error("Failed to delete user", err);
 
-      let message = "Failed to delete user. Please try again.";
+      let message = t("alerts.deleteError");
       if (err instanceof ApiError) {
         try {
           const parsed = JSON.parse(err.body) as { message?: string };
@@ -575,7 +628,7 @@ export default function UsersTab({ activeTab, onStatsUpdated }: UsersTabProps) {
     } finally {
       setDeleting(false);
     }
-  }, [deleteTarget, fetchUsers]);
+  }, [deleteTarget, fetchUsers, t]);
 
   const handleStatusToggle = useCallback(
     async (userId: string) => {
@@ -614,7 +667,7 @@ export default function UsersTab({ activeTab, onStatsUpdated }: UsersTabProps) {
           }}
         >
           <TextField
-            placeholder="Search users..."
+            placeholder={t("searchPlaceholder")}
             value={search}
             onChange={e => {
               setSearch(e.target.value);
@@ -643,12 +696,12 @@ export default function UsersTab({ activeTab, onStatsUpdated }: UsersTabProps) {
               displayEmpty
               sx={{ borderRadius: 2 }}
             >
-              <MenuItem value="all">All Roles</MenuItem>
-              <MenuItem value="admin">Admin</MenuItem>
-              <MenuItem value="customer">Customer</MenuItem>
-              <MenuItem value="supplier">Supplier</MenuItem>
-              <MenuItem value="driver">Driver</MenuItem>
-              <MenuItem value="inspector">Inspector</MenuItem>
+              <MenuItem value="all">{t("filters.allRoles")}</MenuItem>
+              <MenuItem value="admin">{t("form.roles.admin")}</MenuItem>
+              <MenuItem value="customer">{t("form.roles.customer")}</MenuItem>
+              <MenuItem value="supplier">{t("form.roles.supplier")}</MenuItem>
+              <MenuItem value="driver">{t("form.roles.driver")}</MenuItem>
+              <MenuItem value="inspector">{t("form.roles.inspector")}</MenuItem>
             </Select>
           </FormControl>
 
@@ -662,9 +715,9 @@ export default function UsersTab({ activeTab, onStatsUpdated }: UsersTabProps) {
               displayEmpty
               sx={{ borderRadius: 2 }}
             >
-              <MenuItem value="all">All Statuses</MenuItem>
-              <MenuItem value="active">Active</MenuItem>
-              <MenuItem value="blocked">Blocked</MenuItem>
+              <MenuItem value="all">{t("filters.allStatuses")}</MenuItem>
+              <MenuItem value="active">{t("stats.active")}</MenuItem>
+              <MenuItem value="blocked">{t("stats.blocked")}</MenuItem>
             </Select>
           </FormControl>
 
@@ -702,16 +755,16 @@ export default function UsersTab({ activeTab, onStatsUpdated }: UsersTabProps) {
                 <Box sx={{ py: 8, textAlign: "center", opacity: 0.6 }}>
                   <SearchIcon sx={{ fontSize: 60, mb: 2, color: "text.disabled" }} />
                   <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 700 }}>
-                    No users found
+                    {t("table.noUsers")}
                   </Typography>
                   <Typography variant="body2" color="text.disabled">
-                    Try adjusting your search or filters.
+                    {t("table.noUsersDesc")}
                   </Typography>
                 </Box>
               )}
               <Stack direction="column" spacing={1} sx={{ alignItems: "center", mt: 2, mb: 1 }}>
                 <Typography variant="caption">
-                  Showing {pageData.length} of {totalCount}
+                  {t("table.showingCount", { count: pageData.length, total: totalCount })}
                 </Typography>
                 <Pagination
                   count={totalPages}
@@ -749,41 +802,43 @@ export default function UsersTab({ activeTab, onStatsUpdated }: UsersTabProps) {
                       },
                     }}
                   >
-                    <TableCell sx={{ pl: 3 }}>{activeTab === "suppliers" ? "Supplier" : "User"}</TableCell>
+                    <TableCell sx={{ pl: 3 }}>
+                      {activeTab === "suppliers" ? t("table.supplierName") : t("table.user")}
+                    </TableCell>
                     {activeTab === "suppliers" ? (
                       <>
-                        <TableCell>Company</TableCell>
-                        <TableCell>Vehicles</TableCell>
-                        <TableCell>Total Bookings</TableCell>
+                        <TableCell>{t("table.company")}</TableCell>
+                        <TableCell>{t("details.vehiclesCount")}</TableCell>
+                        <TableCell>{t("details.totalBookings")}</TableCell>
                       </>
                     ) : activeTab === "drivers" ? (
                       <>
-                        <TableCell>License</TableCell>
-                        <TableCell>Completed Trips</TableCell>
-                        <TableCell>Availability</TableCell>
+                        <TableCell>{t("details.licenseNumber")}</TableCell>
+                        <TableCell>{t("details.completedTrips")}</TableCell>
+                        <TableCell>{t("details.availability")}</TableCell>
                       </>
                     ) : activeTab === "inspectors" ? (
                       <>
-                        <TableCell>Employee Code</TableCell>
-                        <TableCell>Completed</TableCell>
-                        <TableCell>Availability</TableCell>
+                        <TableCell>{t("details.employeeCode")}</TableCell>
+                        <TableCell>{t("details.completedInspections")}</TableCell>
+                        <TableCell>{t("details.availability")}</TableCell>
                       </>
                     ) : activeTab === "users" ? (
                       <>
-                        <TableCell>Total Bookings</TableCell>
-                        <TableCell>Total Spent</TableCell>
-                        <TableCell>Last Booking</TableCell>
+                        <TableCell>{t("details.totalBookings")}</TableCell>
+                        <TableCell>{t("details.totalSpent")}</TableCell>
+                        <TableCell>{t("details.lastBookingDate")}</TableCell>
                       </>
                     ) : (
                       <>
-                        <TableCell>Phone</TableCell>
-                        <TableCell>Role</TableCell>
+                        <TableCell>{t("details.phone")}</TableCell>
+                        <TableCell>{t("details.role")}</TableCell>
                       </>
                     )}
-                    <TableCell>Status</TableCell>
-                    <TableCell>{activeTab === "suppliers" ? "Joined" : "Created"}</TableCell>
+                    <TableCell>{t("table.status")}</TableCell>
+                    <TableCell>{activeTab === "suppliers" ? t("details.joined") : t("table.createdAt")}</TableCell>
                     <TableCell align="right" sx={{ pr: 3 }}>
-                      Actions
+                      {t("table.actions")}
                     </TableCell>
                   </TableRow>
                 </TableHead>
@@ -810,10 +865,10 @@ export default function UsersTab({ activeTab, onStatsUpdated }: UsersTabProps) {
                         <Box sx={{ textAlign: "center", opacity: 0.6 }}>
                           <SearchIcon sx={{ fontSize: 60, mb: 2, color: "text.disabled" }} />
                           <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 700 }}>
-                            No users found
+                            {t("table.noUsers")}
                           </Typography>
                           <Typography variant="body2" color="text.disabled">
-                            Try adjusting your search or filters to find what you&apos;re looking for.
+                            {t("table.noUsersDesc")}
                           </Typography>
                         </Box>
                       </TableCell>
@@ -824,7 +879,7 @@ export default function UsersTab({ activeTab, onStatsUpdated }: UsersTabProps) {
                   <TableRow>
                     <TableCell colSpan={3} sx={{ pl: 3 }}>
                       <Typography variant="caption" color="text.secondary">
-                        Showing page <strong>{page}</strong> of {totalPages || 1} ({totalCount} total)
+                        {t("table.showingCount", { count: pageData.length, total: totalCount })}
                       </Typography>
                     </TableCell>
                     <TableCell colSpan={3} align="right" sx={{ pr: 3 }}>
@@ -861,12 +916,12 @@ export default function UsersTab({ activeTab, onStatsUpdated }: UsersTabProps) {
           sx={{ display: "flex", alignItems: "center", gap: 1, fontWeight: 700 }}
         >
           <WarningAmberIcon color="error" />
-          Delete User
+          {t("dialogs.deleteTitle")}
         </DialogTitle>
 
         <DialogContent>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            You are about to permanently delete the following account:
+            {t("dialogs.deleteConfirmText")}
           </Typography>
 
           {deleteTarget && (
@@ -882,7 +937,7 @@ export default function UsersTab({ activeTab, onStatsUpdated }: UsersTabProps) {
               <Stack spacing={1}>
                 <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
                   <Typography variant="caption" color="text.secondary">
-                    Name
+                    {t("dialogs.name")}
                   </Typography>
                   <Typography variant="body2" sx={{ fontWeight: 600, textAlign: "right" }}>
                     {deleteTarget.firstName} {deleteTarget.lastName}
@@ -891,7 +946,7 @@ export default function UsersTab({ activeTab, onStatsUpdated }: UsersTabProps) {
                 <Divider flexItem />
                 <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
                   <Typography variant="caption" color="text.secondary">
-                    Email
+                    {t("dialogs.email")}
                   </Typography>
                   <Typography variant="body2" sx={{ fontWeight: 600, textAlign: "right", wordBreak: "break-all" }}>
                     {deleteTarget.email}
@@ -900,7 +955,7 @@ export default function UsersTab({ activeTab, onStatsUpdated }: UsersTabProps) {
                 <Divider flexItem />
                 <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
                   <Typography variant="caption" color="text.secondary">
-                    Role
+                    {t("details.role")}
                   </Typography>
                   <Typography variant="body2" sx={{ fontWeight: 600, textAlign: "right", textTransform: "capitalize" }}>
                     {deleteTarget.roles.join(", ") || "—"}
@@ -911,13 +966,13 @@ export default function UsersTab({ activeTab, onStatsUpdated }: UsersTabProps) {
           )}
 
           <Alert severity="warning" icon={<WarningAmberIcon />} sx={{ mt: 2 }}>
-            This action permanently deletes the user and cannot be undone.
+            {t("dialogs.deleteWarningText")}
           </Alert>
         </DialogContent>
 
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={closeDeleteDialog} disabled={deleting} color="inherit">
-            Cancel
+            {t("details.cancel")}
           </Button>
           <Button
             onClick={() => {
@@ -928,7 +983,7 @@ export default function UsersTab({ activeTab, onStatsUpdated }: UsersTabProps) {
             color="error"
             startIcon={deleting ? <CircularProgress size={16} color="inherit" /> : <DeleteOutlinedIcon />}
           >
-            {deleting ? "Deleting..." : "Delete Permanently"}
+            {deleting ? t("dialogs.deleting") : t("dialogs.deleteConfirmBtn")}
           </Button>
         </DialogActions>
       </Dialog>

@@ -9,8 +9,8 @@ import { parseUtcDate } from "@/utils/dateTime";
 import { useRouter } from "@/shared/i18n/routing";
 
 interface UpcomingTasksListProps {
-  tasks: InspectorTask[];
-  loading: boolean;
+  readonly tasks: InspectorTask[];
+  readonly loading: boolean;
 }
 
 export default function UpcomingTasksList({ tasks, loading }: UpcomingTasksListProps) {
@@ -30,8 +30,18 @@ export default function UpcomingTasksList({ tasks, loading }: UpcomingTasksListP
 
   if (tasks.length === 0) {
     return (
-      <Box sx={{ py: 4, textAlign: "center", color: "text.secondary" }}>
-        <Typography variant="body2">{t("emptyState.noUpcoming", { fallback: "No upcoming inspections." })}</Typography>
+      <Box
+        sx={{
+          py: 4,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "text.secondary",
+        }}
+      >
+        <EventIcon sx={{ fontSize: 40, mb: 1, color: "text.disabled" }} />
+        <Typography variant="body2">{t("emptyState.noUpcoming")}</Typography>
       </Box>
     );
   }
@@ -50,7 +60,9 @@ export default function UpcomingTasksList({ tasks, loading }: UpcomingTasksListP
           <Paper
             key={task.inspectionId}
             elevation={0}
-            onClick={() => router.push(`/inspector/inspections/${task.inspectionId}`)}
+            onClick={() => {
+              router.push(`/inspector/inspections/${task.inspectionId}`);
+            }}
             sx={{
               p: 2,
               borderRadius: 2,
@@ -61,7 +73,7 @@ export default function UpcomingTasksList({ tasks, loading }: UpcomingTasksListP
               transition: "all 0.2s ease",
               "&:hover": {
                 borderColor: accentColor,
-                boxShadow: theme.palette.shadow?.cardHover,
+                boxShadow: theme.palette.shadow.cardHover,
                 transform: "translateY(-1px)",
               },
             }}
@@ -81,9 +93,7 @@ export default function UpcomingTasksList({ tasks, loading }: UpcomingTasksListP
               </Box>
               <Box sx={{ textAlign: "right" }}>
                 <Typography variant="caption" sx={{ color: accentColor, fontWeight: 700, display: "block" }}>
-                  {isCheckOut
-                    ? t("card.checkOutBadge", { fallback: "Check-Out" })
-                    : t("card.checkInBadge", { fallback: "Check-In" })}
+                  {isCheckOut ? t("card.checkOutBadge") : t("card.checkInBadge")}
                 </Typography>
                 <Typography
                   variant="caption"

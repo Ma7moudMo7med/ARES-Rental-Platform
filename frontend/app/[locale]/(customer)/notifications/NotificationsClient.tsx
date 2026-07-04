@@ -33,6 +33,7 @@ import { formatUtcDateTime, parseUtcDate } from "@/utils/dateTime";
 import { getNotificationTypeConfig } from "@/utils/notification-type-config";
 import DeleteNotificationDialog from "@/components/notifications/DeleteNotificationDialog";
 import { useTranslations, useLocale } from "next-intl";
+import { translateNotification } from "@/utils/notificationTranslator";
 
 export default function NotificationsClient() {
   const t = useTranslations("customer.notifications");
@@ -294,26 +295,31 @@ export default function NotificationsClient() {
                   </Avatar>
                 );
               })()}
-              <Box sx={{ flex: 1 }}>
-                <Typography
-                  variant="subtitle1"
-                  sx={{ fontWeight: n.isRead ? 500 : 700 }}
-                  color={n.isRead ? "text.secondary" : "text.primary"}
-                >
-                  {n.title}
-                </Typography>
-                <Typography variant="body2" sx={{ my: 0.5, color: "text.secondary" }}>
-                  {n.message}
-                </Typography>
-                <Typography variant="caption" sx={{ color: "text.disabled" }}>
-                  {formatUtcDateTime(n.createdAt, locale, {
-                    month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </Typography>
-              </Box>
+              {(() => {
+                const { title: displayTitle, message: displayMessage } = translateNotification(n, locale);
+                return (
+                  <Box sx={{ flex: 1 }}>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{ fontWeight: n.isRead ? 500 : 700 }}
+                      color={n.isRead ? "text.secondary" : "text.primary"}
+                    >
+                      {displayTitle}
+                    </Typography>
+                    <Typography variant="body2" sx={{ my: 0.5, color: "text.secondary" }}>
+                      {displayMessage}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: "text.disabled" }}>
+                      {formatUtcDateTime(n.createdAt, locale, {
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </Typography>
+                  </Box>
+                );
+              })()}
 
               <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
                 {!n.isRead ? (

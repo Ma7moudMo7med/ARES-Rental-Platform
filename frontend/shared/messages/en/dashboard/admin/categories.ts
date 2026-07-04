@@ -100,6 +100,24 @@ const categories: CategoriesLabels = {
   pagination: {
     showing: "Showing {count} of {total} categories",
   },
+  categoryValues: {
+    names: {
+      suv: "SUV",
+      sedan: "Sedan",
+      luxury: "Luxury",
+      electric: "Electric",
+      sports: "Sports",
+      business: "Business",
+    },
+    descriptions: {
+      suv: "Spacious and powerful, built to handle any terrain or family road trip with maximum comfort.",
+      sedan: "Classic styling, excellent fuel efficiency, and a smooth, comfortable ride for daily commutes.",
+      luxury: "Premium class vehicles combining cutting-edge technology, elite comfort, and prestige performance.",
+      electric: "Zero emission vehicles featuring silent drives, instant torque, and futuristic technology.",
+      sports: "High-performance cars designed for speed, precise handling, and pure driving excitement.",
+      business: "Refined and professional vehicles, ideal for executive travel, meetings, and business trips.",
+    },
+  },
 };
 
 export default categories;

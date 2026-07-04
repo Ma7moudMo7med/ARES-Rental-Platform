@@ -20,7 +20,7 @@ import PaymentIcon from "@mui/icons-material/Payment";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import { useSession } from "next-auth/react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { apiFetchJson, ApiError } from "@/utils/api-client";
 import { logger } from "@/utils/logger";
 import { parseUtcDate, formatUtcDateTime } from "@/utils/dateTime";
@@ -79,15 +79,81 @@ const TYPE_META: Record<
   verification: { color: "success", icon: <VerifiedIcon fontSize="small" /> },
 };
 
+function getLocalizedMessage(item: RecentActivityItem, t: any): string {
+  const msg = item.message;
+  if (!msg) return "";
+
+  // 1. Booking
+  // Backend format: $"Booking #{shortId} created by {customerName}"
+  if (item.type === "booking") {
+    const match = msg.match(/Booking\s+#([A-Za-z0-9-]+)\s+created\s+by\s+(.+)/i);
+    if (match) {
+      const [, id, name] = match;
+      return t("liveActivity.bookingCreatedByUser", { id, name });
+    }
+    // Fallback matches
+    const fallbackMatch = msg.match(/Booking\s+#([A-Za-z0-9-]+)/i);
+    if (fallbackMatch) {
+      return t("liveActivity.bookingCreated", { id: fallbackMatch[1] });
+    }
+  }
+
+  // 2. Payment
+  // Backend format: $"Payment completed for Booking #{shortId}"
+  if (item.type === "payment") {
+    const match = msg.match(/Payment\s+completed\s+for\s+Booking\s+#([A-Za-z0-9-]+)/i);
+    if (match) {
+      return t("liveActivity.paymentCompleted", { id: match[1] });
+    }
+  }
+
+  // 3. User
+  // Backend format: $"New user registered: {fullName}"
+  if (item.type === "user") {
+    const match = msg.match(/New\s+user\s+registered:\s*(.+)/i);
+    if (match) {
+      return t("liveActivity.newUserRegistered", { name: match[1] });
+    }
+  }
+
+  // 4. Vehicle
+  // Backend format: $"Vehicle added: {label}"
+  if (item.type === "vehicle") {
+    const match = msg.match(/Vehicle\s+added:\s*(.+)/i);
+    if (match) {
+      return t("liveActivity.vehicleAdded", { label: match[1] });
+    }
+  }
+
+  // 5. Verification
+  // Backend format: $"Verification submitted by {fullName} ({statusLabel})"
+  if (item.type === "verification") {
+    const match = msg.match(/Verification\s+submitted\s+by\s+(.+?)\s*\((.+?)\)/i);
+    if (match) {
+      const [, name, status] = match;
+      const statusLower = status.toLowerCase();
+      let statusKey = "statusPending";
+      if (statusLower === "approved" || statusLower === "completed" || statusLower === "verified") {
+        statusKey = "statusApproved";
+      } else if (statusLower === "rejected" || statusLower === "failed") {
+        statusKey = "statusRejected";
+      }
+      return t("liveActivity.verificationSubmitted", { name, status: t(`liveActivity.${statusKey}`) });
+    }
+  }
+
+  return msg;
+}
+
 // ── Timestamp display ─────────────────────────────────────────────────────────
-function formatTimestamp(iso: string | null | undefined, locale: string): string {
+function formatTimestamp(iso: string | null | undefined, locale: string, t: any): string {
   if (!iso) return "–";
   const date = parseUtcDate(iso);
   if (Number.isNaN(date.getTime())) return "–";
 
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
-  if (diffMs < 0) return "just now";
+  if (diffMs < 0) return t("liveActivity.justNow");
 
   const seconds = Math.floor(diffMs / 1000);
   const minutes = Math.floor(seconds / 60);
@@ -97,9 +163,9 @@ function formatTimestamp(iso: string | null | undefined, locale: string): string
     date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate();
 
   if (isToday) {
-    if (seconds < 60) return "just now";
-    if (minutes < 60) return `${minutes.toString()} min ago`;
-    return `${hours.toString()} hr ago`;
+    if (seconds < 60) return t("liveActivity.justNow");
+    if (minutes < 60) return t("liveActivity.minAgo", { count: minutes });
+    return t("liveActivity.hrAgo", { count: hours });
   }
 
   return formatUtcDateTime(
@@ -126,7 +192,8 @@ const bestPaymentTs = (b: RawBooking): string | undefined =>
 async function fetchViaFallbackApis(
   accessToken: string,
   isSupplier: boolean,
-  userId: string
+  userId: string,
+  t: any
 ): Promise<RecentActivityItem[]> {
   const [bookingsRes, usersRes, vehiclesRes, verificationsRes] = await Promise.all([
     apiFetchJson<AnyPagedResponse<RawBooking>>("api/admin/bookings/search/1/10", {
@@ -192,7 +259,9 @@ async function fetchViaFallbackApis(
     const bTs = bestBookingTs(b);
     keepLatest({
       type: "booking",
-      message: carName ? `Booking for ${carName} created` : `Booking #${shortId} created`,
+      message: carName
+        ? t("liveActivity.bookingCreatedWithCar", { car: carName })
+        : t("liveActivity.bookingCreated", { id: shortId }),
       createdAt: bTs ?? "",
       icon: "booking",
     });
@@ -202,7 +271,9 @@ async function fetchViaFallbackApis(
       const pTs = bestPaymentTs(b);
       keepLatest({
         type: "payment",
-        message: carName ? `Payment completed for ${carName}` : `Payment completed for Booking #${shortId}`,
+        message: carName
+          ? t("liveActivity.paymentCompletedWithCar", { car: carName })
+          : t("liveActivity.paymentCompleted", { id: shortId }),
         createdAt: pTs ?? "",
         icon: "payment",
       });
@@ -215,7 +286,7 @@ async function fetchViaFallbackApis(
     const fullName = `${u.firstName ?? ""} ${u.lastName ?? ""}`.trim() || u.email || "New user";
     keepLatest({
       type: "user",
-      message: `New user registered: ${fullName}`,
+      message: t("liveActivity.newUserRegistered", { name: fullName }),
       createdAt: u.createdAt ?? "",
       icon: "user",
     });
@@ -228,7 +299,7 @@ async function fetchViaFallbackApis(
     const label = [v.make, v.model].filter(Boolean).join(" ") || "Vehicle";
     keepLatest({
       type: "vehicle",
-      message: `Vehicle ${label} added`,
+      message: t("liveActivity.vehicleAdded", { label }),
       createdAt: v.createdAt ?? "",
       icon: "vehicle",
     });
@@ -242,7 +313,7 @@ async function fetchViaFallbackApis(
     const statusLabel = v.status || "Pending";
     keepLatest({
       type: "verification",
-      message: `Verification submitted by ${fullName} (${statusLabel})`,
+      message: t("liveActivity.verificationSubmitted", { name: fullName, status: statusLabel }),
       createdAt: v.submittedAt,
       icon: "verification",
     });
@@ -261,6 +332,7 @@ export default function LiveActivity({ activities: _ }: { readonly activities?: 
   const theme = useTheme();
   const { data: session } = useSession();
   const locale = useLocale();
+  const t = useTranslations("dashboardAdmin.dashboard");
 
   const [items, setItems] = useState<RecentActivityItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -297,8 +369,8 @@ export default function LiveActivity({ activities: _ }: { readonly activities?: 
     const user = session.user;
     const isSupplier = user.roles.includes("Supplier");
     const userId = user.id;
-    return fetchViaFallbackApis(session.accessToken, isSupplier, userId);
-  }, [session?.accessToken, session?.user]);
+    return fetchViaFallbackApis(session.accessToken, isSupplier, userId, t);
+  }, [session?.accessToken, session?.user, t]);
 
   const fetchActivity = useCallback(() => {
     setLoading(true);
@@ -345,7 +417,7 @@ export default function LiveActivity({ activities: _ }: { readonly activities?: 
           }}
         >
           <Typography color="error" variant="body2" sx={{ fontWeight: 500 }}>
-            Failed to load recent activity.
+            {t("liveActivity.failedToLoad")}
           </Typography>
           <Typography
             variant="caption"
@@ -353,7 +425,7 @@ export default function LiveActivity({ activities: _ }: { readonly activities?: 
             sx={{ cursor: "pointer", textDecoration: "underline" }}
             onClick={handleRefresh}
           >
-            Try again
+            {t("liveActivity.tryAgain")}
           </Typography>
         </Box>
       );
@@ -363,7 +435,7 @@ export default function LiveActivity({ activities: _ }: { readonly activities?: 
       return (
         <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: 180 }}>
           <Typography color="text.secondary" variant="body2">
-            No recent activity available.
+            {t("liveActivity.noActivity")}
           </Typography>
         </Box>
       );
@@ -422,14 +494,14 @@ export default function LiveActivity({ activities: _ }: { readonly activities?: 
                     textOverflow: "ellipsis",
                   }}
                 >
-                  {item.message}
+                  {getLocalizedMessage(item, t)}
                 </Typography>
                 <Typography
                   variant="caption"
                   color="text.secondary"
                   sx={{ fontSize: "0.7rem", flexShrink: 0, whiteSpace: "nowrap" }}
                 >
-                  {formatTimestamp(item.createdAt, locale)}
+                  {formatTimestamp(item.createdAt, locale, t)}
                 </Typography>
               </Box>
             </Box>
@@ -454,7 +526,7 @@ export default function LiveActivity({ activities: _ }: { readonly activities?: 
       <CardContent sx={{ p: 2.5, height: "100%", "&:last-child": { pb: 2.5 } }}>
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
           <Typography variant="subtitle1" sx={{ fontWeight: 800, fontSize: "1rem" }}>
-            Recent Activity
+            {t("liveActivity.title")}
           </Typography>
           <IconButton
             size="small"

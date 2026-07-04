@@ -34,6 +34,7 @@ import {
 } from "@/api-clients/notfications/notfications";
 import { logger } from "@/utils/logger";
 import DeleteNotificationDialog from "@/components/notifications/DeleteNotificationDialog";
+import { translateNotification } from "@/utils/notificationTranslator";
 
 const POLL_INTERVAL_MS = 60_000;
 const PREVIEW_LIMIT = 6;
@@ -386,71 +387,76 @@ export default function NotificationsBell({
                   >
                     <NotificationsActiveIcon fontSize="small" />
                   </Avatar>
-                  <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          fontWeight: n.isRead ? 500 : 700,
-                          color: "text.primary",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                          flexGrow: 1,
-                        }}
-                      >
-                        {n.title || t("notifications")}
-                      </Typography>
-                      <Stack direction="row" spacing={0.5} sx={{ alignItems: "center", flexShrink: 0 }}>
-                        {!n.isRead && (
-                          <Box
+                  {(() => {
+                    const { title: displayTitle, message: displayMessage } = translateNotification(n, locale);
+                    return (
+                      <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
+                          <Typography
+                            variant="body2"
                             sx={{
-                              width: 8,
-                              height: 8,
-                              borderRadius: "50%",
-                              bgcolor: "primary.main",
+                              fontWeight: n.isRead ? 500 : 700,
+                              color: "text.primary",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                              flexGrow: 1,
                             }}
-                          />
+                          >
+                            {displayTitle || t("notifications")}
+                          </Typography>
+                          <Stack direction="row" spacing={0.5} sx={{ alignItems: "center", flexShrink: 0 }}>
+                            {!n.isRead && (
+                              <Box
+                                sx={{
+                                  width: 8,
+                                  height: 8,
+                                  borderRadius: "50%",
+                                  bgcolor: "primary.main",
+                                }}
+                              />
+                            )}
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={e => {
+                                handleDeleteClick(e, n);
+                              }}
+                              sx={{
+                                p: 0.25,
+                                opacity: 0.6,
+                                "&:hover": { opacity: 1, bgcolor: "action.hover" },
+                              }}
+                            >
+                              <DeleteOutlinedIcon sx={{ fontSize: "0.95rem" }} />
+                            </IconButton>
+                          </Stack>
+                        </Box>
+                        {displayMessage && (
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{
+                              display: "-webkit-box",
+                              WebkitBoxOrient: "vertical",
+                              WebkitLineClamp: 2,
+                              overflow: "hidden",
+                              lineHeight: 1.4,
+                              mt: 0.25,
+                            }}
+                          >
+                            {displayMessage}
+                          </Typography>
                         )}
-                        <IconButton
-                          size="small"
-                          color="error"
-                          onClick={e => {
-                            handleDeleteClick(e, n);
-                          }}
-                          sx={{
-                            p: 0.25,
-                            opacity: 0.6,
-                            "&:hover": { opacity: 1, bgcolor: "action.hover" },
-                          }}
-                        >
-                          <DeleteOutlinedIcon sx={{ fontSize: "0.95rem" }} />
-                        </IconButton>
-                      </Stack>
-                    </Box>
-                    {n.message && (
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{
-                          display: "-webkit-box",
-                          WebkitBoxOrient: "vertical",
-                          WebkitLineClamp: 2,
-                          overflow: "hidden",
-                          lineHeight: 1.4,
-                          mt: 0.25,
-                        }}
-                      >
-                        {n.message}
-                      </Typography>
-                    )}
-                    <Typography
-                      variant="caption"
-                      sx={{ display: "block", mt: 0.5, color: "text.disabled", fontSize: "0.7rem" }}
-                    >
-                      {timeAgo(n.createdAt, t, locale)}
-                    </Typography>
-                  </Box>
+                      </Box>
+                    );
+                  })()}
+                  <Typography
+                    variant="caption"
+                    sx={{ display: "block", mt: 0.5, color: "text.disabled", fontSize: "0.7rem" }}
+                  >
+                    {timeAgo(n.createdAt, t, locale)}
+                  </Typography>
                 </Box>
               ))}
             </Stack>

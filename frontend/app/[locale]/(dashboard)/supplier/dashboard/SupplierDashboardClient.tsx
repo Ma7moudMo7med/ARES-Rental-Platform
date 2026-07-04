@@ -43,7 +43,6 @@ import BookingsChart from "./_components/BookingsChart";
 import TopVehiclesList from "./_components/TopVehiclesList";
 import VehicleStatusChart from "./_components/VehicleStatusChart";
 import RecentActivity from "./_components/RecentActivity";
-import PendingActions from "./_components/PendingActions";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -269,15 +268,9 @@ export default function SupplierDashboardClient() {
         </Grid>
 
         <Grid container spacing={3} sx={{ mt: 0 }}>
-          <Grid size={{ xs: 12, lg: 7 }}>
+          <Grid size={{ xs: 12 }}>
             <motion.div variants={itemVariants} style={{ height: "100%" }}>
               <RecentActivity />
-            </motion.div>
-          </Grid>
-
-          <Grid size={{ xs: 12, lg: 5 }}>
-            <motion.div variants={itemVariants} style={{ height: "100%" }}>
-              <PendingActions />
             </motion.div>
           </Grid>
         </Grid>

@@ -23,7 +23,7 @@ import DoneAllIcon from "@mui/icons-material/DoneAll";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { parseUtcDate, formatUtcDateTime } from "@/utils/dateTime";
 import { useRouter, Link } from "@/shared/i18n/routing";
 import { useSession } from "next-auth/react";
@@ -37,22 +37,23 @@ import {
 import { logger } from "@/utils/logger";
 import { getNotificationTypeConfig } from "@/utils/notification-type-config";
 import DeleteNotificationDialog from "@/components/notifications/DeleteNotificationDialog";
+import { translateNotification } from "@/utils/notificationTranslator";
 
 const POLL_INTERVAL_MS = 60_000;
 const PREVIEW_LIMIT = 6;
 
-function timeAgo(input: string, locale: string): string {
+function timeAgo(input: string, t: ReturnType<typeof useTranslations>, locale: string): string {
   const date = parseUtcDate(input);
   if (Number.isNaN(date.getTime())) return "";
   const diffMs = Date.now() - date.getTime();
   const seconds = Math.floor(diffMs / 1000);
-  if (seconds < 30) return "just now";
+  if (seconds < 30) return t("justNow");
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes.toString()}m ago`;
+  if (minutes < 60) return `${minutes.toString()}${t("minutesAgo")}`;
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours.toString()}h ago`;
+  if (hours < 24) return `${hours.toString()}${t("hoursAgo")}`;
   const days = Math.floor(hours / 24);
-  if (days < 7) return `${days.toString()}d ago`;
+  if (days < 7) return `${days.toString()}${t("daysAgo")}`;
   return formatUtcDateTime(input, locale, { month: "short", day: "numeric" });
 }
 
@@ -63,6 +64,7 @@ interface NotificationsPanelProps {
 export default function NotificationsPanel({ iconColor = "inherit" }: NotificationsPanelProps) {
   const theme = useTheme();
   const locale = useLocale();
+  const t = useTranslations("common");
   const router = useRouter();
   const { data: session } = useSession();
   const token = session?.accessToken;
@@ -218,7 +220,7 @@ export default function NotificationsPanel({ iconColor = "inherit" }: Notificati
       setItems(prev => prev.filter(n => n.id !== deletingNotification.id));
       setToast({
         open: true,
-        message: "Notification deleted successfully.",
+        message: t("notificationDeletedSuccessfully"),
         severity: "success",
       });
       window.dispatchEvent(new CustomEvent("notifications-updated"));
@@ -230,7 +232,7 @@ export default function NotificationsPanel({ iconColor = "inherit" }: Notificati
         setItems(prev => prev.filter(n => n.id !== deletingNotification.id));
         setToast({
           open: true,
-          message: "Notification deleted successfully.",
+          message: t("notificationDeletedSuccessfully"),
           severity: "success",
         });
         window.dispatchEvent(new CustomEvent("notifications-updated"));
@@ -238,7 +240,7 @@ export default function NotificationsPanel({ iconColor = "inherit" }: Notificati
       } else {
         setToast({
           open: true,
-          message: "Failed to delete notification. Please try again.",
+          message: t("failedToDeleteNotification"),
           severity: "error",
         });
       }
@@ -253,9 +255,9 @@ export default function NotificationsPanel({ iconColor = "inherit" }: Notificati
 
   return (
     <>
-      <Tooltip title="Notifications">
+      <Tooltip title={t("notifications")}>
         <IconButton
-          aria-label="notifications"
+          aria-label={t("notifications")}
           onClick={handleOpen}
           color={iconColor}
           sx={{
@@ -333,13 +335,13 @@ export default function NotificationsPanel({ iconColor = "inherit" }: Notificati
         >
           <Box>
             <Typography variant="subtitle1" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
-              Notifications
+              {t("notifications")}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {unreadCount > 0 ? `${unreadCount.toString()} unread` : "You're all caught up"}
+              {unreadCount > 0 ? `${unreadCount.toString()} ${t("unreadMessages")}` : t("allCaughtUp")}
             </Typography>
           </Box>
-          <Tooltip title="Mark all as read">
+          <Tooltip title={t("markAllAsRead")}>
             <span>
               <IconButton
                 size="small"
@@ -364,10 +366,10 @@ export default function NotificationsPanel({ iconColor = "inherit" }: Notificati
           {!loading && error && (
             <Box sx={{ p: 4, textAlign: "center" }}>
               <Typography variant="body2" color="error">
-                Failed to load notifications.
+                {t("failedToLoadNotifications")}
               </Typography>
               <Button size="small" onClick={() => void fetchData()} sx={{ mt: 1 }}>
-                Try again
+                {t("tryAgain")}
               </Button>
             </Box>
           )}
@@ -376,7 +378,7 @@ export default function NotificationsPanel({ iconColor = "inherit" }: Notificati
             <Box sx={{ p: 5, textAlign: "center" }}>
               <NotificationsIcon sx={{ fontSize: 36, color: "text.disabled", mb: 1 }} />
               <Typography variant="body2" color="text.secondary">
-                No notifications yet.
+                {t("noNotificationsYet")}
               </Typography>
             </Box>
           )}
@@ -410,71 +412,76 @@ export default function NotificationsPanel({ iconColor = "inherit" }: Notificati
                   >
                     {React.createElement(getNotificationTypeConfig(n.type).icon, { fontSize: "small" })}
                   </Avatar>
-                  <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          fontWeight: n.isRead ? 500 : 700,
-                          color: "text.primary",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                          flexGrow: 1,
-                        }}
-                      >
-                        {n.title || "Notification"}
-                      </Typography>
-                      <Stack direction="row" spacing={0.5} sx={{ alignItems: "center", flexShrink: 0 }}>
-                        {!n.isRead && (
-                          <Box
+                  {(() => {
+                    const { title: displayTitle, message: displayMessage } = translateNotification(n, locale);
+                    return (
+                      <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1 }}>
+                          <Typography
+                            variant="body2"
                             sx={{
-                              width: 8,
-                              height: 8,
-                              borderRadius: "50%",
-                              bgcolor: "primary.main",
+                              fontWeight: n.isRead ? 500 : 700,
+                              color: "text.primary",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                              flexGrow: 1,
                             }}
-                          />
+                          >
+                            {displayTitle || t("notifications")}
+                          </Typography>
+                          <Stack direction="row" spacing={0.5} sx={{ alignItems: "center", flexShrink: 0 }}>
+                            {!n.isRead && (
+                              <Box
+                                sx={{
+                                  width: 8,
+                                  height: 8,
+                                  borderRadius: "50%",
+                                  bgcolor: "primary.main",
+                                }}
+                              />
+                            )}
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={e => {
+                                handleDeleteClick(e, n);
+                              }}
+                              sx={{
+                                p: 0.25,
+                                opacity: 0.6,
+                                "&:hover": { opacity: 1, bgcolor: "action.hover" },
+                              }}
+                            >
+                              <DeleteOutlinedIcon sx={{ fontSize: "0.95rem" }} />
+                            </IconButton>
+                          </Stack>
+                        </Box>
+                        {displayMessage && (
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{
+                              display: "-webkit-box",
+                              WebkitBoxOrient: "vertical",
+                              WebkitLineClamp: 2,
+                              overflow: "hidden",
+                              lineHeight: 1.4,
+                              mt: 0.25,
+                            }}
+                          >
+                            {displayMessage}
+                          </Typography>
                         )}
-                        <IconButton
-                          size="small"
-                          color="error"
-                          onClick={e => {
-                            handleDeleteClick(e, n);
-                          }}
-                          sx={{
-                            p: 0.25,
-                            opacity: 0.6,
-                            "&:hover": { opacity: 1, bgcolor: "action.hover" },
-                          }}
-                        >
-                          <DeleteOutlinedIcon sx={{ fontSize: "0.95rem" }} />
-                        </IconButton>
-                      </Stack>
-                    </Box>
-                    {n.message && (
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{
-                          display: "-webkit-box",
-                          WebkitBoxOrient: "vertical",
-                          WebkitLineClamp: 2,
-                          overflow: "hidden",
-                          lineHeight: 1.4,
-                          mt: 0.25,
-                        }}
-                      >
-                        {n.message}
-                      </Typography>
-                    )}
-                    <Typography
-                      variant="caption"
-                      sx={{ display: "block", mt: 0.5, color: "text.disabled", fontSize: "0.7rem" }}
-                    >
-                      {timeAgo(n.createdAt, locale)}
-                    </Typography>
-                  </Box>
+                      </Box>
+                    );
+                  })()}
+                  <Typography
+                    variant="caption"
+                    sx={{ display: "block", mt: 0.5, color: "text.disabled", fontSize: "0.7rem" }}
+                  >
+                    {timeAgo(n.createdAt, t, locale)}
+                  </Typography>
                 </Box>
               ))}
             </Stack>
@@ -498,7 +505,7 @@ export default function NotificationsPanel({ iconColor = "inherit" }: Notificati
             endIcon={<OpenInNewIcon fontSize="small" />}
             sx={{ fontWeight: 600, textTransform: "none" }}
           >
-            View all notifications
+            {t("viewAllNotifications")}
           </Button>
         </Box>
       </Popover>

@@ -11,4 +11,8 @@ public record NotificationDto(
     string Message,
     bool IsRead,
     DateTime CreatedAt,
-    string? Type = null);
+    string? Type = null,
+    string? BookingNumber = null,
+    string? VehicleName = null,
+    string? InspectionType = null,
+    string? ActionUrl = null);

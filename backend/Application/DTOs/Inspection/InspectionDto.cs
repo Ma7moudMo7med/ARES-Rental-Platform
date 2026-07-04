@@ -18,5 +18,6 @@ public record InspectionDto(
     bool IsSubmitted,
     DateTime InspectionDate,
     DateTime? SubmittedAt,
-    int ImageCount
+    int ImageCount,
+    string InspectionType
 );

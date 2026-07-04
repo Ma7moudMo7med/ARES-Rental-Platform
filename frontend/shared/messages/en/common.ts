@@ -65,6 +65,7 @@ const common: CommonLabels = {
   hoursAgo: "h ago",
   daysAgo: "d ago",
   na: "N/A",
+  date: "Date",
 };
 
 export default common;
