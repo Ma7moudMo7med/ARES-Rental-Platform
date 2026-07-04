@@ -107,7 +107,9 @@ export default function PromotionManager({ categoryId }: { readonly categoryId: 
                       <Typography sx={{ fontWeight: 700, color: "primary.main" }}>{discount.code}</Typography>
                       <Typography variant="h6" sx={{ fontWeight: 800, mt: 0.5 }}>
                         {discount.discountValue}
-                        {discount.discountType === "percentage" ? t("promotions.percentOff") : " off"}
+                        {discount.discountType === "percentage"
+                          ? t("promotions.percentOff")
+                          : ` ${t("promotions.amountOff")}`}
                       </Typography>
                       <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 0.5 }}>
                         {discount.validFrom ? formatUtcDate(discount.validFrom, locale) : ""} -{" "}
@@ -116,7 +118,11 @@ export default function PromotionManager({ categoryId }: { readonly categoryId: 
                     </Box>
                     <Stack spacing={1} sx={{ alignItems: "flex-end" }}>
                       <Chip
-                        label={discount.isActive ? "Active" : "Inactive"}
+                        label={
+                          discount.isActive
+                            ? t("promotions.form.statusOptions.active")
+                            : t("promotions.form.statusOptions.inactive")
+                        }
                         size="small"
                         sx={{
                           height: 20,

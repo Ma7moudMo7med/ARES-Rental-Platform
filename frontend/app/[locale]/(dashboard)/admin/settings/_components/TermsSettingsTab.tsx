@@ -17,6 +17,10 @@ import {
   DialogContent,
   DialogActions,
   Tooltip,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
@@ -68,7 +72,7 @@ export default function TermsSettingsTab() {
   const [fetching, setFetching] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
-  const selectedLocale = "en" as LocaleCode;
+  const [selectedLocale, setSelectedLocale] = useState<LocaleCode>("en");
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -84,12 +88,12 @@ export default function TermsSettingsTab() {
 
   const getLocaleTitle = (section: TermsSection): string => {
     if (isDefaultLocale) return section.title;
-    return section.localizations.ar.title;
+    return section.localizations.ar.title || section.title;
   };
 
   const getLocaleContent = (section: TermsSection): string => {
     if (isDefaultLocale) return section.content;
-    return section.localizations.ar.content;
+    return section.localizations.ar.content || section.content;
   };
 
   const fetchSections = useCallback(async () => {
@@ -111,7 +115,7 @@ export default function TermsSettingsTab() {
 
   const openCreate = () => {
     setEditingId(null);
-    setForm({ ...emptyForm, order: sections.length + 1, localizations: { ...defaultLocalizations } });
+    setForm({ ...emptyForm, order: sections.length + 1, localizations: { ar: { title: "", content: "" } } });
     setDialogOpen(true);
   };
 
@@ -205,14 +209,29 @@ export default function TermsSettingsTab() {
             {t("terms.subtitle")}
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddRoundedIcon />}
-          onClick={openCreate}
-          sx={{ borderRadius: 2, fontWeight: 700 }}
-        >
-          {t("terms.addSection")}
-        </Button>
+        <Stack sx={{ flexDirection: "row", gap: 2, alignItems: "center" }}>
+          <FormControl size="small" sx={{ minWidth: 180 }}>
+            <InputLabel>{t("configureLocale")}</InputLabel>
+            <Select
+              label={t("configureLocale")}
+              value={selectedLocale}
+              onChange={e => {
+                setSelectedLocale(e.target.value);
+              }}
+            >
+              <MenuItem value="en">{t("englishLabel")}</MenuItem>
+              <MenuItem value="ar">{t("arabicLabel")}</MenuItem>
+            </Select>
+          </FormControl>
+          <Button
+            variant="contained"
+            startIcon={<AddRoundedIcon />}
+            onClick={openCreate}
+            sx={{ borderRadius: 2, fontWeight: 700 }}
+          >
+            {t("terms.addSection")}
+          </Button>
+        </Stack>
       </Stack>
 
       <Stack sx={{ gap: 2 }}>
@@ -277,27 +296,71 @@ export default function TermsSettingsTab() {
         fullWidth
         maxWidth="sm"
       >
-        <DialogTitle sx={{ fontWeight: 700 }}>{editingId ? t("terms.editSection") : t("terms.newSection")}</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 700 }}>
+          {editingId ? t("terms.editSection") : t("terms.newSection")} &mdash;{" "}
+          {selectedLocale === "en" ? t("englishLabel") : t("arabicLabel")}
+        </DialogTitle>
         <DialogContent>
           <Stack sx={{ gap: 2, pt: 1 }}>
-            <TextField
-              label={t("terms.titleLabel")}
-              name="title"
-              value={form.title}
-              onChange={handleFormChange}
-              fullWidth
-              required
-            />
-            <TextField
-              label={t("terms.contentLabel")}
-              name="content"
-              value={form.content}
-              onChange={handleFormChange}
-              fullWidth
-              required
-              multiline
-              minRows={4}
-            />
+            {isDefaultLocale ? (
+              <>
+                <TextField
+                  label={t("terms.titleLabel")}
+                  name="title"
+                  value={form.title}
+                  onChange={handleFormChange}
+                  fullWidth
+                  required
+                />
+                <TextField
+                  label={t("terms.contentLabel")}
+                  name="content"
+                  value={form.content}
+                  onChange={handleFormChange}
+                  fullWidth
+                  required
+                  multiline
+                  minRows={4}
+                />
+              </>
+            ) : (
+              <>
+                <TextField
+                  label={t("terms.titleLabel")}
+                  name="title"
+                  value={form.localizations.ar.title}
+                  onChange={e => {
+                    const { value } = e.target;
+                    setForm(prev => ({
+                      ...prev,
+                      localizations: {
+                        ...prev.localizations,
+                        ar: { ...prev.localizations.ar, title: value },
+                      },
+                    }));
+                  }}
+                  fullWidth
+                />
+                <TextField
+                  label={t("terms.contentLabel")}
+                  name="content"
+                  value={form.localizations.ar.content}
+                  onChange={e => {
+                    const { value } = e.target;
+                    setForm(prev => ({
+                      ...prev,
+                      localizations: {
+                        ...prev.localizations,
+                        ar: { ...prev.localizations.ar, content: value },
+                      },
+                    }));
+                  }}
+                  fullWidth
+                  multiline
+                  minRows={4}
+                />
+              </>
+            )}
             <TextField
               label={t("terms.orderLabel")}
               name="order"
