@@ -96,14 +96,22 @@ export default function CategoryDetailsPage({ params }: { readonly params: Promi
   const activePromo = category.activePromotion;
 
   const nameKey = category.name.toLowerCase().replace(/\s+/g, "");
-  const translatedName = t(`categoryValues.names.${nameKey}` as any);
-  const displayName = translatedName.startsWith("categoryValues.names.") ? category.name : translatedName;
+  const validKeys = [
+    "suv",
+    "sedan",
+    "luxury",
+    "electric",
+    "sports",
+    "business",
+    "economy",
+    "hybrid",
+    "standard",
+    "van",
+  ];
+  const isValidKey = validKeys.includes(nameKey);
+  const displayName = isValidKey ? t(`categoryValues.names.${nameKey}` as any) : category.name;
 
-  const translatedDesc = category.description ? t(`categoryValues.descriptions.${nameKey}` as any) : "";
-  const displayDesc =
-    translatedDesc.startsWith("categoryValues.descriptions.") || !category.description
-      ? category.description || "—"
-      : translatedDesc;
+  const displayDesc = isValidKey ? t(`categoryValues.descriptions.${nameKey}` as any) : category.description || "—";
 
   return (
     <Box sx={{ pb: 6, minHeight: "100vh" }}>

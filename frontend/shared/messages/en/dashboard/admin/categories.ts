@@ -67,6 +67,15 @@ const categories: CategoriesLabels = {
     errors: {
       saveFailed: "Failed to save category. Please try again.",
     },
+    imageUpload: {
+      title: "Category Image",
+      changeBtn: "Change Image",
+      removeBtn: "Remove",
+      clickToUpload: "Click to upload an image",
+      allowedTypes: "PNG, JPG, WEBP up to 10 MB",
+      errorType: "Only PNG, JPG, and WEBP images are allowed.",
+      errorSize: "File size exceeds 10MB limit.",
+    },
   },
   summaryCards: {
     categories: "Categories",
@@ -108,6 +117,10 @@ const categories: CategoriesLabels = {
       electric: "Electric",
       sports: "Sports",
       business: "Business",
+      economy: "Economy",
+      hybrid: "Hybrid",
+      standard: "Standard",
+      van: "Van",
     },
     descriptions: {
       suv: "Spacious and powerful, built to handle any terrain or family road trip with maximum comfort.",
@@ -116,6 +129,10 @@ const categories: CategoriesLabels = {
       electric: "Zero emission vehicles featuring silent drives, instant torque, and futuristic technology.",
       sports: "High-performance cars designed for speed, precise handling, and pure driving excitement.",
       business: "Refined and professional vehicles, ideal for executive travel, meetings, and business trips.",
+      economy: "Fuel-efficient, budget-friendly cars perfect for daily commutes and short city trips.",
+      hybrid: "Smart, fuel-efficient vehicles powered by a combination of gasoline and electric systems.",
+      standard: "Comfortable, reliable mid-sized vehicles suitable for business or family travel.",
+      van: "High-capacity multi-passenger vans and cargo vehicles for group travel or transport.",
     },
   },
 };
