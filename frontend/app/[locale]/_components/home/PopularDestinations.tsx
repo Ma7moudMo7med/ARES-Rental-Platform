@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { toImageUrl } from "@/utils/image-url";
 import { toApiUrl } from "@/utils/api-client";
 import { logger } from "@/utils/logger";
+import { useTranslations } from "next-intl";
 
 interface Destination {
   id: string;
@@ -27,6 +28,7 @@ interface LocationApi {
 }
 
 export default function PopularDestinations() {
+  const t = useTranslations("publicPages.home.popularDestinations");
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -88,10 +90,10 @@ export default function PopularDestinations() {
               variant="h3"
               sx={{ fontSize: { xs: "2rem", md: "3rem" }, fontWeight: "bold", textAlign: "center" }}
             >
-              Browse by Destination
+              {t("title")}
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, textAlign: "center" }}>
-              Explore our most popular rental locations with competitive rates and premium vehicles.
+              {t("subtitle")}
             </Typography>
           </Stack>
           <Typography color="text.secondary" sx={{ textAlign: "center" }}>
@@ -114,10 +116,10 @@ export default function PopularDestinations() {
             variant="h3"
             sx={{ fontSize: { xs: "2rem", md: "3rem" }, fontWeight: "bold", textAlign: "center" }}
           >
-            Browse by Destination
+            {t("title")}
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, textAlign: "center" }}>
-            Explore our most popular rental locations with competitive rates and premium vehicles.
+            {t("subtitle")}
           </Typography>
         </Stack>
 
@@ -243,7 +245,7 @@ export default function PopularDestinations() {
               textTransform: "none",
             }}
           >
-            View All Destinations
+            {t("exploreAll")}
           </Button>
         </Box>
       </Container>

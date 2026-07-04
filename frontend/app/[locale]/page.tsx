@@ -1,4 +1,5 @@
 import { Box, Container, Divider, Typography } from "@mui/material";
+import { getTranslations } from "next-intl/server";
 import HeroSection from "./_components/home/HeroSection";
 import SearchForm from "./_components/home/SearchForm";
 import TrustIndicators from "./_components/home/TrustIndicators";
@@ -33,12 +34,14 @@ function getDefaultDates() {
   };
 }
 
-export default async function Home() {
+export default async function Home({ params: { locale } }: { readonly params: { readonly locale: string } }) {
+  const t = await getTranslations({ locale, namespace: "publicPages.home" });
+
   const [locations, landingContent, destinations, suppliers] = await Promise.all([
-    fetchPublicLocations(),
-    fetchLandingContent(),
-    fetchPublicDestinations(4),
-    fetchPublicSuppliers(8),
+    fetchPublicLocations(locale),
+    fetchLandingContent(locale),
+    fetchPublicDestinations(4, locale),
+    fetchPublicSuppliers(8, locale),
   ]);
 
   const defaultDates = getDefaultDates();
@@ -46,35 +49,29 @@ export default async function Home() {
 
   const faqItems = landingContent?.faqItems ?? [
     {
-      question: "How do I book a rental car?",
-      answer:
-        "Simply select your pickup location, dates, and browse available vehicles. Click 'Reserve Now' on your chosen vehicle to complete the booking process.",
+      question: t("faq.defaultItems.q1"),
+      answer: t("faq.defaultItems.a1"),
     },
     {
-      question: "What documents do I need to pick up the car?",
-      answer:
-        "You'll need a valid driver's license, a credit card in your name, and your booking confirmation. International renters may need a passport and international driving permit.",
+      question: t("faq.defaultItems.q2"),
+      answer: t("faq.defaultItems.a2"),
     },
     {
-      question: "Can I cancel or modify my reservation?",
-      answer:
-        "Yes, you can cancel or modify your reservation through your account dashboard. Cancellation policies vary by supplier, so please review the terms during booking.",
+      question: t("faq.defaultItems.q3"),
+      answer: t("faq.defaultItems.a3"),
     },
     {
-      question: "Is insurance included in the rental price?",
-      answer:
-        "Basic insurance is typically included, but coverage levels vary. You can add additional protection during the booking process for extra peace of mind.",
+      question: t("faq.defaultItems.q4"),
+      answer: t("faq.defaultItems.a4"),
     },
     {
-      question: "What if I return the car late?",
-      answer:
-        "Late returns may incur additional charges based on the supplier's policy. We recommend contacting the rental location if you anticipate being late to discuss options.",
+      question: t("faq.defaultItems.q5"),
+      answer: t("faq.defaultItems.a5"),
     },
   ];
 
-  const heroTitle = landingContent?.heroTitle ?? "Find the right car for your next adventure.";
-  const heroDescription =
-    landingContent?.heroDescription ?? "Compare top providers, see honest reviews, and book instantly.";
+  const heroTitle = landingContent?.heroTitle ?? t("hero.defaultTitle");
+  const heroDescription = landingContent?.heroDescription ?? t("hero.defaultDescription");
   const valueProps = landingContent?.valueProps ?? [];
   const support = landingContent?.support;
 
@@ -107,10 +104,10 @@ export default async function Home() {
 
         <Box>
           <Typography variant="h4" sx={{ fontWeight: "bold", textAlign: "center", mb: 2 }}>
-            Destination Discovery
+            {t("destinationMap.title")}
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ textAlign: "center", mb: 4 }}>
-            Find our premium fleet in hundreds of locations worldwide.
+            {t("destinationMap.subtitle")}
           </Typography>
           <DestinationMapWrapper locations={locations} />
         </Box>

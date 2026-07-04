@@ -19,6 +19,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { toApiUrl } from "@/utils/api-client";
 import { logger } from "@/utils/logger";
 import { toApiDate, parseDateOnly } from "@/utils/dateTime";
+import { useTranslations, useLocale } from "next-intl";
 
 interface LocationOption {
   id: string;
@@ -43,6 +44,8 @@ export default function SearchForm({
   defaultPickupDate,
   defaultReturnDate,
 }: SearchFormProps) {
+  const t = useTranslations("publicPages.home.searchForm");
+  const locale = useLocale();
   const fallbackLocation = useMemo(() => {
     const found = locations.find(loc => loc.id === defaultLocationId);
     if (found) return found;
@@ -73,7 +76,7 @@ export default function SearchForm({
       try {
         const response = await fetch(
           toApiUrl(`/api/locations/autocomplete?query=${encodeURIComponent(query)}&type=pickup`),
-          { cache: "no-store" }
+          { cache: "no-store", headers: { "Accept-Language": locale } }
         );
 
         if (!response.ok) {
@@ -109,7 +112,7 @@ export default function SearchForm({
         }
       }
     },
-    [locations]
+    [locations, locale]
   );
 
   useEffect(() => {
@@ -199,7 +202,7 @@ export default function SearchForm({
             renderInput={params => (
               <TextField
                 {...params}
-                label="Pickup location"
+                label={t("locationPlaceholder")}
                 slotProps={{
                   ...params.slotProps,
                   inputLabel: {
@@ -225,7 +228,7 @@ export default function SearchForm({
             )}
           />
           <DatePicker
-            label="Pickup date"
+            label={t("pickupDatePlaceholder")}
             value={pickupDate}
             onChange={newValue => {
               setPickupDate(newValue);
@@ -253,7 +256,7 @@ export default function SearchForm({
             }}
           />
           <DatePicker
-            label="Return date"
+            label={t("returnDatePlaceholder")}
             value={returnDate}
             onChange={newValue => {
               setReturnDate(newValue);
@@ -305,7 +308,7 @@ export default function SearchForm({
                   transition: "all 0.2s ease",
                 }}
               >
-                Search cars
+                {t("searchButton")}
               </Button>
             </Link>
           </Box>
@@ -333,9 +336,9 @@ export default function SearchForm({
                 },
               }}
             >
-              <ToggleButton value="tomorrow">Tomorrow</ToggleButton>
-              <ToggleButton value="weekend">Weekend</ToggleButton>
-              <ToggleButton value="week">1 Week</ToggleButton>
+              <ToggleButton value="tomorrow">{t("presets.tomorrow")}</ToggleButton>
+              <ToggleButton value="weekend">{t("presets.weekend")}</ToggleButton>
+              <ToggleButton value="week">{t("presets.week")}</ToggleButton>
             </ToggleButtonGroup>
           </Stack>
         </Paper>

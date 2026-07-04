@@ -2,6 +2,7 @@
 
 import { Accordion, AccordionDetails, AccordionSummary, Box, Paper, Typography } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { useTranslations } from "next-intl";
 
 interface FAQItem {
   readonly question: string;
@@ -13,16 +14,18 @@ interface FAQSectionProps {
 }
 
 export default function FAQSection({ faqItems }: FAQSectionProps) {
+  const t = useTranslations("publicPages.home.faq");
+
   return (
     <Box sx={{ mb: 4 }}>
       <Typography
         variant="h4"
         sx={{ fontWeight: "bold", textAlign: "center", mb: 2, fontSize: { xs: "1.75rem", md: "2.125rem" } }}
       >
-        Frequently asked questions
+        {t("title")}
       </Typography>
       <Typography variant="body1" color="text.secondary" sx={{ textAlign: "center", mb: 5, maxWidth: 600, mx: "auto" }}>
-        Find answers to common questions about our rental service.
+        {t("subtitle")}
       </Typography>
 
       {/* Unified container with consistent border radius */}
@@ -113,7 +116,7 @@ export default function FAQSection({ faqItems }: FAQSectionProps) {
       {/* Optional: Add a help CTA below FAQs */}
       <Box sx={{ textAlign: "center", mt: 4 }}>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Still have questions?
+          {t("stillHaveQuestions")}
         </Typography>
         <Typography
           variant="body2"
@@ -126,7 +129,7 @@ export default function FAQSection({ faqItems }: FAQSectionProps) {
             },
           }}
         >
-          Contact our support team →
+          {t("contactSupport")}
         </Typography>
       </Box>
     </Box>

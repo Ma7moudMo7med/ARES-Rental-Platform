@@ -2,12 +2,14 @@
 
 import { Box, Container, Typography } from "@mui/material";
 import type { PublicSupplierCard } from "@/utils/public-data";
+import { useTranslations } from "next-intl";
 
 interface PartnerLogosProps {
   readonly suppliers?: readonly PublicSupplierCard[];
 }
 
 export default function PartnerLogos({ suppliers = [] }: Readonly<PartnerLogosProps>) {
+  const t = useTranslations("publicPages.home.partnerLogos");
   // Sample partner/brand names - in production, use actual logos
   const fallbackPartners = ["Toyota", "BMW", "Mercedes-Benz", "Hyundai", "Nissan", "Volkswagen", "Ford", "Chevrolet"];
   const partners = suppliers
@@ -33,7 +35,7 @@ export default function PartnerLogos({ suppliers = [] }: Readonly<PartnerLogosPr
       >
         <Box>
           <Typography variant="h5" sx={{ fontWeight: "bold", textAlign: "center", mb: 4 }}>
-            {partners.length > 0 ? "Trusted rental partners" : "Connecting you to the biggest brands"}
+            {t("title")}
           </Typography>
 
           <Box

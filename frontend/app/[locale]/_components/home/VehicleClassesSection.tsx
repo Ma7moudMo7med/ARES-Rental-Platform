@@ -13,37 +13,32 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import { fetchPublicCategories, type PublicCategory } from "@/utils/public-data";
 import { logger } from "@/utils/logger";
 import React from "react";
+import { useTranslations, useLocale } from "next-intl";
 
 // Pre-defined premium descriptions, images, and icons for fallback & style enhancement
-const categoryDetails: Record<string, { image: string; description: string; icon: React.ReactElement } | undefined> = {
+const categoryDetails: Record<string, { image: string; icon: React.ReactElement } | undefined> = {
   suv: {
     image: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=800",
-    description: "Spacious and powerful, built to handle any terrain or family road trip with maximum comfort.",
     icon: <GroupsIcon />,
   },
   sedan: {
     image: "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&q=80&w=800",
-    description: "Classic styling, excellent fuel efficiency, and a smooth, comfortable ride for daily commutes.",
     icon: <DirectionsCarIcon />,
   },
   luxury: {
     image: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&q=80&w=800",
-    description: "Premium class vehicles combining cutting-edge technology, elite comfort, and prestige performance.",
     icon: <StarIcon />,
   },
   electric: {
     image: "https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&q=80&w=800",
-    description: "Zero emission vehicles featuring silent drives, instant torque, and futuristic technology.",
     icon: <ElectricCarIcon />,
   },
   sports: {
     image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=800",
-    description: "High-performance cars designed for speed, precise handling, and pure driving excitement.",
     icon: <SpeedIcon />,
   },
   business: {
     image: "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=800",
-    description: "Refined and professional vehicles, ideal for executive travel, meetings, and business trips.",
     icon: <WorkIcon />,
   },
 };
@@ -57,6 +52,8 @@ interface VehicleClassesSectionProps {
 }
 
 export default function VehicleClassesSection({ defaultLocationId }: VehicleClassesSectionProps) {
+  const t = useTranslations("publicPages.home.vehicleClasses");
+  const locale = useLocale();
   const [categories, setCategories] = useState<PublicCategory[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -64,7 +61,7 @@ export default function VehicleClassesSection({ defaultLocationId }: VehicleClas
     let active = true;
     async function loadCategories() {
       try {
-        const data = await fetchPublicCategories();
+        const data = await fetchPublicCategories(locale);
         if (active) {
           if (data.length > 0) {
             // Filter out electric if present
@@ -114,15 +111,15 @@ export default function VehicleClassesSection({ defaultLocationId }: VehicleClas
     return () => {
       active = false;
     };
-  }, []);
+  }, [locale]);
 
   return (
     <Box>
       <Typography variant="h4" sx={{ fontWeight: "bold", textAlign: "center", mb: 1 }}>
-        Choose your ride
+        {t("title")}
       </Typography>
       <Typography variant="body1" color="text.secondary" sx={{ textAlign: "center", mb: 5 }}>
-        We have a wide range of vehicles to fit your needs.
+        {t("subtitle")}
       </Typography>
 
       {loading ? (
@@ -139,9 +136,13 @@ export default function VehicleClassesSection({ defaultLocationId }: VehicleClas
               };
               const searchName = getSearchCategoryName(cat.name);
               const nameLower = searchName.toLowerCase();
+
+              // We cast the translated classNames to any to allow dynamic key access
+              const translatedClassName = (t("classNames") as any)[nameLower] || cat.name;
+              const translatedDesc = (t("descriptions") as any)[nameLower] || defaultDescription;
+
               const details = categoryDetails[nameLower] || {
                 image: defaultImage,
-                description: defaultDescription,
                 icon: defaultIcon,
               };
 
@@ -225,7 +226,7 @@ export default function VehicleClassesSection({ defaultLocationId }: VehicleClas
 
                           {/* Category Name */}
                           <Typography variant="h5" sx={{ fontWeight: 800, color: "common.white", mb: 1 }}>
-                            {cat.name}
+                            {translatedClassName}
                           </Typography>
 
                           {/* Category Description */}
@@ -239,7 +240,7 @@ export default function VehicleClassesSection({ defaultLocationId }: VehicleClas
                               fontSize: "0.9rem",
                             }}
                           >
-                            {details.description}
+                            {translatedDesc}
                           </Typography>
 
                           {/* Bottom info strip */}
@@ -254,7 +255,7 @@ export default function VehicleClassesSection({ defaultLocationId }: VehicleClas
                             }}
                           >
                             <Typography variant="caption" sx={{ color: "common.white", opacity: 0.6, fontWeight: 600 }}>
-                              {cat.vehicleCount ?? 0} Vehicles Available
+                              {cat.vehicleCount ?? 0} {t("viewVehicles")}
                             </Typography>
                             <Typography
                               variant="caption"
@@ -266,7 +267,7 @@ export default function VehicleClassesSection({ defaultLocationId }: VehicleClas
                                 gap: 0.5,
                               }}
                             >
-                              Explore Now →
+                              {t("viewVehicles")} →
                             </Typography>
                           </Box>
                         </Box>

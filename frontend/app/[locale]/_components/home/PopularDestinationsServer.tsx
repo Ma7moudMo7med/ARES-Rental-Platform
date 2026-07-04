@@ -3,6 +3,7 @@ import { Box, Button, Card, CardContent, Container, Stack, Typography } from "@m
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { toImageUrl } from "@/utils/image-url";
+import { useTranslations } from "next-intl";
 
 interface Destination {
   id: string;
@@ -18,6 +19,7 @@ interface PopularDestinationsServerProps {
 }
 
 export default function PopularDestinationsServer({ destinations }: PopularDestinationsServerProps) {
+  const t = useTranslations("publicPages.home.popularDestinations");
   if (destinations.length === 0) {
     return null; // Don't show the section if no destinations
   }
@@ -30,10 +32,10 @@ export default function PopularDestinationsServer({ destinations }: PopularDesti
             variant="h3"
             sx={{ fontSize: { xs: "2rem", md: "3rem" }, fontWeight: "bold", textAlign: "center" }}
           >
-            Browse by Destination
+            {t("title")}
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, textAlign: "center" }}>
-            Explore our most popular rental locations with competitive rates and premium vehicles.
+            {t("subtitle")}
           </Typography>
         </Stack>
 
@@ -122,7 +124,7 @@ export default function PopularDestinationsServer({ destinations }: PopularDesti
                       }}
                     >
                       <Typography variant="caption" sx={{ fontWeight: "bold" }}>
-                        From ${dest.startingPrice}/day
+                        {t("fromPrice", { price: dest.startingPrice })}
                       </Typography>
                     </Box>
                   </Box>
@@ -135,7 +137,7 @@ export default function PopularDestinationsServer({ destinations }: PopularDesti
                       {dest.country}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {dest.vehicleCount}+ vehicles available
+                      {t("vehiclesAvailable", { count: dest.vehicleCount })}
                     </Typography>
                   </CardContent>
                 </Card>
@@ -158,7 +160,7 @@ export default function PopularDestinationsServer({ destinations }: PopularDesti
               textTransform: "none",
             }}
           >
-            View All Destinations
+            {t("exploreAll")}
           </Button>
         </Box>
       </Container>
