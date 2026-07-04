@@ -137,9 +137,14 @@ export default function VehicleClassesSection({ defaultLocationId }: VehicleClas
               const searchName = getSearchCategoryName(cat.name);
               const nameLower = searchName.toLowerCase();
 
-              // We cast the translated classNames to any to allow dynamic key access
-              const translatedClassName = (t("classNames") as any)[nameLower] || cat.name;
-              const translatedDesc = (t("descriptions") as any)[nameLower] || defaultDescription;
+              // Handle special cases where the category name differs from the translation key
+              const translationKey = nameLower === "suv" ? "suvs" : nameLower;
+              
+              const classNameKey = `classNames.${translationKey}` as any;
+              const translatedClassName = t.has(classNameKey) ? t(classNameKey) : cat.name;
+
+              const descKey = `descriptions.${translationKey}` as any;
+              const translatedDesc = t.has(descKey) ? t(descKey) : defaultDescription;
 
               const details = categoryDetails[nameLower] || {
                 image: defaultImage,
