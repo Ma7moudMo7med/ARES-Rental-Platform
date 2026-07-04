@@ -36,4 +36,3 @@ const notifications: AdminNotificationsLabels = {
 };
 
 export default notifications;
-

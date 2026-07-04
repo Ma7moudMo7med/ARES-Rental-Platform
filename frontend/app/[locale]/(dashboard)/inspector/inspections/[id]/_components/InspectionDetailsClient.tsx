@@ -79,7 +79,11 @@ export default function InspectionDetailsClient({ inspectionId }: Props): JSX.El
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [toast, setToast] = useState<{ readonly open: boolean; readonly severity: "success" | "error"; readonly message: string }>({
+  const [toast, setToast] = useState<{
+    readonly open: boolean;
+    readonly severity: "success" | "error";
+    readonly message: string;
+  }>({
     open: false,
     severity: "success",
     message: "",
@@ -254,7 +258,7 @@ export default function InspectionDetailsClient({ inspectionId }: Props): JSX.El
   if (!details) return <Box>{t("labels.notFound")}</Box>;
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: "auto", px: { xs: 2, sm: 3 }, py: { xs: 2, md: 3 } }}>
+    <Box sx={{ maxWidth: 1440, mx: "auto", px: { xs: 2, sm: 3 }, py: { xs: 2, md: 3 } }}>
       {/* Header section */}
       <Stack spacing={1.5} sx={{ mb: 2 }}>
         <Box>
@@ -264,7 +268,12 @@ export default function InspectionDetailsClient({ inspectionId }: Props): JSX.El
               router.back();
             }}
             color="inherit"
-            sx={{ textTransform: "none", fontWeight: 600, color: "text.secondary", "&:hover": { color: "text.primary", bgcolor: "transparent" } }}
+            sx={{
+              textTransform: "none",
+              fontWeight: 600,
+              color: "text.secondary",
+              "&:hover": { color: "text.primary", bgcolor: "transparent" },
+            }}
           >
             {t("actions.goBack")}
           </Button>
@@ -288,7 +297,7 @@ export default function InspectionDetailsClient({ inspectionId }: Props): JSX.El
         </Alert>
       )}
 
-      <Stack spacing={2}>
+      <Stack spacing={1.5}>
         {/* 1. Booking Information */}
         <BookingInfoSection details={details} />
 
@@ -336,12 +345,7 @@ export default function InspectionDetailsClient({ inspectionId }: Props): JSX.El
         />
 
         {/* 6. Submit Final Report */}
-        {!isLocked && (
-          <SubmitSection
-            submitting={submitting}
-            handleConfirmSubmit={handleConfirmSubmit}
-          />
-        )}
+        {!isLocked && <SubmitSection submitting={submitting} handleConfirmSubmit={handleConfirmSubmit} />}
       </Stack>
 
       <Dialog
@@ -414,14 +418,10 @@ interface InfoRowProps {
 function InfoRow({ label, value }: InfoRowProps) {
   return (
     <Box>
-      <Typography
-        variant="caption"
-        color="text.secondary"
-        sx={{ fontWeight: 600, display: "block", mb: 0.25, textTransform: "uppercase", letterSpacing: 0.5 }}
-      >
+      <Typography variant="body2" color="text.primary" sx={{ fontWeight: 700, display: "block", mb: 0.25 }}>
         {label}
       </Typography>
-      <Typography variant="body2" color="text.primary" sx={{ fontWeight: 600 }}>
+      <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
         {value}
       </Typography>
     </Box>
@@ -439,24 +439,26 @@ function BookingInfoSection({ details }: BookingInfoSectionProps) {
 
   const isPickup = details.inspectionType?.toLowerCase() === "pickup" || details.inspectionType === "CheckOut";
   const typeLabel = isPickup ? t("labels.pickupInspection") : t("labels.returnInspection");
-  const typeBg = isPickup ? alpha(theme.palette.status.confirmed.main, 0.15) : alpha(theme.palette.status.completed.main, 0.15);
+  const typeBg = isPickup
+    ? alpha(theme.palette.status.confirmed.main, 0.15)
+    : alpha(theme.palette.status.completed.main, 0.15);
   const typeColor = isPickup ? theme.palette.status.confirmed.main : theme.palette.status.completed.main;
 
   return (
     <Paper
       elevation={0}
       sx={{
-        p: 2,
-        borderRadius: 3,
+        px: 2,
+        py: 1.5,
+        borderRadius: 2,
         border: "1px solid",
         borderColor: "divider",
         bgcolor: "background.paper",
-        boxShadow: theme.shadows[1],
       }}
     >
       <Grid container spacing={2} sx={{ alignItems: "center" }}>
         <Grid size={{ xs: 12, md: 9 }}>
-          <Grid container spacing={1.5}>
+          <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 4 }}>
               <InfoRow label={t("labels.bookingNumber")} value={details.bookingNumber || "—"} />
             </Grid>
@@ -470,14 +472,20 @@ function BookingInfoSection({ details }: BookingInfoSectionProps) {
               <InfoRow label={t("labels.inspectionType")} value={typeLabel} />
             </Grid>
             <Grid size={{ xs: 12, sm: 4 }}>
-              <InfoRow label={t("labels.scheduledDateTime")} value={formatUtcDateTime(details.inspectionDate, locale)} />
+              <InfoRow
+                label={t("labels.scheduledDateTime")}
+                value={formatUtcDateTime(details.inspectionDate, locale)}
+              />
             </Grid>
             <Grid size={{ xs: 12, sm: 4 }}>
               <InfoRow label={t("labels.assignedInspector")} value={details.inspectorFullName || "—"} />
             </Grid>
           </Grid>
         </Grid>
-        <Grid size={{ xs: 12, md: 3 }} sx={{ display: "flex", flexDirection: "column", alignItems: { xs: "flex-start", md: "flex-end" }, gap: 1.5 }}>
+        <Grid
+          size={{ xs: 12, md: 3 }}
+          sx={{ display: "flex", flexDirection: "column", alignItems: { xs: "flex-start", md: "flex-end" }, gap: 1.5 }}
+        >
           <Chip
             label={typeLabel}
             sx={{
@@ -517,26 +525,25 @@ function VehicleMetricsSection({
   validationErrors,
 }: VehicleMetricsSectionProps) {
   const t = useTranslations("dashboardInspector.inspectionDetail");
-  const theme = useTheme();
 
   return (
     <Paper
       elevation={0}
       sx={{
-        p: 2,
-        borderRadius: 3,
+        px: 2,
+        py: 1.5,
+        borderRadius: 2,
         border: "1px solid",
         borderColor: "divider",
         bgcolor: "background.paper",
-        boxShadow: theme.shadows[1],
       }}
     >
-      <Typography variant="h6" sx={{ fontWeight: 800, mb: 1.5 }}>
+      <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 1 }}>
         {t("labels.vehicleMetrics")}
       </Typography>
-      <Grid container spacing={3}>
+      <Grid container spacing={1.5}>
         <Grid size={{ xs: 12, sm: 6 }}>
-          <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>
+          <Typography variant="body2" color="text.primary" sx={{ fontWeight: 700, mb: 0.5 }}>
             {t("labels.odometerReading")}
           </Typography>
           <TextField
@@ -566,7 +573,7 @@ function VehicleMetricsSection({
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
-          <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>
+          <Typography variant="body2" color="text.primary" sx={{ fontWeight: 700, mb: 0.5 }}>
             {t("labels.fuelLevel", { level: fuelLevel })}
           </Typography>
           <Box
@@ -635,16 +642,16 @@ function VisualEvidenceSection({
     <Paper
       elevation={0}
       sx={{
-        p: 2,
-        borderRadius: 3,
+        px: 2,
+        py: 1.5,
+        borderRadius: 2,
         border: "1px solid",
         borderColor: "divider",
         bgcolor: "background.paper",
-        boxShadow: theme.shadows[1],
       }}
     >
       <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center", mb: 1.5 }}>
-        <Typography variant="h6" sx={{ fontWeight: 800 }}>
+        <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>
           {t("labels.visualEvidence", { count: totalImageCount, max: MAX_IMAGES })}
         </Typography>
         {!isLocked && (
@@ -671,47 +678,32 @@ function VisualEvidenceSection({
         onChange={handleFileSelect}
       />
 
-      {allImages.length === 0 ? (
-        <Box
-          sx={{
-            border: "2px dashed",
-            borderColor: validationErrors.images ? "error.main" : "divider",
-            borderRadius: 3,
-            p: 4,
-            textAlign: "center",
-            cursor: isLocked ? "default" : "pointer",
-            bgcolor: alpha(theme.palette.background.default, 0.5),
-            transition: "all 0.2s",
-            "&:hover": { bgcolor: isLocked ? "inherit" : "action.hover" },
-          }}
-          onClick={() => {
-            if (!isLocked) fileInputRef.current?.click();
-          }}
-        >
-          <AddPhotoAlternateIcon sx={{ fontSize: 48, color: "text.disabled", mb: 2 }} />
-          <Typography variant="h6" sx={{ fontWeight: 700 }}>
-            {isLocked ? t("labels.noPhotos") : t("labels.uploadTitle")}
-          </Typography>
-          {!isLocked && (
-            <Typography variant="body2" color="text.secondary">
-              {t("labels.uploadSubtitle", { min: MIN_IMAGES, max: MAX_IMAGES })}
-            </Typography>
-          )}
-        </Box>
-      ) : (
-        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "repeat(2, 1fr)", sm: "repeat(3, 1fr)", md: "repeat(4, 1fr)", lg: "repeat(5, 1fr)" }, gap: 2 }}>
-          {allImages.map(img => (
-            <Box
-              key={img.id}
-              sx={{
-                position: "relative",
-                aspectRatio: "1 / 1",
-                borderRadius: 2,
-                overflow: "hidden",
-                border: "1px solid",
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "repeat(2, 1fr)",
+            sm: "repeat(3, 1fr)",
+            md: "repeat(4, 1fr)",
+            lg: `repeat(${MAX_IMAGES}, 1fr)`,
+          },
+          gap: 1.5,
+        }}
+      >
+        {Array.from({ length: Math.max(allImages.length, isLocked ? allImages.length : MAX_IMAGES) }).map((_, i) => {
+          const img = allImages[i];
+          if (img) {
+            return (
+              <Box
+                key={img.id}
+                sx={{
+                  position: "relative",
+                  aspectRatio: "1 / 1",
+                  borderRadius: 2,
+                  overflow: "hidden",
+                  border: "1px solid",
                   borderColor: "divider",
                   bgcolor: "background.default",
-                  boxShadow: theme.shadows[1],
                 }}
               >
                 {img.src && (
@@ -719,40 +711,67 @@ function VisualEvidenceSection({
                     component="img"
                     src={img.src}
                     alt={t("labels.imageAltText")}
-                    sx={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
+                    sx={{ width: "100%", height: "100%", objectFit: "cover" }}
                   />
                 )}
                 {img.isPending && !isLocked && (
                   <IconButton
                     size="small"
-                    onClick={() => {
-                      removePending(img.id);
-                    }}
+                    onClick={() => removePending(img.id)}
                     sx={{
                       position: "absolute",
-                      top: 8,
-                      right: 8,
+                      top: 4,
+                      right: 4,
                       bgcolor: alpha(theme.palette.error.main, 0.9),
                       color: theme.palette.error.contrastText,
                       backdropFilter: "blur(4px)",
                       "&:hover": { bgcolor: theme.palette.error.main, transform: "scale(1.1)" },
                       transition: "all 0.2s",
+                      padding: "4px",
                     }}
                   >
-                    <DeleteOutlinedIcon fontSize="small" />
+                    <DeleteOutlinedIcon sx={{ fontSize: 18 }} />
                   </IconButton>
                 )}
               </Box>
-          ))}
-        </Box>
-      )}
+            );
+          }
+
+          return (
+            <Box
+              key={`empty-${i}`}
+              onClick={() => {
+                if (!isLocked) fileInputRef.current?.click();
+              }}
+              sx={{
+                aspectRatio: "1 / 1",
+                borderRadius: 2,
+                border: "2px dashed",
+                borderColor: validationErrors.images ? "error.main" : "divider",
+                bgcolor: alpha(theme.palette.background.default, 0.5),
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: isLocked ? "default" : "pointer",
+                transition: "all 0.2s",
+                "&:hover": { bgcolor: isLocked ? "inherit" : "action.hover" },
+              }}
+            >
+              <AddPhotoAlternateIcon sx={{ fontSize: 32, color: "text.disabled", mb: 1 }} />
+              <Typography variant="caption" sx={{ fontWeight: 600, color: "text.secondary" }}>
+                {t("labels.uploadTitle")}
+              </Typography>
+            </Box>
+          );
+        })}
+      </Box>
 
       {/* Validation Errors & Photo Stats */}
-      <Stack direction={{ xs: "column", sm: "row" }} sx={{ justifyContent: "space-between", mt: 2, gap: 1, alignItems: { sm: "center" } }}>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        sx={{ justifyContent: "space-between", mt: 2, gap: 1, alignItems: { sm: "center" } }}
+      >
         <Box>
           <Typography variant="subtitle2" color="text.primary" sx={{ display: "block", fontWeight: 800 }}>
             {totalImageCount} / {MAX_IMAGES} {t("labels.photoCount")}
@@ -791,32 +810,32 @@ function ConditionReportSection({
   validationErrors,
 }: ConditionReportSectionProps) {
   const t = useTranslations("dashboardInspector.inspectionDetail");
-  const theme = useTheme();
 
   return (
     <Paper
       elevation={0}
       sx={{
-        p: 2,
-        borderRadius: 3,
+        px: 2,
+        py: 1.5,
+        borderRadius: 2,
         border: "1px solid",
         borderColor: "divider",
         bgcolor: "background.paper",
-        boxShadow: theme.shadows[1],
       }}
     >
-      <Typography variant="h6" sx={{ fontWeight: 800, mb: 1.5 }}>
+      <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 1 }}>
         {t("labels.conditionTitle")}
       </Typography>
 
-      <Stack spacing={2}>
+      <Stack spacing={1.5}>
         <Box>
-          <Typography variant="subtitle2" sx={{ fontWeight: 800, color: "primary.main", mb: 1 }}>
+          <Typography variant="body2" color="text.primary" sx={{ fontWeight: 700, mb: 0.5 }}>
             {t("labels.damageReportTitle")}
           </Typography>
           <TextField
             fullWidth
             multiline
+            size="small"
             minRows={2}
             placeholder={t("labels.damagePlaceholder")}
             value={generalCondition}
@@ -831,12 +850,13 @@ function ConditionReportSection({
         <Divider />
 
         <Box>
-          <Typography variant="subtitle2" sx={{ fontWeight: 800, color: "primary.main", mb: 1 }}>
+          <Typography variant="body2" color="text.primary" sx={{ fontWeight: 700, mb: 0.5 }}>
             {t("labels.finalNotesTitle")}
           </Typography>
           <TextField
             fullWidth
             multiline
+            size="small"
             minRows={2}
             placeholder={t("labels.finalNotesPlaceholder")}
             value={notes}
@@ -882,18 +902,19 @@ function DecisionButton({ type, selected, disabled, onClick, label }: DecisionBu
         if (!disabled) onClick();
       }}
       sx={{
-        p: 1.5,
-        borderRadius: 3,
+        py: 1.25,
+        px: 2,
+        borderRadius: 2,
         border: "2px solid",
         borderColor: selected ? color : "divider",
         bgcolor: selected ? alpha(paletteColor, 0.12) : "transparent",
-        boxShadow: selected ? `0 4px 12px ${alpha(paletteColor, 0.2)}` : "none",
+        boxShadow: "none",
         cursor: disabled ? "default" : "pointer",
         display: "flex",
-        flexDirection: "column",
+        flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
-        gap: 0.5,
+        gap: 1,
         textAlign: "center",
         transition: "all 0.2s ease-in-out",
         "&:hover": {
@@ -904,12 +925,12 @@ function DecisionButton({ type, selected, disabled, onClick, label }: DecisionBu
     >
       <Icon
         sx={{
-          fontSize: 32,
+          fontSize: 24,
           color: selected ? color : "text.disabled",
         }}
       />
       <Typography
-        variant="subtitle1"
+        variant="body2"
         sx={{
           fontWeight: 800,
           color: selected ? color : "text.primary",
@@ -929,22 +950,21 @@ function FinalDecisionSection({
   validationErrors,
 }: FinalDecisionSectionProps) {
   const t = useTranslations("dashboardInspector.inspectionDetail");
-  const theme = useTheme();
   const disabled = isLocked || submitting;
 
   return (
     <Paper
       elevation={0}
       sx={{
-        p: 2,
-        borderRadius: 3,
+        px: 2,
+        py: 1.5,
+        borderRadius: 2,
         border: "1px solid",
         borderColor: "divider",
         bgcolor: "background.paper",
-        boxShadow: theme.shadows[1],
       }}
     >
-      <Typography variant="h6" sx={{ fontWeight: 800, mb: 1.5 }}>
+      <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 1 }}>
         {t("labels.finalDecision")}
       </Typography>
       <Grid container spacing={2}>
@@ -953,7 +973,9 @@ function FinalDecisionSection({
             type="approve"
             selected={decision === "approve"}
             disabled={disabled}
-            onClick={() => { setDecision("approve"); }}
+            onClick={() => {
+              setDecision("approve");
+            }}
             label={t("actions.approveVehicle")}
           />
         </Grid>
@@ -962,7 +984,9 @@ function FinalDecisionSection({
             type="reject"
             selected={decision === "reject"}
             disabled={disabled}
-            onClick={() => { setDecision("reject"); }}
+            onClick={() => {
+              setDecision("reject");
+            }}
             label={t("actions.rejectVehicle")}
           />
         </Grid>
@@ -989,24 +1013,25 @@ function SubmitSection({ submitting, handleConfirmSubmit }: SubmitSectionProps) 
     <Paper
       elevation={0}
       sx={{
-        p: 2,
-        borderRadius: 3,
+        px: 2,
+        py: 1.5,
+        borderRadius: 2,
         border: "1px solid",
         borderColor: "divider",
         bgcolor: "background.paper",
-        boxShadow: theme.shadows[1],
       }}
     >
       {/* Information Warning Box */}
       <Stack
         direction="row"
-        spacing={2}
+        spacing={1.5}
         sx={{
-          p: 1.5,
+          px: 2,
+          py: 1.25,
           borderRadius: 2,
           bgcolor: alpha(theme.palette.warning.main, 0.08),
           borderLeft: `4px solid ${theme.palette.warning.main}`,
-          mb: 2.5,
+          mb: 2,
           alignItems: "center",
         }}
       >

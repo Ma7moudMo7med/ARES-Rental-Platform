@@ -78,7 +78,7 @@ export default function InspectorNotificationsPage() {
       try {
         if (!background) setLoading(true);
         const data = (await getNotifications(token)) as InspectorNotification[] | NotificationsResponse;
-        
+
         let notificationData: InspectorNotification[] = [];
         if (Array.isArray(data)) {
           notificationData = data as InspectorNotification[];
@@ -122,7 +122,7 @@ export default function InspectorNotificationsPage() {
 
       setNotifications(prev => prev.map(n => (n.id === id ? { ...n, isRead: true } : n)));
       window.dispatchEvent(new CustomEvent("notifications-updated"));
-      
+
       if (redirectUrl) {
         router.push(redirectUrl);
       }
@@ -259,11 +259,11 @@ export default function InspectorNotificationsPage() {
               borderColor: n.isRead ? "divider" : "primary.light",
               bgcolor: n.isRead ? "background.paper" : "action.hover",
               transition: "transform 0.2s, box-shadow 0.2s",
-              "&:hover": { 
+              "&:hover": {
                 transform: "translateY(-2px)",
-                boxShadow: (theme) => theme.shadows[4]
+                boxShadow: theme => theme.shadows[4],
               },
-              cursor: n.actionUrl ? "pointer" : "default"
+              cursor: n.actionUrl ? "pointer" : "default",
             }}
             onClick={() => {
               if (n.actionUrl) {
@@ -315,7 +315,10 @@ export default function InspectorNotificationsPage() {
 
               {/* Content */}
               <Box sx={{ flex: 1 }}>
-                <Stack direction={{ xs: "column", sm: "row" }} sx={{ justifyContent: "space-between", alignItems: { xs: "flex-start", sm: "center" }, mb: 0.5 }}>
+                <Stack
+                  direction={{ xs: "column", sm: "row" }}
+                  sx={{ justifyContent: "space-between", alignItems: { xs: "flex-start", sm: "center" }, mb: 0.5 }}
+                >
                   <Typography
                     variant="subtitle1"
                     sx={{ fontWeight: n.isRead ? 500 : 700 }}
@@ -343,17 +346,29 @@ export default function InspectorNotificationsPage() {
                       <Chip size="small" variant="outlined" label={`#${n.bookingNumber}`} color="primary" />
                     )}
                     {n.vehicleName && (
-                      <Chip size="small" variant="outlined" icon={<DirectionsCarIcon fontSize="small"/>} label={n.vehicleName} />
+                      <Chip
+                        size="small"
+                        variant="outlined"
+                        icon={<DirectionsCarIcon fontSize="small" />}
+                        label={n.vehicleName}
+                      />
                     )}
-                    {n.inspectionType && (
-                      <Chip size="small" variant="outlined" label={n.inspectionType} />
-                    )}
+                    {n.inspectionType && <Chip size="small" variant="outlined" label={n.inspectionType} />}
                   </Stack>
                 )}
               </Box>
 
               {/* Actions */}
-              <Stack direction="row" spacing={1} sx={{ alignItems: "center", mt: { xs: 2, sm: 0 }, width: { xs: "100%", sm: "auto" }, justifyContent: { xs: "flex-end", sm: "center" } }}>
+              <Stack
+                direction="row"
+                spacing={1}
+                sx={{
+                  alignItems: "center",
+                  mt: { xs: 2, sm: 0 },
+                  width: { xs: "100%", sm: "auto" },
+                  justifyContent: { xs: "flex-end", sm: "center" },
+                }}
+              >
                 {!n.isRead ? (
                   <Tooltip title={t("markAsReadTooltip")}>
                     <IconButton
@@ -366,17 +381,21 @@ export default function InspectorNotificationsPage() {
                       disabled={processingId === n.id}
                       sx={{ bgcolor: "background.paper", boxShadow: 1 }}
                     >
-                      {processingId === n.id ? <CircularProgress size={20} color="inherit" /> : <DoneAllIcon fontSize="small" />}
+                      {processingId === n.id ? (
+                        <CircularProgress size={20} color="inherit" />
+                      ) : (
+                        <DoneAllIcon fontSize="small" />
+                      )}
                     </IconButton>
                   </Tooltip>
                 ) : null}
-                
+
                 {n.actionUrl && (
                   <Button
                     variant="contained"
                     size="small"
                     endIcon={<KeyboardArrowRightIcon />}
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation();
                       if (!n.isRead) {
                         void handleMarkRead(n.id, n.actionUrl);
@@ -413,7 +432,10 @@ export default function InspectorNotificationsPage() {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       {/* Header Section */}
-      <Stack direction={{ xs: "column", sm: "row" }} sx={{ justifyContent: "space-between", alignItems: { xs: "flex-start", sm: "center" }, mb: 4, gap: 2 }}>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        sx={{ justifyContent: "space-between", alignItems: { xs: "flex-start", sm: "center" }, mb: 4, gap: 2 }}
+      >
         <Box>
           <Typography variant="h4" sx={{ fontWeight: "800", display: "flex", alignItems: "center", gap: 2, mb: 1 }}>
             {t("title")}
@@ -493,9 +515,7 @@ export default function InspectorNotificationsPage() {
       )}
 
       {/* Main List */}
-      <Box>
-        {renderContent()}
-      </Box>
+      <Box>{renderContent()}</Box>
 
       <DeleteNotificationDialog
         open={deleteDialogOpen}

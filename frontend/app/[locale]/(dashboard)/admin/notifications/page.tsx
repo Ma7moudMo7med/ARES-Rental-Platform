@@ -267,12 +267,12 @@ export default function NotificationsPage() {
                 );
               })()}
               <Typography variant="caption" sx={{ color: "text.disabled" }}>
-                  {formatUtcDateTime(n.createdAt, locale, {
-                    month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                {formatUtcDateTime(n.createdAt, locale, {
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
               </Typography>
 
               {/* Actions */}

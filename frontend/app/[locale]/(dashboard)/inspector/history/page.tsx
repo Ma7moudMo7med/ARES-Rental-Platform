@@ -46,7 +46,7 @@ export default function InspectionHistoryPage() {
   const t = useTranslations("dashboardInspector.history");
   const locale = useLocale();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  
+
   const [allHistory, setAllHistory] = useState<InspectionSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,7 +57,7 @@ export default function InspectionHistoryPage() {
   const [typeFilter, setTypeFilter] = useState("All");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
-  
+
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
@@ -67,7 +67,9 @@ export default function InspectionHistoryPage() {
       setDebouncedSearch(search);
       setPage(1);
     }, 500);
-    return () => { clearTimeout(handler); };
+    return () => {
+      clearTimeout(handler);
+    };
   }, [search]);
 
   const fetchData = useCallback(async () => {
@@ -131,7 +133,7 @@ export default function InspectionHistoryPage() {
   }, [allHistory, debouncedSearch, statusFilter, typeFilter, dateFrom, dateTo]);
 
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / pageSize));
-  
+
   const paginatedItems = useMemo(() => {
     const startIndex = (page - 1) * pageSize;
     return filteredItems.slice(startIndex, startIndex + pageSize);
@@ -200,7 +202,7 @@ export default function InspectionHistoryPage() {
               {t("filterReset")}
             </Button>
           </Stack>
-          
+
           {/* Bottom Row: Dropdowns */}
           <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
             {/* Status */}
@@ -324,7 +326,14 @@ export default function InspectionHistoryPage() {
           }}
         >
           <Typography color="error.main">{error}</Typography>
-          <Button variant="outlined" color="error" sx={{ mt: 2 }} onClick={() => { void fetchData(); }}>
+          <Button
+            variant="outlined"
+            color="error"
+            sx={{ mt: 2 }}
+            onClick={() => {
+              void fetchData();
+            }}
+          >
             Retry
           </Button>
         </Paper>
@@ -404,13 +413,23 @@ export default function InspectionHistoryPage() {
                 {i.vehicleDisplayName}
               </Typography>
               <Stack spacing={0.5} sx={{ mb: 2 }}>
-                <Typography variant="caption" color="text.secondary" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                >
                   {i.inspectionType === "Pickup" || i.inspectionType === "CheckOut" ? (
                     <DirectionsCarIcon sx={{ fontSize: 16, color: "status.active.main" }} />
                   ) : (
                     <CarRepairIcon sx={{ fontSize: 16, color: "status.cancelled.main" }} />
                   )}
-                  {i.inspectionType === "Pickup" ? t("typePickup") : i.inspectionType === "Return" ? t("typeReturn") : i.inspectionType === "Routine" ? t("typeRoutine") : i.inspectionType || "—"}
+                  {i.inspectionType === "Pickup"
+                    ? t("typePickup")
+                    : i.inspectionType === "Return"
+                      ? t("typeReturn")
+                      : i.inspectionType === "Routine"
+                        ? t("typeRoutine")
+                        : i.inspectionType || "—"}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
                   {t("mobileCard.photosCount", { count: i.imageCount })}
@@ -437,7 +456,9 @@ export default function InspectionHistoryPage() {
       ) : (
         // Desktop Table
         !error && (
-          <Paper sx={{ borderRadius: 2, overflow: "hidden", border: "1px solid", borderColor: "divider", elevation: 0 }}>
+          <Paper
+            sx={{ borderRadius: 2, overflow: "hidden", border: "1px solid", borderColor: "divider", elevation: 0 }}
+          >
             <Table>
               <TableHead sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
                 <TableRow
@@ -460,9 +481,7 @@ export default function InspectionHistoryPage() {
                   <TableCell>{t("filterTypeLabel")}</TableCell>
                   <TableCell>{t("table.photos")}</TableCell>
                   <TableCell>{t("table.status")}</TableCell>
-                  <TableCell align="right">
-                    {t("table.action")}
-                  </TableCell>
+                  <TableCell align="right">{t("table.action")}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -490,7 +509,13 @@ export default function InspectionHistoryPage() {
                           <CarRepairIcon sx={{ fontSize: 16, color: "status.cancelled.main" }} />
                         )}
                         <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          {i.inspectionType === "Pickup" ? t("typePickup") : i.inspectionType === "Return" ? t("typeReturn") : i.inspectionType === "Routine" ? t("typeRoutine") : i.inspectionType || "—"}
+                          {i.inspectionType === "Pickup"
+                            ? t("typePickup")
+                            : i.inspectionType === "Return"
+                              ? t("typeReturn")
+                              : i.inspectionType === "Routine"
+                                ? t("typeRoutine")
+                                : i.inspectionType || "—"}
                         </Typography>
                       </Stack>
                     </TableCell>
@@ -529,7 +554,9 @@ export default function InspectionHistoryPage() {
           <Pagination
             count={totalPages}
             page={page}
-            onChange={(_, value) => { setPage(value); }}
+            onChange={(_, value) => {
+              setPage(value);
+            }}
             color="primary"
             variant="outlined"
             shape="rounded"

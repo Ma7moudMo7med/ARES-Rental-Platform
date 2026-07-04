@@ -55,10 +55,14 @@ export type AdminDashboardLabels = {
     readonly hrAgo: string;
     readonly bookingCreatedWithCar: string;
     readonly bookingCreated: string;
+    readonly bookingCreatedByUser: string;
     readonly paymentCompletedWithCar: string;
     readonly paymentCompleted: string;
     readonly newUserRegistered: string;
     readonly vehicleAdded: string;
     readonly verificationSubmitted: string;
+    readonly statusPending: string;
+    readonly statusApproved: string;
+    readonly statusRejected: string;
   };
 };

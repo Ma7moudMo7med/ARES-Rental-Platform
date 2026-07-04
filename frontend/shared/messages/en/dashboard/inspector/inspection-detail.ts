@@ -68,7 +68,8 @@ const inspectionDetail: InspectorInspectionDetailLabels = {
     photoCount: "Photos Uploaded",
     damageReportTitle: "1. Damage Report",
     finalNotesTitle: "2. Final Inspection Notes",
-    submitInfoBox: "Please review all inspection information before submitting. Once submitted, the inspection report cannot be edited.",
+    submitInfoBox:
+      "Please review all inspection information before submitting. Once submitted, the inspection report cannot be edited.",
   },
 };
 

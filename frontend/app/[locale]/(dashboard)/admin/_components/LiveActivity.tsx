@@ -79,12 +79,74 @@ const TYPE_META: Record<
   verification: { color: "success", icon: <VerifiedIcon fontSize="small" /> },
 };
 
+function getLocalizedMessage(item: RecentActivityItem, t: any): string {
+  const msg = item.message;
+  if (!msg) return "";
+
+  // 1. Booking
+  // Backend format: $"Booking #{shortId} created by {customerName}"
+  if (item.type === "booking") {
+    const match = msg.match(/Booking\s+#([A-Za-z0-9-]+)\s+created\s+by\s+(.+)/i);
+    if (match) {
+      const [, id, name] = match;
+      return t("liveActivity.bookingCreatedByUser", { id, name });
+    }
+    // Fallback matches
+    const fallbackMatch = msg.match(/Booking\s+#([A-Za-z0-9-]+)/i);
+    if (fallbackMatch) {
+      return t("liveActivity.bookingCreated", { id: fallbackMatch[1] });
+    }
+  }
+
+  // 2. Payment
+  // Backend format: $"Payment completed for Booking #{shortId}"
+  if (item.type === "payment") {
+    const match = msg.match(/Payment\s+completed\s+for\s+Booking\s+#([A-Za-z0-9-]+)/i);
+    if (match) {
+      return t("liveActivity.paymentCompleted", { id: match[1] });
+    }
+  }
+
+  // 3. User
+  // Backend format: $"New user registered: {fullName}"
+  if (item.type === "user") {
+    const match = msg.match(/New\s+user\s+registered:\s*(.+)/i);
+    if (match) {
+      return t("liveActivity.newUserRegistered", { name: match[1] });
+    }
+  }
+
+  // 4. Vehicle
+  // Backend format: $"Vehicle added: {label}"
+  if (item.type === "vehicle") {
+    const match = msg.match(/Vehicle\s+added:\s*(.+)/i);
+    if (match) {
+      return t("liveActivity.vehicleAdded", { label: match[1] });
+    }
+  }
+
+  // 5. Verification
+  // Backend format: $"Verification submitted by {fullName} ({statusLabel})"
+  if (item.type === "verification") {
+    const match = msg.match(/Verification\s+submitted\s+by\s+(.+?)\s*\((.+?)\)/i);
+    if (match) {
+      const [, name, status] = match;
+      const statusLower = status.toLowerCase();
+      let statusKey = "statusPending";
+      if (statusLower === "approved" || statusLower === "completed" || statusLower === "verified") {
+        statusKey = "statusApproved";
+      } else if (statusLower === "rejected" || statusLower === "failed") {
+        statusKey = "statusRejected";
+      }
+      return t("liveActivity.verificationSubmitted", { name, status: t(`liveActivity.${statusKey}`) });
+    }
+  }
+
+  return msg;
+}
+
 // ── Timestamp display ─────────────────────────────────────────────────────────
-function formatTimestamp(
-  iso: string | null | undefined,
-  locale: string,
-  t: any
-): string {
+function formatTimestamp(iso: string | null | undefined, locale: string, t: any): string {
   if (!iso) return "–";
   const date = parseUtcDate(iso);
   if (Number.isNaN(date.getTime())) return "–";
@@ -197,7 +259,9 @@ async function fetchViaFallbackApis(
     const bTs = bestBookingTs(b);
     keepLatest({
       type: "booking",
-      message: carName ? t("liveActivity.bookingCreatedWithCar", { car: carName }) : t("liveActivity.bookingCreated", { id: shortId }),
+      message: carName
+        ? t("liveActivity.bookingCreatedWithCar", { car: carName })
+        : t("liveActivity.bookingCreated", { id: shortId }),
       createdAt: bTs ?? "",
       icon: "booking",
     });
@@ -207,7 +271,9 @@ async function fetchViaFallbackApis(
       const pTs = bestPaymentTs(b);
       keepLatest({
         type: "payment",
-        message: carName ? t("liveActivity.paymentCompletedWithCar", { car: carName }) : t("liveActivity.paymentCompleted", { id: shortId }),
+        message: carName
+          ? t("liveActivity.paymentCompletedWithCar", { car: carName })
+          : t("liveActivity.paymentCompleted", { id: shortId }),
         createdAt: pTs ?? "",
         icon: "payment",
       });
@@ -428,7 +494,7 @@ export default function LiveActivity({ activities: _ }: { readonly activities?: 
                     textOverflow: "ellipsis",
                   }}
                 >
-                  {item.message}
+                  {getLocalizedMessage(item, t)}
                 </Typography>
                 <Typography
                   variant="caption"

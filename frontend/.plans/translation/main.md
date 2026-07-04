@@ -12,7 +12,6 @@
 - **English**: 78/94 split (common, auth, errors + 6 auth + 10 customer + 21 admin + 7 driver + 4 inspector + 9 supplier + 16 public/root page translations done; 16 remaining)
 - **Arabic**: 78/94 split (common, auth, errors + 6 auth + 10 customer + 21 admin + 7 driver + 4 inspector + 9 supplier + 16 public/root page translations done; 16 remaining)
 
-
 > See `shared/Messages_README.md` for messages directory conventions.
 
 ---

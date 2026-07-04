@@ -2,7 +2,8 @@ import type { AdminDashboardLabels } from "../../types/admin/dashboard";
 
 const dashboard: AdminDashboardLabels = {
   title: "Admin Dashboard | ARES Car Rental",
-  description: "Monitor bookings, manage fleet, and oversee system performance from the ARES administrative command center.",
+  description:
+    "Monitor bookings, manage fleet, and oversee system performance from the ARES administrative command center.",
   summary: {
     totalUsers: "Total Users",
     activeBookings: "Active Bookings",
@@ -57,11 +58,15 @@ const dashboard: AdminDashboardLabels = {
     hrAgo: "{count} hr ago",
     bookingCreatedWithCar: "Booking for {car} created",
     bookingCreated: "Booking #{id} created",
+    bookingCreatedByUser: "Booking #{id} created by {name}",
     paymentCompletedWithCar: "Payment completed for {car}",
     paymentCompleted: "Payment completed for Booking #{id}",
     newUserRegistered: "New user registered: {name}",
     vehicleAdded: "Vehicle {label} added",
     verificationSubmitted: "Verification submitted by {name} ({status})",
+    statusPending: "Pending",
+    statusApproved: "Approved",
+    statusRejected: "Rejected",
   },
 };
 

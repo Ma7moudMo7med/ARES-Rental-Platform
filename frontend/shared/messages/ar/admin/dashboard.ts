@@ -57,11 +57,15 @@ const dashboard: AdminDashboardLabels = {
     hrAgo: "منذ {count} ساعة",
     bookingCreatedWithCar: "تم إنشاء حجز لـ {car}",
     bookingCreated: "تم إنشاء الحجز #{id}",
+    bookingCreatedByUser: "تم إنشاء الحجز #{id} بواسطة {name}",
     paymentCompletedWithCar: "تم الدفع لـ {car}",
     paymentCompleted: "تم الدفع للحجز #{id}",
     newUserRegistered: "تم تسجيل مستخدم جديد: {name}",
     vehicleAdded: "تم إضافة سيارة {label}",
     verificationSubmitted: "تم تقديم طلب تحقق من {name} ({status})",
+    statusPending: "قيد الانتظار",
+    statusApproved: "مقبول",
+    statusRejected: "مرفوض",
   },
 };
 

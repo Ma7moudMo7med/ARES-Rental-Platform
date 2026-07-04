@@ -109,7 +109,16 @@ export default function RecentActivityList({ history, loading }: RecentActivityL
               </Box>
               <Box sx={{ textAlign: "right" }}>
                 <Typography variant="caption" sx={{ color: color, fontWeight: 700, display: "block" }}>
-                  {item.status}
+                  {(() => {
+                    const statusLower = (item.status || "").toLowerCase();
+                    if (statusLower === "approved" || statusLower === "completed" || statusLower === "verified") {
+                      return t("status.approved");
+                    }
+                    if (statusLower === "rejected" || statusLower === "failed") {
+                      return t("status.rejected");
+                    }
+                    return t("status.pending");
+                  })()}
                 </Typography>
                 <Typography variant="caption" sx={{ color: "text.secondary" }}>
                   {date.toLocaleDateString()}

@@ -2,7 +2,12 @@
 
 import React from "react";
 import { useTranslations } from "next-intl";
-import { Dashboard as DashboardIcon, History as HistoryIcon, Person as PersonIcon, Notifications as NotificationsIcon } from "@mui/icons-material";
+import {
+  Dashboard as DashboardIcon,
+  History as HistoryIcon,
+  Person as PersonIcon,
+  Notifications as NotificationsIcon,
+} from "@mui/icons-material";
 import DashboardShell, { type DashboardMenuItem } from "../_components/DashboardShell";
 
 export default function InspectorLayout({ children }: { readonly children: React.ReactNode }) {

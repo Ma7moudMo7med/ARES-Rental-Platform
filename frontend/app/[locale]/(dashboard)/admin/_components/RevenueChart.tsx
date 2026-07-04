@@ -78,7 +78,8 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
             ● {t("revenue.grossRevenue")}: ${payload.find(p => p.dataKey === "revenue")?.value.toLocaleString() || 0}
           </Typography>
           <Typography sx={{ color: theme.palette.status.active.main, fontSize: "0.875rem" }}>
-            ■ {t("revenue.platformRevenue")}: ${payload.find(p => p.dataKey === "platformRevenue")?.value.toLocaleString() || 0}
+            ■ {t("revenue.platformRevenue")}: $
+            {payload.find(p => p.dataKey === "platformRevenue")?.value.toLocaleString() || 0}
           </Typography>
         </Stack>
       </Box>

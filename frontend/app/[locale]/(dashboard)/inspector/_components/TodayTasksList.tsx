@@ -202,9 +202,7 @@ export default function TodayTasksList({ tasks, loading }: TodaysTasksListProps)
                 <TableCell>{t("table.inspectionType", { fallback: "Inspection Type" })}</TableCell>
                 <TableCell>{t("table.status", { fallback: "Status" })}</TableCell>
                 <TableCell>{t("table.quickActions", { fallback: "Quick Actions" })}</TableCell>
-                <TableCell sx={{ textAlign: "right" }}>
-                  {t("table.action", { fallback: "Action" })}
-                </TableCell>
+                <TableCell sx={{ textAlign: "right" }}>{t("table.action", { fallback: "Action" })}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

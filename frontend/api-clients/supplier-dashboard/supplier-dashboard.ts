@@ -66,3 +66,23 @@ export async function getSupplierVehicleStatusDistribution(accessToken: string):
     accessToken,
   });
 }
+
+/**
+ * Single recent activity item from the dashboard summary feed.
+ */
+export interface RecentActivityItem {
+  type: "booking" | "payment" | "user" | "vehicle" | "verification" | string;
+  message: string;
+  createdAt: string;
+  icon: string;
+}
+
+/**
+ * Fetch the authenticated supplier's recent activity feed.
+ */
+export async function getSupplierRecentActivity(accessToken: string): Promise<RecentActivityItem[]> {
+  return apiFetchJson<RecentActivityItem[]>("/api/dashboard/recent-summary", {
+    method: "GET",
+    accessToken,
+  });
+}
