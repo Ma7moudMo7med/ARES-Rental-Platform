@@ -4,16 +4,17 @@ import { Link } from "@/shared/i18n/routing";
 import { Box, Button, Grid, List, ListItem, ListItemIcon, ListItemText, Paper, Typography, alpha } from "@mui/material";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import type { PublicLandingSupport } from "@/utils/public-data";
+import { useTranslations } from "next-intl";
 
 interface SupportSectionProps {
   readonly support?: PublicLandingSupport | null;
 }
 
 export default function SupportSection({ support }: Readonly<SupportSectionProps>) {
-  const supportTitle = support?.title || "We're here for you.";
-  const supportDescription =
-    support?.description || "Our customer care team is available to assist you with every step of the rental process.";
-  const supportActionLabel = support?.actionLabel || "Contact Support";
+  const t = useTranslations("publicPages.home.support");
+  const supportTitle = support?.title || t("title");
+  const supportDescription = support?.description || t("subtitle");
+  const supportActionLabel = support?.actionLabel || t("contactSupportBtn");
 
   return (
     <Paper
@@ -51,35 +52,33 @@ export default function SupportSection({ support }: Readonly<SupportSectionProps
               {supportDescription}
             </Typography>
             <List sx={{ mb: 3 }}>
-              {["24/7 Phone Support", "Easy Online Cancellation", "Local Area Guides", "Dedicated Fleet Managers"].map(
-                (item, idx) => (
-                  <ListItem
-                    key={idx}
-                    disablePadding
-                    sx={{
-                      mb: 1.5, // Increased from 1 to 1.5 (12px) for better spacing
-                    }}
-                  >
-                    <ListItemIcon sx={{ minWidth: 40 }}>
-                      <CheckCircleRoundedIcon
-                        color="warning"
-                        sx={{ fontSize: 28 }} // Slightly larger icons
-                      />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={item}
-                      slotProps={{
-                        primary: {
-                          sx: {
-                            fontWeight: "bold",
-                            fontSize: "1.05rem",
-                          },
-                        },
-                      }}
+              {[t("features.f1"), t("features.f2"), t("features.f3"), t("features.f4")].map((item, idx) => (
+                <ListItem
+                  key={idx}
+                  disablePadding
+                  sx={{
+                    mb: 1.5, // Increased from 1 to 1.5 (12px) for better spacing
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 40 }}>
+                    <CheckCircleRoundedIcon
+                      color="warning"
+                      sx={{ fontSize: 28 }} // Slightly larger icons
                     />
-                  </ListItem>
-                )
-              )}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item}
+                    slotProps={{
+                      primary: {
+                        sx: {
+                          fontWeight: "bold",
+                          fontSize: "1.05rem",
+                        },
+                      },
+                    }}
+                  />
+                </ListItem>
+              ))}
             </List>
             <Box>
               <Link href="/contact" style={{ textDecoration: "none" }}>
@@ -166,10 +165,10 @@ export default function SupportSection({ support }: Readonly<SupportSectionProps
                   lineHeight: 1.4,
                 }}
               >
-                &quot;The easiest rental I&apos;ve ever booked.&quot;
+                {t("review.text")}
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                — Sarah J., Verified Review
+                {t("review.author")}
               </Typography>
 
               {/* Optional: Add star rating for credibility */}
@@ -197,7 +196,7 @@ export default function SupportSection({ support }: Readonly<SupportSectionProps
                   </Box>
                 ))}
                 <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                  5.0 out of 5
+                  {t("review.rating")}
                 </Typography>
               </Box>
             </Paper>

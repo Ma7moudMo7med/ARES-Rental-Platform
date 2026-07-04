@@ -97,7 +97,7 @@ export default function CommissionSettingsTab() {
       setSuccess(null);
       const numValue = parseFloat(percentage);
       if (isNaN(numValue) || numValue < 0 || numValue > 100) {
-        throw new Error("Commission percentage must be between 0 and 100");
+        throw new Error(t("commission.invalidRate"));
       }
 
       await apiFetchJson("api/admin/commission/global", {
@@ -127,7 +127,7 @@ export default function CommissionSettingsTab() {
       setDriverSuccess(null);
       const numValue = parseFloat(driverPercentage);
       if (isNaN(numValue) || numValue < 0 || numValue > 100) {
-        throw new Error("Commission percentage must be between 0 and 100");
+        throw new Error(t("commission.invalidRate"));
       }
 
       await apiFetchJson("api/admin/commission/driver-global", {

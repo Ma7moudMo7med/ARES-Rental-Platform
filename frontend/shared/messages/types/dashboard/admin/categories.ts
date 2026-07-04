@@ -65,6 +65,15 @@ export type CategoriesLabels = {
     readonly errors: {
       readonly saveFailed: string;
     };
+    readonly imageUpload: {
+      readonly title: string;
+      readonly changeBtn: string;
+      readonly removeBtn: string;
+      readonly clickToUpload: string;
+      readonly allowedTypes: string;
+      readonly errorType: string;
+      readonly errorSize: string;
+    };
   };
   readonly summaryCards: {
     readonly categories: string;
@@ -106,6 +115,10 @@ export type CategoriesLabels = {
       readonly electric: string;
       readonly sports: string;
       readonly business: string;
+      readonly economy: string;
+      readonly hybrid: string;
+      readonly standard: string;
+      readonly van: string;
     };
     readonly descriptions: {
       readonly suv: string;
@@ -114,6 +127,10 @@ export type CategoriesLabels = {
       readonly electric: string;
       readonly sports: string;
       readonly business: string;
+      readonly economy: string;
+      readonly hybrid: string;
+      readonly standard: string;
+      readonly van: string;
     };
   };
 };

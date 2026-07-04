@@ -10,42 +10,54 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
+import { useTranslations } from "next-intl";
 
 export default function Footer() {
-  const topCities = ["Cairo", "Alexandria", "Giza", "Sharm El Sheikh", "Hurghada", "Luxor", "Aswan", "Port Said"];
+  const t = useTranslations("footer");
+
+  const topCities = [
+    { name: t("topCities.cairo"), query: "Cairo" },
+    { name: t("topCities.alexandria"), query: "Alexandria" },
+    { name: t("topCities.giza"), query: "Giza" },
+    { name: t("topCities.sharm"), query: "Sharm El Sheikh" },
+    { name: t("topCities.hurghada"), query: "Hurghada" },
+    { name: t("topCities.luxor"), query: "Luxor" },
+    { name: t("topCities.aswan"), query: "Aswan" },
+    { name: t("topCities.portsaid"), query: "Port Said" },
+  ];
 
   const fleetTypes = [
-    "Economy Cars",
-    "Compact Cars",
-    "Mid-Size Sedans",
-    "SUVs",
-    "Luxury Vehicles",
-    "Vans & Minivans",
-    "Electric Vehicles",
-    "Convertibles",
+    { label: t("fleetTypes.economy"), query: "Economy Cars" },
+    { label: t("fleetTypes.compact"), query: "Compact Cars" },
+    { label: t("fleetTypes.midSize"), query: "Mid-Size Sedans" },
+    { label: t("fleetTypes.suvs"), query: "SUVs" },
+    { label: t("fleetTypes.luxury"), query: "Luxury Vehicles" },
+    { label: t("fleetTypes.vans"), query: "Vans & Minivans" },
+    { label: t("fleetTypes.electric"), query: "Electric Vehicles" },
+    { label: t("fleetTypes.convertibles"), query: "Convertibles" },
   ];
 
   const company = [
-    { label: "About Us", href: "/about" },
-    { label: "Careers", href: "/careers" },
-    { label: "Press", href: "/press" },
-    { label: "Blog", href: "/blog" },
-    { label: "Partnerships", href: "/partnerships" },
+    { label: t("company.aboutUs"), href: "/about" },
+    { label: t("company.careers"), href: "/careers" },
+    { label: t("company.press"), href: "/press" },
+    { label: t("company.blog"), href: "/blog" },
+    { label: t("company.partnerships"), href: "/partnerships" },
   ];
 
   const support = [
-    { label: "Help Center", href: "/help" },
-    { label: "Contact Us", href: "/contact" },
-    { label: "FAQs", href: "/faq" },
-    { label: "Booking Guide", href: "/guide" },
-    { label: "Cancellation Policy", href: "/cancellation" },
+    { label: t("support.helpCenter"), href: "/help" },
+    { label: t("support.contactUs"), href: "/contact" },
+    { label: t("support.faqs"), href: "/faq" },
+    { label: t("support.bookingGuide"), href: "/guide" },
+    { label: t("support.cancellationPolicy"), href: "/cancellation" },
   ];
 
   const legal = [
-    { label: "Terms of Service", href: "/terms" },
-    { label: "Privacy Policy", href: "/privacy" },
-    { label: "Cookie Policy", href: "/cookies" },
-    { label: "Accessibility", href: "/accessibility" },
+    { label: t("legal.termsOfService"), href: "/terms" },
+    { label: t("legal.privacyPolicy"), href: "/privacy" },
+    { label: t("legal.cookiePolicy"), href: "/cookies" },
+    { label: t("legal.accessibility"), href: "/accessibility" },
   ];
 
   const paymentMethods = ["Visa", "Mastercard", "PayPal", "Apple Pay", "Google Pay"];
@@ -67,10 +79,10 @@ export default function Footer() {
             <Grid size={{ xs: 12, md: 6 }}>
               <Stack spacing={2}>
                 <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-                  Subscribe to our newsletter
+                  {t("subscribeTitle")}
                 </Typography>
                 <Typography variant="body1" sx={{ opacity: 0.9 }}>
-                  Get exclusive deals, travel tips, and the latest updates delivered to your inbox.
+                  {t("subscribeSubtitle")}
                 </Typography>
               </Stack>
             </Grid>
@@ -79,7 +91,7 @@ export default function Footer() {
                 <TextField
                   id="newsletter-email-input"
                   fullWidth
-                  placeholder="Enter your email"
+                  placeholder={t("emailPlaceholder")}
                   variant="outlined"
                   sx={{
                     bgcolor: "background.paper",
@@ -101,7 +113,7 @@ export default function Footer() {
                     whiteSpace: "nowrap",
                   }}
                 >
-                  Subscribe
+                  {t("subscribeButton")}
                 </Button>
               </Stack>
             </Grid>
@@ -137,8 +149,7 @@ export default function Footer() {
               </Box>
             </Box>
             <Typography variant="body2" sx={{ mb: 3, lineHeight: 1.7 }}>
-              Your trusted partner for car rentals worldwide. Quality vehicles, transparent pricing, and exceptional
-              service.
+              {t("companyDesc")}
             </Typography>
             <Stack spacing={1.5}>
               <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
@@ -151,7 +162,7 @@ export default function Footer() {
               </Stack>
               <Stack direction="row" spacing={1} sx={{ alignItems: "flex-start" }}>
                 <LocationOnIcon fontSize="small" />
-                <Typography variant="body2">Cairo, Egypt</Typography>
+                <Typography variant="body2">{t("topCities.cairo")}, Egypt</Typography>
               </Stack>
             </Stack>
           </Grid>
@@ -159,19 +170,19 @@ export default function Footer() {
           {/* Top Cities */}
           <Grid size={{ xs: 6, sm: 6, md: 2 }}>
             <Typography variant="h6" sx={{ fontWeight: "bold" }} color="footer.title" gutterBottom>
-              Top Cities
+              {t("topCitiesTitle")}
             </Typography>
             <Stack spacing={1}>
               {topCities.map(city => (
                 <MuiLink
-                  key={city}
-                  href={`/search?city=${city}`}
+                  key={city.query}
+                  href={`/search?city=${city.query}`}
                   component={Link}
                   color="inherit"
                   underline="hover"
                   sx={{ fontSize: "0.875rem" }}
                 >
-                  {city}
+                  {city.name}
                 </MuiLink>
               ))}
             </Stack>
@@ -180,19 +191,19 @@ export default function Footer() {
           {/* Fleet Types */}
           <Grid size={{ xs: 6, sm: 6, md: 2 }}>
             <Typography variant="h6" sx={{ fontWeight: "bold" }} color="footer.title" gutterBottom>
-              Fleet Types
+              {t("fleetTypesTitle")}
             </Typography>
             <Stack spacing={1}>
               {fleetTypes.slice(0, 6).map(type => (
                 <MuiLink
-                  key={type}
-                  href={`/search?type=${type}`}
+                  key={type.query}
+                  href={`/search?type=${type.query}`}
                   component={Link}
                   color="inherit"
                   underline="hover"
                   sx={{ fontSize: "0.875rem" }}
                 >
-                  {type}
+                  {type.label}
                 </MuiLink>
               ))}
             </Stack>
@@ -201,7 +212,7 @@ export default function Footer() {
           {/* Company */}
           <Grid size={{ xs: 6, sm: 4, md: 1.5 }}>
             <Typography variant="h6" sx={{ fontWeight: "bold" }} color="footer.title" gutterBottom>
-              Company
+              {t("companyTitle")}
             </Typography>
             <Stack spacing={1}>
               {company.map(item => (
@@ -222,7 +233,7 @@ export default function Footer() {
           {/* Support */}
           <Grid size={{ xs: 6, sm: 4, md: 1.5 }}>
             <Typography variant="h6" sx={{ fontWeight: "bold" }} color="footer.title" gutterBottom>
-              Support
+              {t("supportTitle")}
             </Typography>
             <Stack spacing={1}>
               {support.map(item => (
@@ -243,7 +254,7 @@ export default function Footer() {
           {/* Legal */}
           <Grid size={{ xs: 12, sm: 4, md: 2 }}>
             <Typography variant="h6" sx={{ fontWeight: "bold" }} color="footer.title" gutterBottom>
-              Legal
+              {t("legalTitle")}
             </Typography>
             <Stack spacing={1}>
               {legal.map(item => (
@@ -272,13 +283,13 @@ export default function Footer() {
         >
           {/* Copyright */}
           <Typography variant="body2" color="footer.text">
-            © {new Date().getFullYear()} ARES Rentals. All rights reserved.
+            {t("copyright", { year: new Date().getFullYear() })}
           </Typography>
 
           {/* Payment Methods */}
           <Stack direction="row" spacing={2} sx={{ alignItems: "center", flexWrap: "wrap" }}>
             <Typography variant="caption" color="footer.text">
-              We accept:
+              {t("acceptPayments")}
             </Typography>
             {paymentMethods.map(method => (
               <Box

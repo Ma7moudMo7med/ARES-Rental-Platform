@@ -82,7 +82,7 @@ export default function AboutSettingsTab() {
   const [fetching, setFetching] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
-  const selectedLocale = "en" as LocaleCode;
+  const [selectedLocale, setSelectedLocale] = useState<LocaleCode>("en");
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -122,7 +122,7 @@ export default function AboutSettingsTab() {
 
   const openCreate = () => {
     setEditingId(null);
-    setForm({ ...emptyForm, order: sections.length + 1, localizations: { ...defaultLocalizations } });
+    setForm({ ...emptyForm, order: sections.length + 1, localizations: { ar: { title: "", content: "" } } });
     setDialogOpen(true);
   };
 
@@ -218,14 +218,29 @@ export default function AboutSettingsTab() {
             {t("about.subtitle")}
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddRoundedIcon />}
-          onClick={openCreate}
-          sx={{ borderRadius: 2, fontWeight: 700 }}
-        >
-          {t("about.addSection")}
-        </Button>
+        <Stack sx={{ flexDirection: "row", gap: 2, alignItems: "center" }}>
+          <FormControl size="small" sx={{ minWidth: 180 }}>
+            <InputLabel>{t("configureLocale")}</InputLabel>
+            <Select
+              label={t("configureLocale")}
+              value={selectedLocale}
+              onChange={e => {
+                setSelectedLocale(e.target.value);
+              }}
+            >
+              <MenuItem value="en">{t("englishLabel")}</MenuItem>
+              <MenuItem value="ar">{t("arabicLabel")}</MenuItem>
+            </Select>
+          </FormControl>
+          <Button
+            variant="contained"
+            startIcon={<AddRoundedIcon />}
+            onClick={openCreate}
+            sx={{ borderRadius: 2, fontWeight: 700 }}
+          >
+            {t("about.addSection")}
+          </Button>
+        </Stack>
       </Stack>
 
       <Stack sx={{ gap: 2 }}>
@@ -245,7 +260,12 @@ export default function AboutSettingsTab() {
                   <Typography variant="caption" color="text.secondary">
                     #{section.order}
                   </Typography>
-                  <Chip label={section.sectionType} size="small" color="primary" variant="outlined" />
+                  <Chip
+                    label={t(`about.types.${section.sectionType}` as any)}
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                  />
                   <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
                     {getLocaleTitle(section)}
                   </Typography>
@@ -295,27 +315,71 @@ export default function AboutSettingsTab() {
         fullWidth
         maxWidth="sm"
       >
-        <DialogTitle sx={{ fontWeight: 700 }}>{editingId ? t("about.editSection") : t("about.newSection")}</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 700 }}>
+          {editingId ? t("about.editSection") : t("about.newSection")} &mdash;{" "}
+          {selectedLocale === "en" ? t("englishLabel") : t("arabicLabel")}
+        </DialogTitle>
         <DialogContent>
           <Stack sx={{ gap: 2, pt: 1 }}>
-            <TextField
-              label={t("about.titleLabel")}
-              name="title"
-              value={form.title}
-              onChange={handleFormChange}
-              fullWidth
-              required
-            />
-            <TextField
-              label={t("about.contentLabel")}
-              name="content"
-              value={form.content}
-              onChange={handleFormChange}
-              fullWidth
-              required
-              multiline
-              minRows={4}
-            />
+            {isDefaultLocale ? (
+              <>
+                <TextField
+                  label={t("about.titleLabel")}
+                  name="title"
+                  value={form.title}
+                  onChange={handleFormChange}
+                  fullWidth
+                  required
+                />
+                <TextField
+                  label={t("about.contentLabel")}
+                  name="content"
+                  value={form.content}
+                  onChange={handleFormChange}
+                  fullWidth
+                  required
+                  multiline
+                  minRows={4}
+                />
+              </>
+            ) : (
+              <>
+                <TextField
+                  label={t("about.titleLabel")}
+                  name="title"
+                  value={form.localizations.ar.title}
+                  onChange={e => {
+                    const { value } = e.target;
+                    setForm(prev => ({
+                      ...prev,
+                      localizations: {
+                        ...prev.localizations,
+                        ar: { ...prev.localizations.ar, title: value },
+                      },
+                    }));
+                  }}
+                  fullWidth
+                />
+                <TextField
+                  label={t("about.contentLabel")}
+                  name="content"
+                  value={form.localizations.ar.content}
+                  onChange={e => {
+                    const { value } = e.target;
+                    setForm(prev => ({
+                      ...prev,
+                      localizations: {
+                        ...prev.localizations,
+                        ar: { ...prev.localizations.ar, content: value },
+                      },
+                    }));
+                  }}
+                  fullWidth
+                  multiline
+                  minRows={4}
+                />
+              </>
+            )}
             <Stack direction="row" spacing={2}>
               <FormControl fullWidth required>
                 <InputLabel>{t("about.typeLabel")}</InputLabel>
@@ -327,9 +391,9 @@ export default function AboutSettingsTab() {
                     setForm(prev => ({ ...prev, sectionType: e.target.value }));
                   }}
                 >
-                  {SECTION_TYPES.map(t => (
-                    <MenuItem key={t} value={t}>
-                      {t}
+                  {SECTION_TYPES.map(type => (
+                    <MenuItem key={type} value={type}>
+                      {t(`about.types.${type}` as any)}
                     </MenuItem>
                   ))}
                 </Select>

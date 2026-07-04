@@ -13,6 +13,7 @@ const adminSidebar: AdminSidebarLabels = {
   notifications: "Notifications",
   settings: "Settings",
   financialReports: "Financial Reports",
+  suppliers: "Suppliers",
   sidebarLabel: "Admin",
   userFallbackName: "Admin User",
   userFallbackInitial: "A",

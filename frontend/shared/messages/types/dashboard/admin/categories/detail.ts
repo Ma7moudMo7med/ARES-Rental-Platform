@@ -44,6 +44,7 @@ export type CategoryDetailsLabels = {
     readonly duration: string;
     readonly addBtn: string;
     readonly percentOff: string;
+    readonly amountOff: string;
     readonly deleteConfirm: string;
     readonly empty: string;
     readonly emptyDesc: string;
@@ -89,6 +90,10 @@ export type CategoryDetailsLabels = {
       readonly electric: string;
       readonly sports: string;
       readonly business: string;
+      readonly economy: string;
+      readonly hybrid: string;
+      readonly standard: string;
+      readonly van: string;
     };
     readonly descriptions: {
       readonly suv: string;
@@ -97,6 +102,10 @@ export type CategoryDetailsLabels = {
       readonly electric: string;
       readonly sports: string;
       readonly business: string;
+      readonly economy: string;
+      readonly hybrid: string;
+      readonly standard: string;
+      readonly van: string;
     };
   };
 };

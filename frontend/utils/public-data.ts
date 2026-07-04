@@ -418,12 +418,17 @@ async function fetchJsonOrNull<T>(url: string, init?: RequestInit): Promise<T | 
   }
 }
 
-export async function fetchPublicLocations(): Promise<PublicLocation[]> {
+export async function fetchPublicLocations(locale?: string): Promise<PublicLocation[]> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (locale) {
+    headers["Accept-Language"] = locale;
+  }
+
   const payload = await fetchJsonOrNull<ApiPagedResponse<ApiLocationDto>>(toApiUrl("/api/locations/1/50"), {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers,
     cache: "no-store",
   });
 
@@ -443,7 +448,8 @@ export async function fetchFeaturedVehicles(
   category?: string,
   limit = 6,
   transmission?: string,
-  sortBy?: string
+  sortBy?: string,
+  locale?: string
 ): Promise<PublicVehicleCard[]> {
   const searchParams: Record<string, string> = {
     pickupLocationId,
@@ -466,10 +472,16 @@ export async function fetchFeaturedVehicles(
 
   const search = new URLSearchParams(searchParams);
 
+  const headers: Record<string, string> = {};
+  if (locale) {
+    headers["Accept-Language"] = locale;
+  }
+
   const payload = await fetchJsonOrNull<ApiPagedResponse<ApiVehicleListDto>>(
     toApiUrl(`/api/vehicles/search?${search.toString()}`),
     {
       cache: "no-store",
+      headers,
     }
   );
 
@@ -482,10 +494,15 @@ export async function fetchFeaturedVehicles(
     .filter(vehicle => Boolean(vehicle.vehicleId));
 }
 
-export async function fetchPublicSuppliers(limit = 6): Promise<PublicSupplierCard[]> {
+export async function fetchPublicSuppliers(limit = 6, locale?: string): Promise<PublicSupplierCard[]> {
+  const headers: Record<string, string> = {};
+  if (locale) {
+    headers["Accept-Language"] = locale;
+  }
+
   const payload = await fetchJsonOrNull<ApiPagedResponse<ApiSupplierDto>>(
     toApiUrl(`/api/public/suppliers/1/${String(limit)}`),
-    { cache: "no-store" }
+    { cache: "no-store", headers }
   );
 
   if (!payload) {
@@ -497,9 +514,15 @@ export async function fetchPublicSuppliers(limit = 6): Promise<PublicSupplierCar
     .filter(supplier => Boolean(supplier.id));
 }
 
-export async function fetchLandingContent(): Promise<PublicLandingContent | null> {
+export async function fetchLandingContent(locale?: string): Promise<PublicLandingContent | null> {
+  const headers: Record<string, string> = {};
+  if (locale) {
+    headers["Accept-Language"] = locale;
+  }
+
   const payload = await fetchJsonOrNull<ApiLandingContentDto>(toApiUrl("/api/public/landing"), {
     cache: "no-store",
+    headers,
   });
 
   if (!payload) {
@@ -509,10 +532,15 @@ export async function fetchLandingContent(): Promise<PublicLandingContent | null
   return normalizeLandingContent(payload);
 }
 
-export async function fetchPublicDestinations(limit = 4): Promise<PublicDestinationCard[]> {
+export async function fetchPublicDestinations(limit = 4, locale?: string): Promise<PublicDestinationCard[]> {
+  const headers: Record<string, string> = {};
+  if (locale) {
+    headers["Accept-Language"] = locale;
+  }
+
   const payload = await fetchJsonOrNull<ApiDestinationDto[] | ApiPagedResponse<ApiDestinationDto>>(
     toApiUrl(`/api/public/destinations?limit=${String(limit)}`),
-    { cache: "no-store" }
+    { cache: "no-store", headers }
   );
 
   if (!payload) {
@@ -524,10 +552,15 @@ export async function fetchPublicDestinations(limit = 4): Promise<PublicDestinat
     .filter(destination => Boolean(destination.id));
 }
 
-export async function fetchPublicCategories(): Promise<PublicCategory[]> {
+export async function fetchPublicCategories(locale?: string): Promise<PublicCategory[]> {
+  const headers: Record<string, string> = {};
+  if (locale) {
+    headers["Accept-Language"] = locale;
+  }
+
   const payload = await fetchJsonOrNull<ApiCategoryDto[] | ApiPagedResponse<ApiCategoryDto>>(
     toApiUrl(`/api/admin/categories`),
-    { cache: "no-store" }
+    { cache: "no-store", headers }
   );
 
   if (!payload) {

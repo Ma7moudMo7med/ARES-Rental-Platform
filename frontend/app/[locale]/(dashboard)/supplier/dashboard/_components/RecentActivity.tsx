@@ -20,7 +20,8 @@ import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import GppGoodIcon from "@mui/icons-material/GppGood";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { ar, enUS } from "date-fns/locale";
 import { useSession } from "next-auth/react";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -42,6 +43,8 @@ const ACTIVITY_META: Record<
 
 export default function RecentActivity() {
   const theme = useTheme();
+  const locale = useLocale();
+  const dateLocale = locale === "ar" ? ar : enUS;
   const t = useTranslations("dashboard.supplierDashboard");
   const { data: session, status: sessionStatus } = useSession();
 
@@ -89,10 +92,42 @@ export default function RecentActivity() {
   const getRelativeTime = (isoString: string) => {
     try {
       const date = new Date(isoString);
-      return formatDistanceToNow(date, { addSuffix: true });
+      return formatDistanceToNow(date, { addSuffix: true, locale: dateLocale });
     } catch {
       return "";
     }
+  };
+
+  const getLocalizedMessage = (item: RecentActivityItem) => {
+    const msg = item.message;
+    if (!msg) return "";
+
+    if (item.type === "booking") {
+      const match = msg.match(/Booking\s+#([A-Za-z0-9-]+)\s+created\s+by\s+(.+)/i);
+      if (match) {
+        return t("liveActivity.bookingCreatedByUser", { id: match[1], name: match[2] });
+      }
+      const fallbackMatch = msg.match(/Booking\s+#([A-Za-z0-9-]+)/i);
+      if (fallbackMatch) {
+        return t("liveActivity.bookingCreated", { id: fallbackMatch[1] });
+      }
+    }
+
+    if (item.type === "payment") {
+      const match = msg.match(/Payment\s+completed\s+for\s+Booking\s+#([A-Za-z0-9-]+)/i);
+      if (match) {
+        return t("liveActivity.paymentCompleted", { id: match[1] });
+      }
+    }
+
+    if (item.type === "vehicle") {
+      const match = msg.match(/Vehicle\s+added:\s*(.+)/i);
+      if (match) {
+        return t("liveActivity.vehicleAdded", { label: match[1] });
+      }
+    }
+
+    return msg;
   };
 
   return (
@@ -180,7 +215,7 @@ export default function RecentActivity() {
                   </Avatar>
                   <Box sx={{ flexGrow: 1, minWidth: 0 }}>
                     <Typography variant="body2" sx={{ fontWeight: 600, color: "text.primary" }}>
-                      {item.message}
+                      {getLocalizedMessage(item)}
                     </Typography>
                     <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
                       {getRelativeTime(item.createdAt)}

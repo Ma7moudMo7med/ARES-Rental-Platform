@@ -7,6 +7,7 @@ import L from "leaflet";
 import { Box, Typography, Button, Chip, alpha } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { Link } from "@/shared/i18n/routing";
+import { useTranslations } from "next-intl";
 // Fix leaflet default icon path issues with Next.js
 const DefaultIcon = L.icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -158,6 +159,7 @@ interface DestinationMapProps {
 
 export default function DestinationMap({ locations }: DestinationMapProps) {
   const theme = useTheme();
+  const t = useTranslations("publicPages.home.destinationMap");
   const isDarkMode = theme.palette.mode === "dark";
 
   const tileLayerConfig = useMemo(() => {
@@ -278,7 +280,7 @@ export default function DestinationMap({ locations }: DestinationMapProps) {
                     {loc.addressLine}
                   </Typography>
                 )}
-                <Chip label="Available" color="success" size="small" sx={{ mb: 2 }} />
+                <Chip label={t("available")} color="success" size="small" sx={{ mb: 2 }} />
                 <Button
                   size="small"
                   variant="contained"
@@ -297,7 +299,7 @@ export default function DestinationMap({ locations }: DestinationMapProps) {
                     },
                   }}
                 >
-                  View Vehicles
+                  {t("viewVehicles")}
                 </Button>
               </Box>
             </Popup>

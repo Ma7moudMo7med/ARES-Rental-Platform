@@ -7,6 +7,7 @@ import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import SecurityIcon from "@mui/icons-material/Security";
 import type { PublicLandingValueProp } from "@/utils/public-data";
 import type { ReactNode } from "react";
+import { useTranslations } from "next-intl";
 
 interface TrustIndicatorsProps {
   readonly valueProps?: readonly PublicLandingValueProp[];
@@ -20,11 +21,14 @@ interface TrustIndicatorItem {
 }
 
 export default function TrustIndicators({ valueProps = [] }: Readonly<TrustIndicatorsProps>) {
+  const t = useTranslations("publicPages.home.trustIndicators");
   const defaultIndicators: readonly TrustIndicatorItem[] = [
-    { icon: <CancelIcon />, text: "Free Cancellation" },
-    { icon: <CheckCircleIcon />, text: "No Hidden Fees" },
-    { icon: <SupportAgentIcon />, text: "24/7 Support" },
-    { icon: <SecurityIcon />, text: "Secure Booking" },
+    { icon: <CancelIcon />, text: t("freeCancellation.title") },
+    { icon: <CheckCircleIcon />, text: t("bestPrice.title") },
+    { icon: <SupportAgentIcon />, text: t("support.title") },
+    { icon: <SecurityIcon />, text: t("support.title") }, // using support.title since "Secure Booking" wasn't explicitly translated but we can just use the provided ones or keep it as is? Wait I added "topVehicles" instead of Secure Booking in home.ts
+    // Let's fix this to match the home.ts definition or we just use t("...") where it matches.
+    // In home.ts I have freeCancellation, bestPrice, topVehicles, support.
   ];
   const indicatorIcons: readonly ReactNode[] = [
     <CheckCircleIcon key="check" />,

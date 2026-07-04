@@ -42,6 +42,7 @@ import users from "./ar/dashboard/admin/users";
 import vehiclesAdmin from "./ar/dashboard/admin/vehicles";
 import verifications from "./ar/dashboard/admin/verifications";
 import adminSidebar from "./ar/dashboard/admin-sidebar";
+import assignmentCenter from "./ar/dashboard/admin/assignment-center";
 import { driverCompleteProfile } from "./ar/dashboard/driver-complete-profile";
 import { driverDashboard } from "./ar/dashboard/driver-dashboard";
 import { driverEarnings } from "./ar/dashboard/driver-earnings";
@@ -77,6 +78,7 @@ import checkoutSession from "./ar/public/checkout-session";
 import contact from "./ar/public/contact";
 import cookiePolicy from "./ar/public/cookie-policy";
 import faq from "./ar/public/faq";
+import home from "./ar/public/home";
 import locations from "./ar/public/locations";
 import offers from "./ar/public/offers";
 import privacy from "./ar/public/privacy";
@@ -90,6 +92,7 @@ import errorPage from "./ar/root/error";
 import loadingPage from "./ar/root/loading";
 import notFound from "./ar/root/not-found";
 import type { MessageSchema } from "./types/message";
+import footer from "./ar/footer";
 
 import inspectorNotifications from "./ar/dashboard/inspector/notifications";
 
@@ -117,6 +120,7 @@ const ar: MessageSchema = {
     notifications,
   },
   header,
+  footer,
   dashboard: {
     shell,
     adminSidebar,
@@ -169,6 +173,7 @@ const ar: MessageSchema = {
     vehicles: vehiclesAdmin,
     verifications,
     promotions,
+    assignmentCenter,
   },
   dashboardInspector: {
     history: inspectorHistory,
@@ -179,6 +184,7 @@ const ar: MessageSchema = {
   },
   deleteNotificationDialog,
   publicPages: {
+    home,
     about,
     privacy,
     terms,

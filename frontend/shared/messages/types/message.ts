@@ -90,6 +90,9 @@ import type { VehicleDetailLabels } from "./public/vehicles/_vehicleId";
 import type { ErrorPageLabels } from "./root/error";
 import type { LoadingPageLabels } from "./root/loading";
 import type { NotFoundLabels } from "./root/not-found";
+import type { FooterLabels } from "./footer";
+import type { HomeLabels } from "./public/home";
+import type { AssignmentCenterLabels } from "./dashboard/admin/assignment-center";
 
 export type {
   AboutLabels,
@@ -133,6 +136,9 @@ export type {
   ForgotPasswordLabels,
   GoogleSignInLabels,
   HeaderLabels,
+  FooterLabels,
+  HomeLabels,
+  AssignmentCenterLabels,
   InspectorHistoryLabels,
   InspectorInspectionDetailLabels,
   InspectorInspectionsLabels,
@@ -243,6 +249,7 @@ export type DashboardAdminSchema = {
   readonly vehicles: AdminVehiclesLabels;
   readonly verifications: AdminVerificationsLabels;
   readonly promotions: PromotionsLabels;
+  readonly assignmentCenter: AssignmentCenterLabels;
 };
 
 export type DashboardInspectorSchema = {
@@ -269,6 +276,7 @@ export type PublicVehiclesSchema = {
 };
 
 export type PublicPagesSchema = {
+  readonly home: HomeLabels;
   readonly about: AboutLabels;
   readonly privacy: PrivacyLabels;
   readonly terms: TermsLabels;
@@ -298,6 +306,7 @@ export type MessageSchema = {
   readonly authPages: AuthPagesSchema;
   readonly customer: CustomerSchema;
   readonly header: HeaderLabels;
+  readonly footer: FooterLabels;
   readonly dashboard: DashboardSchema;
   readonly dashboardAdmin: DashboardAdminSchema;
   readonly dashboardInspector: DashboardInspectorSchema;

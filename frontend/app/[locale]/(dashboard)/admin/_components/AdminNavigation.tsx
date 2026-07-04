@@ -40,18 +40,20 @@ import {
 import { usePathname, Link } from "@/shared/i18n/routing";
 import { useSession, signOut } from "next-auth/react";
 import { performLogoutCleanup } from "@/utils/auth-cleanup";
+import { useTranslations } from "next-intl";
 
 const drawerWidth = 280;
 
-const menuItems = [
-  { text: "Dashboard", icon: <DashboardIcon />, path: "/admin" },
-  { text: "Bookings", icon: <BookingIcon />, path: "/admin/bookings" },
-  { text: "Vehicles", icon: <CarIcon />, path: "/admin/vehicles" },
-  { text: "Suppliers", icon: <SupplierIcon />, path: "/admin/suppliers" },
-  { text: "Users", icon: <UsersIcon />, path: "/admin/users" },
-  { text: "Locations", icon: <LocationsIcon />, path: "/admin/locations" },
-  { text: "Countries", icon: <CountriesIcon />, path: "/admin/countries" },
-  { text: "Settings", icon: <SettingsIcon />, path: "/admin/settings" },
+// Menu items will be generated inside the component to use translations
+const getMenuItems = (t: (key: string) => string) => [
+  { text: t("dashboard"), icon: <DashboardIcon />, path: "/admin" },
+  { text: t("bookings"), icon: <BookingIcon />, path: "/admin/bookings" },
+  { text: t("vehicles"), icon: <CarIcon />, path: "/admin/vehicles" },
+  { text: t("suppliers"), icon: <SupplierIcon />, path: "/admin/suppliers" },
+  { text: t("users"), icon: <UsersIcon />, path: "/admin/users" },
+  { text: t("locations"), icon: <LocationsIcon />, path: "/admin/locations" },
+  { text: t("countries"), icon: <CountriesIcon />, path: "/admin/countries" },
+  { text: t("settings"), icon: <SettingsIcon />, path: "/admin/settings" },
 ];
 
 export default function AdminNavigation({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -61,6 +63,10 @@ export default function AdminNavigation({ children }: Readonly<{ children: React
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const pathname = usePathname();
   const { data: session, status } = useSession();
+  const t = useTranslations("dashboard.adminSidebar");
+  const commonT = useTranslations("common");
+
+  const menuItems = getMenuItems(t);
 
   // الدالة الجديدة لمعالجة تسجيل الخروج بشكل صحيح
   const handleLogout = async () => {
@@ -96,8 +102,8 @@ export default function AdminNavigation({ children }: Readonly<{ children: React
   }
 
   const user = session?.user;
-  const userName = user?.firstName ? `${user.firstName} ${user.lastName}` : "System Admin";
-  const initial = user?.firstName ? user.firstName.charAt(0).toUpperCase() : "A";
+  const userName = user?.firstName ? `${user.firstName} ${user.lastName}` : t("userFallbackName");
+  const initial = user?.firstName ? user.firstName.charAt(0).toUpperCase() : t("userFallbackInitial");
   const drawer = (
     <Box
       sx={{
@@ -127,7 +133,7 @@ export default function AdminNavigation({ children }: Readonly<{ children: React
           </Typography>
         </Box>
         <Typography variant="h6" sx={{ color: "text.primary", fontWeight: "900", letterSpacing: "-0.5px" }}>
-          ARES Panel
+          {t("sidebarLabel")}
         </Typography>
       </Toolbar>
       <Divider sx={{ mb: 2, mx: 2, opacity: 0.5 }} />
@@ -215,7 +221,7 @@ export default function AdminNavigation({ children }: Readonly<{ children: React
               color="text.secondary"
               sx={{ fontWeight: "700", textTransform: "uppercase", fontSize: "0.65rem", letterSpacing: "0.5px" }}
             >
-              {user?.roles[0] || "Admin"}
+              {user?.roles[0] || t("userRoleFallback")}
             </Typography>
           </Box>
         </Box>
@@ -315,7 +321,7 @@ export default function AdminNavigation({ children }: Readonly<{ children: React
           <ListItemIcon sx={{ minWidth: "auto" }}>
             <CarIcon fontSize="small" />
           </ListItemIcon>
-          Profile
+          {commonT("profile")}
         </MenuItem>
         <MenuItem
           onClick={() => {
@@ -334,7 +340,7 @@ export default function AdminNavigation({ children }: Readonly<{ children: React
           <ListItemIcon sx={{ color: "inherit", minWidth: "auto" }}>
             <LogoutIcon fontSize="small" />
           </ListItemIcon>
-          Logout
+          {commonT("logout")}
         </MenuItem>
       </Menu>
 

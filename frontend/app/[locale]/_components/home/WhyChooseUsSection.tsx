@@ -7,39 +7,42 @@ import DirectionsCarRoundedIcon from "@mui/icons-material/DirectionsCarRounded";
 import SettingsSuggestRoundedIcon from "@mui/icons-material/SettingsSuggestRounded";
 import SupportAgentRoundedIcon from "@mui/icons-material/SupportAgentRounded";
 import PublicRoundedIcon from "@mui/icons-material/PublicRounded";
+import { useTranslations } from "next-intl";
 
 export default function WhyChooseUsSection() {
+  const t = useTranslations("publicPages.home.whyChooseUs");
+
   // Consolidated features - removed redundancy, kept the strongest selling points
   const features = [
     {
-      title: "No Hidden Charges",
+      title: t("features.noHiddenFees.title"),
       icon: <CheckCircleRoundedIcon fontSize="large" />,
-      desc: "Pay exactly what you see. Transparent pricing with no surprises at checkout.",
+      desc: t("features.noHiddenFees.desc"),
     },
     {
-      title: "Verified Reviews",
+      title: t("features.verifiedReviews.title"),
       icon: <StarRoundedIcon fontSize="large" />,
-      desc: "Trust honest feedback from real customers who've rented before you.",
+      desc: t("features.verifiedReviews.desc"),
     },
     {
-      title: "Premium Fleet",
+      title: t("features.premiumFleet.title"),
       icon: <DirectionsCarRoundedIcon fontSize="large" />,
-      desc: "Access a wide range of well-maintained vehicles for every journey.",
+      desc: t("features.premiumFleet.desc"),
     },
     {
-      title: "Flexible Plans",
+      title: t("features.flexiblePlans.title"),
       icon: <SettingsSuggestRoundedIcon fontSize="large" />,
-      desc: "Choose rental options that fit your schedule and budget perfectly.",
+      desc: t("features.flexiblePlans.desc"),
     },
     {
-      title: "24/7 Support",
+      title: t("features.support247.title"),
       icon: <SupportAgentRoundedIcon fontSize="large" />,
-      desc: "Our customer care team is always here to assist you, anytime.",
+      desc: t("features.support247.desc"),
     },
     {
-      title: "Instant Booking",
+      title: t("features.instantBooking.title"),
       icon: <PublicRoundedIcon fontSize="large" />,
-      desc: "Book online in seconds and get instant confirmation for your rental.",
+      desc: t("features.instantBooking.desc"),
     },
   ];
 
@@ -58,14 +61,14 @@ export default function WhyChooseUsSection() {
           variant="h3"
           sx={{ fontWeight: "bold", textAlign: "center", mb: 2, fontSize: { xs: "2rem", md: "3rem" } }}
         >
-          Why choose us?
+          {t("title")}
         </Typography>
         <Typography
           variant="body1"
           color="text.secondary"
           sx={{ textAlign: "center", mb: 8, maxWidth: 600, mx: "auto" }}
         >
-          We combine transparency, quality, and convenience to make your car rental experience seamless.
+          {t("subtitle")}
         </Typography>
 
         {/* 3x2 Grid for better readability and breathing room */}

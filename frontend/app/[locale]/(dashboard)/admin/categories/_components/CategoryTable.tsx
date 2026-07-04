@@ -125,14 +125,24 @@ export function CategoryTable({
                 categories.map(c => {
                   const daysRemaining = getRemainingDays(c.offerEndDate);
                   const nameKey = c.name.toLowerCase().replace(/\s+/g, "");
-                  const translatedName = t(`categoryValues.names.${nameKey}` as any);
-                  const displayName = translatedName.startsWith("categoryValues.names.") ? c.name : translatedName;
+                  const validKeys = [
+                    "suv",
+                    "sedan",
+                    "luxury",
+                    "electric",
+                    "sports",
+                    "business",
+                    "economy",
+                    "hybrid",
+                    "standard",
+                    "van",
+                  ];
+                  const isValidKey = validKeys.includes(nameKey);
+                  const displayName = isValidKey ? t(`categoryValues.names.${nameKey}` as any) : c.name;
 
-                  const translatedDesc = c.description ? t(`categoryValues.descriptions.${nameKey}` as any) : "";
-                  const displayDesc =
-                    translatedDesc.startsWith("categoryValues.descriptions.") || !c.description
-                      ? c.description || ""
-                      : translatedDesc;
+                  const displayDesc = isValidKey
+                    ? t(`categoryValues.descriptions.${nameKey}` as any)
+                    : c.description || "";
 
                   return (
                     <TableRow

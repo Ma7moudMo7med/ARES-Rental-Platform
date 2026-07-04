@@ -26,6 +26,7 @@ import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import axios from "axios";
 import { toApiUrl } from "@/utils/api-client";
 import { logger } from "@/utils/logger";
@@ -55,13 +56,8 @@ interface FormState {
   localizations: LocalizationsMap;
 }
 
-const SUPPORTED_LOCALES = ["en", "ar"] as const;
-type LocaleCode = (typeof SUPPORTED_LOCALES)[number];
-
-const LOCALE_LABELS: Record<LocaleCode, string> = {
-  en: "English (Default)",
-  ar: "\u0627\u0644\u0639\u0631\u0628\u064A\u0629",
-};
+const _SUPPORTED_LOCALES = ["en", "ar"] as const;
+type LocaleCode = (typeof _SUPPORTED_LOCALES)[number];
 
 const emptyLocalization: SectionLocalization = { title: "", content: "" };
 const defaultLocalizations: LocalizationsMap = { ar: { ...emptyLocalization } };
@@ -69,6 +65,8 @@ const emptyForm: FormState = { title: "", content: "", order: 0, localizations: 
 
 export default function PrivacySettingsTab() {
   const { data: session } = useSession();
+  const t = useTranslations("dashboardAdmin.settings");
+  const tc = useTranslations("common");
 
   const [sections, setSections] = useState<PrivacySection[]>([]);
   const [fetching, setFetching] = useState(true);
@@ -117,7 +115,7 @@ export default function PrivacySettingsTab() {
 
   const openCreate = () => {
     setEditingId(null);
-    setForm({ ...emptyForm, order: sections.length + 1, localizations: { ...defaultLocalizations } });
+    setForm({ ...emptyForm, order: sections.length + 1, localizations: { ar: { title: "", content: "" } } });
     setDialogOpen(true);
   };
 
@@ -150,7 +148,7 @@ export default function PrivacySettingsTab() {
 
   const handleSave = async () => {
     if (!session?.accessToken) {
-      setErrorMsg("You must be signed in to perform this action.");
+      setErrorMsg(t("privacy.unauthorized"));
       return;
     }
     setSaving(true);
@@ -170,11 +168,11 @@ export default function PrivacySettingsTab() {
         const res = await axios.post<PrivacySection>(toApiUrl("/api/privacy"), payload, { headers: authHeader });
         setSections(prev => [...prev, res.data]);
       }
-      setSuccessMsg(editingId ? "Section updated." : "Section created.");
+      setSuccessMsg(editingId ? t("privacy.sectionUpdated") : t("privacy.sectionCreated"));
       setDialogOpen(false);
     } catch (err) {
       logger.error("Failed to save privacy section", err);
-      setErrorMsg("Failed to save section.");
+      setErrorMsg(t("privacy.saveError"));
     } finally {
       setSaving(false);
     }
@@ -182,17 +180,17 @@ export default function PrivacySettingsTab() {
 
   const handleDelete = async (id: string) => {
     if (!session?.accessToken) {
-      setErrorMsg("You must be signed in to perform this action.");
+      setErrorMsg(t("privacy.unauthorized"));
       return;
     }
     setDeleting(id);
     try {
       await axios.delete(toApiUrl(`/api/privacy/${id}`), { headers: authHeader });
       setSections(prev => prev.filter(s => s.id !== id));
-      setSuccessMsg("Section deleted.");
+      setSuccessMsg(t("privacy.sectionDeleted"));
     } catch (err) {
       logger.error("Failed to delete privacy section", err);
-      setErrorMsg("Failed to delete section.");
+      setErrorMsg(t("privacy.deleteError"));
     } finally {
       setDeleting(null);
       setDeleteConfirmId(null);
@@ -214,28 +212,24 @@ export default function PrivacySettingsTab() {
       <Stack sx={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
         <Box>
           <Typography variant="h6" sx={{ fontWeight: 700 }}>
-            Privacy Policy Sections
+            {t("privacy.title")}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Manage the sections displayed on the public Privacy Policy page.
+            {t("privacy.subtitle")}
           </Typography>
         </Box>
         <Stack sx={{ flexDirection: "row", gap: 2, alignItems: "center" }}>
           <FormControl size="small" sx={{ minWidth: 180 }}>
-            <InputLabel>Configure Locale</InputLabel>
+            <InputLabel>{t("configureLocale")}</InputLabel>
             <Select
-              label="Configure Locale"
+              label={t("configureLocale")}
               value={selectedLocale}
               onChange={e => {
-                const val = e.target.value;
-                setSelectedLocale(val);
+                setSelectedLocale(e.target.value);
               }}
             >
-              {SUPPORTED_LOCALES.map(loc => (
-                <MenuItem key={loc} value={loc}>
-                  {LOCALE_LABELS[loc]}
-                </MenuItem>
-              ))}
+              <MenuItem value="en">{t("englishLabel")}</MenuItem>
+              <MenuItem value="ar">{t("arabicLabel")}</MenuItem>
             </Select>
           </FormControl>
           <Button
@@ -244,7 +238,7 @@ export default function PrivacySettingsTab() {
             onClick={openCreate}
             sx={{ borderRadius: 2, fontWeight: 700 }}
           >
-            Add Section
+            {t("privacy.addSection")}
           </Button>
         </Stack>
       </Stack>
@@ -252,7 +246,7 @@ export default function PrivacySettingsTab() {
       <Stack sx={{ gap: 2 }}>
         {sortedSections.length === 0 && (
           <Typography color="text.secondary" sx={{ textAlign: "center", py: 6 }}>
-            No privacy sections yet. Click &quot;Add Section&quot; to create one.
+            {t("privacy.noSections")}
           </Typography>
         )}
         {sortedSections.map(section => (
@@ -275,7 +269,7 @@ export default function PrivacySettingsTab() {
                 </Typography>
               </Box>
               <Stack sx={{ flexDirection: "row", gap: 0.5, flexShrink: 0 }}>
-                <Tooltip title="Edit">
+                <Tooltip title={tc("edit")}>
                   <IconButton
                     size="small"
                     onClick={() => {
@@ -285,7 +279,7 @@ export default function PrivacySettingsTab() {
                     <EditRoundedIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
-                <Tooltip title="Delete">
+                <Tooltip title={tc("delete")}>
                   <IconButton
                     size="small"
                     color="error"
@@ -312,14 +306,15 @@ export default function PrivacySettingsTab() {
         maxWidth="sm"
       >
         <DialogTitle sx={{ fontWeight: 700 }}>
-          {editingId ? "Edit Section" : "New Section"} &mdash; {LOCALE_LABELS[selectedLocale]}
+          {editingId ? t("privacy.editSection") : t("privacy.newSection")} &mdash;{" "}
+          {selectedLocale === "en" ? t("englishLabel") : t("arabicLabel")}
         </DialogTitle>
         <DialogContent>
           <Stack sx={{ gap: 2, pt: 1 }}>
             {isDefaultLocale ? (
               <>
                 <TextField
-                  label="Title"
+                  label={t("privacy.titleLabel")}
                   name="title"
                   value={form.title}
                   onChange={handleFormChange}
@@ -327,7 +322,7 @@ export default function PrivacySettingsTab() {
                   required
                 />
                 <TextField
-                  label="Content"
+                  label={t("privacy.contentLabel")}
                   name="content"
                   value={form.content}
                   onChange={handleFormChange}
@@ -337,7 +332,7 @@ export default function PrivacySettingsTab() {
                   minRows={4}
                 />
                 <TextField
-                  label="Order"
+                  label={t("privacy.orderLabel")}
                   name="order"
                   type="number"
                   value={form.order}
@@ -349,14 +344,14 @@ export default function PrivacySettingsTab() {
             ) : (
               <>
                 <TextField
-                  label="Title"
+                  label={t("privacy.titleLabel")}
                   name="title"
                   value={form.localizations.ar.title}
                   onChange={handleLocaleFormChange}
                   fullWidth
                 />
                 <TextField
-                  label="Content"
+                  label={t("privacy.contentLabel")}
                   name="content"
                   value={form.localizations.ar.content}
                   onChange={handleLocaleFormChange}
@@ -374,7 +369,7 @@ export default function PrivacySettingsTab() {
               setDialogOpen(false);
             }}
           >
-            Cancel
+            {tc("cancel")}
           </Button>
           <Button
             variant="contained"
@@ -384,7 +379,7 @@ export default function PrivacySettingsTab() {
             disabled={saving || (isDefaultLocale && (!form.title || !form.content))}
             sx={{ fontWeight: 700 }}
           >
-            {saving ? <CircularProgress size={20} color="inherit" /> : "Save"}
+            {saving ? <CircularProgress size={20} color="inherit" /> : tc("save")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -396,9 +391,9 @@ export default function PrivacySettingsTab() {
           setDeleteConfirmId(null);
         }}
       >
-        <DialogTitle sx={{ fontWeight: 700 }}>Delete Section?</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 700 }}>{t("privacy.deleteTitle")}</DialogTitle>
         <DialogContent>
-          <Typography>This action cannot be undone.</Typography>
+          <Typography>{t("privacy.deleteConfirmDesc")}</Typography>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button
@@ -406,7 +401,7 @@ export default function PrivacySettingsTab() {
               setDeleteConfirmId(null);
             }}
           >
-            Cancel
+            {tc("cancel")}
           </Button>
           <Button
             variant="contained"
@@ -417,7 +412,7 @@ export default function PrivacySettingsTab() {
             disabled={!!deleting}
             sx={{ fontWeight: 700 }}
           >
-            {deleting ? <CircularProgress size={20} color="inherit" /> : "Delete"}
+            {deleting ? <CircularProgress size={20} color="inherit" /> : tc("delete")}
           </Button>
         </DialogActions>
       </Dialog>

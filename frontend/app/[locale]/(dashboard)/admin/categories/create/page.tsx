@@ -69,13 +69,13 @@ export default function CreateCategoryPage() {
     if (!file) return;
 
     if (!ACCEPTED_MIME_TYPES.includes(file.type)) {
-      setError("Only PNG, JPG, and WEBP images are allowed.");
+      setError(t("form.imageUpload.errorType"));
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      setError("File size exceeds 10MB limit.");
+      setError(t("form.imageUpload.errorSize"));
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
@@ -271,7 +271,7 @@ export default function CreateCategoryPage() {
 
                 <Grid size={{ xs: 12 }}>
                   <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1, color: "text.primary" }}>
-                    Category Image
+                    {t("form.imageUpload.title")}
                   </Typography>
 
                   <input
@@ -307,7 +307,7 @@ export default function CreateCategoryPage() {
                             fileInputRef.current?.click();
                           }}
                         >
-                          Change Image
+                          {t("form.imageUpload.changeBtn")}
                         </Button>
                         <Button
                           size="small"
@@ -316,7 +316,7 @@ export default function CreateCategoryPage() {
                           disabled={loading}
                           onClick={handleRemoveImage}
                         >
-                          Remove
+                          {t("form.imageUpload.removeBtn")}
                         </Button>
                       </Stack>
                     </Box>
@@ -343,10 +343,10 @@ export default function CreateCategoryPage() {
                     >
                       <CloudUploadIcon sx={{ fontSize: 40, color: "text.secondary" }} />
                       <Typography variant="body2" color="text.secondary">
-                        Click to upload an image
+                        {t("form.imageUpload.clickToUpload")}
                       </Typography>
                       <Typography variant="caption" color="text.disabled">
-                        PNG, JPG, WEBP up to 10 MB
+                        {t("form.imageUpload.allowedTypes")}
                       </Typography>
                     </Box>
                   )}
