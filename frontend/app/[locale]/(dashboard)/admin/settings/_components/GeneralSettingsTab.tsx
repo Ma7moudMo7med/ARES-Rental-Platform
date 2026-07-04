@@ -129,10 +129,10 @@ export default function GeneralSettingsTab() {
                 onChange={handleChange}
                 required
               >
-                <MenuItem value="en">English (EN)</MenuItem>
-                <MenuItem value="ar">Arabic (AR)</MenuItem>
-                <MenuItem value="fr">French (FR)</MenuItem>
-                <MenuItem value="es">Spanish (ES)</MenuItem>
+                <MenuItem value="en">{t("general.languages.en")}</MenuItem>
+                <MenuItem value="ar">{t("general.languages.ar")}</MenuItem>
+                <MenuItem value="fr">{t("general.languages.fr")}</MenuItem>
+                <MenuItem value="es">{t("general.languages.es")}</MenuItem>
               </TextField>
             </Grid>
 
@@ -146,12 +146,12 @@ export default function GeneralSettingsTab() {
                 onChange={handleChange}
                 required
               >
-                <MenuItem value="USD">US Dollar (USD)</MenuItem>
-                <MenuItem value="EUR">Euro (EUR)</MenuItem>
-                <MenuItem value="EGP">Egyptian Pound (EGP)</MenuItem>
-                <MenuItem value="SAR">Saudi Riyal (SAR)</MenuItem>
-                <MenuItem value="AED">Emirati Dirham (AED)</MenuItem>
-                <MenuItem value="GBP">British Pound (GBP)</MenuItem>
+                <MenuItem value="USD">{t("general.currencies.USD")}</MenuItem>
+                <MenuItem value="EUR">{t("general.currencies.EUR")}</MenuItem>
+                <MenuItem value="EGP">{t("general.currencies.EGP")}</MenuItem>
+                <MenuItem value="SAR">{t("general.currencies.SAR")}</MenuItem>
+                <MenuItem value="AED">{t("general.currencies.AED")}</MenuItem>
+                <MenuItem value="GBP">{t("general.currencies.GBP")}</MenuItem>
               </TextField>
             </Grid>
 

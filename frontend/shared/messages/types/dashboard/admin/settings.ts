@@ -1,10 +1,14 @@
 export type AdminSettingsLabels = {
   readonly title: string;
   readonly subtitle: string;
+  readonly configureLocale: string;
+  readonly englishLabel: string;
+  readonly arabicLabel: string;
   readonly tabs: {
     readonly general: string;
     readonly commission: string;
     readonly terms: string;
+    readonly privacy: string;
     readonly about: string;
   };
   readonly general: {
@@ -16,6 +20,20 @@ export type AdminSettingsLabels = {
     readonly success: string;
     readonly error: string;
     readonly unauthorized: string;
+    readonly languages: {
+      readonly en: string;
+      readonly ar: string;
+      readonly fr: string;
+      readonly es: string;
+    };
+    readonly currencies: {
+      readonly USD: string;
+      readonly EUR: string;
+      readonly EGP: string;
+      readonly SAR: string;
+      readonly AED: string;
+      readonly GBP: string;
+    };
   };
   readonly commission: {
     readonly title: string;
@@ -28,8 +46,34 @@ export type AdminSettingsLabels = {
     readonly success: string;
     readonly error: string;
     readonly unauthorized: string;
+    readonly invalidRate: string;
+  };
+  readonly driverCommission: {
+    readonly title: string;
+    readonly subtitle: string;
+    readonly success: string;
+    readonly error: string;
   };
   readonly terms: {
+    readonly title: string;
+    readonly subtitle: string;
+    readonly addSection: string;
+    readonly noSections: string;
+    readonly editSection: string;
+    readonly newSection: string;
+    readonly titleLabel: string;
+    readonly contentLabel: string;
+    readonly orderLabel: string;
+    readonly deleteTitle: string;
+    readonly deleteConfirmDesc: string;
+    readonly sectionUpdated: string;
+    readonly sectionCreated: string;
+    readonly sectionDeleted: string;
+    readonly saveError: string;
+    readonly deleteError: string;
+    readonly unauthorized: string;
+  };
+  readonly privacy: {
     readonly title: string;
     readonly subtitle: string;
     readonly addSection: string;
@@ -67,5 +111,13 @@ export type AdminSettingsLabels = {
     readonly saveError: string;
     readonly deleteError: string;
     readonly unauthorized: string;
+    readonly types: {
+      readonly hero: string;
+      readonly story: string;
+      readonly offer: string;
+      readonly stats: string;
+      readonly values: string;
+      readonly cta: string;
+    };
   };
 };
