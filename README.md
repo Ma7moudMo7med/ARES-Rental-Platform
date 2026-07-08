@@ -151,7 +151,84 @@ Each role accesses its own dedicated dashboard with customized features and perm
 | Inspector Dashboard | Inspector |
 | Admin Dashboard | Administrator |
 
-  
+# 🏗️ System Architecture
+
+ARES follows a modern **Clean Architecture** that separates business logic from infrastructure and presentation layers, making the system scalable, maintainable, and easy to extend.
+
+<p align="center">
+  <img src="docs/images/architecture.png" alt="ARES Architecture" width="900">
+</p>
+
+## Architecture Layers
+
+### 🌐 Presentation Layer
+- ASP.NET Core REST API
+- Next.js Frontend
+- Swagger API Documentation
+- Authentication & Authorization
+
+### ⚙️ Application Layer
+- Business Use Cases
+- CQRS (Commands & Queries)
+- MediatR Handlers
+- DTOs
+- Validation
+- AutoMapper
+
+### 🧠 Domain Layer
+- Business Rules
+- Domain Entities
+- Domain Events
+- Repository Contracts
+
+### 💾 Infrastructure Layer
+- Entity Framework Core
+- SQL Server
+- Identity
+- Background Services
+- External Services (Paymob, Email, Storage)
+
+---
+
+## Request Flow
+
+```text
+Client
+      │
+      ▼
+ ASP.NET Core API
+      │
+      ▼
+ Authentication
+      │
+      ▼
+ MediatR
+      │
+      ▼
+ Command / Query Handler
+      │
+      ▼
+ Business Rules
+      │
+      ▼
+ Repository
+      │
+      ▼
+ SQL Server
+```
+
+## 🎯 Design Principles
+
+- Clean Architecture
+- CQRS Pattern
+- Repository Pattern
+- Dependency Injection
+- SOLID Principles
+- Domain-Driven Design Concepts
+- Separation of Concerns
+- Background Processing
+- Role-Based Authorization
+- RESTful API Design
 
 
 ## 🚀 Quick Start
