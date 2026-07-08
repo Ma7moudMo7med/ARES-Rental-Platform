@@ -125,6 +125,32 @@ The project follows modern software engineering practices including **Clean Arch
 - RTL support.
 - Dark & Light themes.
 
+# 👥 System Roles
+
+ARES is built around a **multi-role architecture**, where each role has dedicated permissions, dashboards, and business workflows.
+
+| Role | Responsibilities |
+|------|-------------------|
+| 👤 **Customer** | Browse vehicles, create bookings, complete payments, manage reservations, submit reviews, and track booking status. |
+| 🚘 **Supplier** | Register and manage vehicles, monitor bookings, review earnings, respond to customer requests, and manage fleet operations. |
+| 🚖 **Driver** | Complete driver profile, manage availability, receive assignments, track trips, and request payouts. |
+| 🔍 **Inspector** | Perform pickup and return inspections, record vehicle condition, report damages, verify mileage, and submit inspection reports. |
+| 🛠 **Administrator** | Manage users, vehicles, bookings, inspections, payments, suppliers, drivers, reports, and overall platform operations. |
+
+---
+
+### 🔐 Role-Based Access Control
+
+Each role accesses its own dedicated dashboard with customized features and permissions.
+
+| Dashboard | Access |
+|-----------|--------|
+| Customer Portal | Customer |
+| Supplier Dashboard | Supplier |
+| Driver Dashboard | Driver |
+| Inspector Dashboard | Inspector |
+| Admin Dashboard | Administrator |
+
   
 
 
