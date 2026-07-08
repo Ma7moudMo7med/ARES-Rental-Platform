@@ -70,6 +70,63 @@ The project follows modern software engineering practices including **Clean Arch
 | 🔐 Authentication | JWT + Google OAuth |
 | 📊 Dashboards | Role-based Analytics |
 
+# ✨ Key Features
+
+### 🚗 Vehicle Rental Management
+- Complete vehicle lifecycle management from listing to booking and return.
+- Advanced availability tracking and fleet management.
+- Vehicle verification and approval workflow.
+- Dynamic pricing and category management.
+
+### 📅 Booking & Reservation
+- End-to-end booking workflow.
+- Secure checkout experience.
+- Driver assignment support.
+- Booking approval and cancellation management.
+- Automatic booking expiration.
+
+### 🔍 Inspection Management
+- Pickup and return inspections.
+- Automatic inspector assignment.
+- Damage reporting and condition tracking.
+- Fuel level and mileage recording.
+
+### 💳 Payment Processing
+- Paymob payment gateway integration.
+- Secure payment verification.
+- Refund management.
+- Transaction history.
+
+### 👥 Multi-Role Platform
+- Customer Portal
+- Supplier Dashboard
+- Driver Dashboard
+- Inspector Dashboard
+- Administrator Dashboard
+
+### 📊 Analytics & Administration
+- Role-based dashboards.
+- Financial reports.
+- Booking analytics.
+- Vehicle performance metrics.
+- User management.
+
+### 🔒 Security
+- JWT Authentication.
+- Google OAuth Login.
+- Role-Based Authorization.
+- Email Verification.
+- Refresh Tokens.
+- Rate Limiting.
+
+### 🌍 Modern User Experience
+- Responsive design.
+- Arabic & English localization.
+- RTL support.
+- Dark & Light themes.
+
+  
+
 
 ## 🚀 Quick Start
 
