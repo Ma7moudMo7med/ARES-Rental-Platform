@@ -28,6 +28,49 @@ Supporting the complete vehicle rental lifecycle from vehicle listing and bookin
 <p align="center">
   <img src="docs/images/banner.png" alt="ARES Banner">
 </p>
+## 📑 Table of Contents
+
+- [About ARES](#-about-ares)
+- [Key Features](#-key-features)
+- [System Roles](#-system-roles)
+- [System Architecture](#-system-architecture)
+- [Booking Workflow](#-booking-workflow)
+- [Technology Stack](#-technology-stack)
+- [Project Structure](#-project-structure)
+- [Quick Start](#-quick-start)
+- [Manual Installation](#-manual-installation)
+- [API Documentation](#-api-documentation)
+- [Testing](#-testing)
+- [Database Design](#-database-design)
+- [Roadmap](#-roadmap)
+- [Contributors](#-contributors)
+
+# 📖 About ARES
+
+ARES Rental Platform is a modern enterprise-grade vehicle rental management system developed as a graduation project at Al-Azhar University.
+
+The platform connects customers, suppliers, drivers, inspectors, and administrators through a unified ecosystem that manages the complete vehicle rental lifecycle.
+
+Built with **ASP.NET Core**, **Next.js**, **SQL Server**, and **Clean Architecture**, ARES delivers a scalable solution for vehicle booking, payment processing, inspections, fleet management, and administrative operations through secure role-based dashboards.
+
+The project follows modern software engineering practices including **Clean Architecture**, **CQRS**, **MediatR**, **Repository Pattern**, **JWT Authentication**, **Background Services**, and **Internationalization**, making it suitable as a production-oriented software architecture.
+
+## 📊 Project Highlights
+
+| Feature | Description |
+|----------|-------------|
+| 👥 User Roles | 5 Integrated Roles |
+| 🚗 Vehicle Management | Complete Fleet Lifecycle |
+| 📅 Booking Workflow | End-to-End Reservation Process |
+| 💳 Payment Gateway | Paymob Integration |
+| 🔍 Vehicle Inspection | Pickup & Return Inspections |
+| 🔔 Notifications | Real-time Notification System |
+| 🌍 Localization | Arabic & English (RTL Support) |
+| 🏗 Architecture | Clean Architecture + CQRS |
+| 🔐 Authentication | JWT + Google OAuth |
+| 📊 Dashboards | Role-based Analytics |
+
+
 ## 🚀 Quick Start
 
 ### Prerequisites
