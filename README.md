@@ -217,7 +217,6 @@ flowchart TB
     Repo --> Identity
 ```
 
-
 ## 🎯 Design Principles
 
 | Principle | Purpose |
@@ -267,6 +266,32 @@ L --> M
 M --> N
 N --> O
 ```
+## 📌 Booking States
+
+| Status | Description |
+|---------|-------------|
+| 🟡 **Draft** | Initial booking created before payment. |
+| 💳 **Payment Pending** | Waiting for successful payment confirmation. |
+| 🟢 **Confirmed** | Payment completed and booking confirmed. |
+| ✅ **Approved** | Booking approved by the administrator. |
+| 🚗 **Active** | Vehicle has been delivered to the customer. |
+| 🏁 **Completed** | Rental completed successfully after return inspection. |
+| ❌ **Cancelled** | Booking cancelled by the customer or administrator. |
+| ⏰ **Expired** | Booking automatically expired due to payment timeout. |
+---
+## 🤖 Automated Business Processes
+
+ARES automates several critical business operations to reduce manual effort and improve operational efficiency.
+
+- ✅ Automatic vehicle availability validation.
+- ✅ Dynamic rental price calculation.
+- ✅ Automatic inspector assignment based on region and workload.
+- ✅ Automatic booking expiration after payment timeout.
+- ✅ Real-time notifications throughout the booking lifecycle.
+- ✅ Vehicle status synchronization.
+- ✅ Refund calculation according to the cancellation policy.
+---
+
 # 🗄 Database Design
 
 ARES uses a normalized relational database designed to efficiently support the complete vehicle rental lifecycle.
@@ -283,7 +308,6 @@ erDiagram
     BOOKINGS }o--|| DRIVERS : assigned
     BOOKINGS }o--|| INSPECTORS : inspected_by
 ```
-
 ## Core Database Entities
 
 | Entity | Responsibility |
@@ -303,28 +327,183 @@ erDiagram
     <img src="docs/images/erd.png" alt="ARES ERD" width="100%">
 </p>
 
-## 📌 Booking States
+# 🛠 Technology Stack
 
-| Status | Description |
-|---------|-------------|
-| 🟡 **Draft** | Initial booking created before payment. |
-| 💳 **Payment Pending** | Waiting for successful payment confirmation. |
-| 🟢 **Confirmed** | Payment completed and booking confirmed. |
-| ✅ **Approved** | Booking approved by the administrator. |
-| 🚗 **Active** | Vehicle has been delivered to the customer. |
-| 🏁 **Completed** | Rental completed successfully after return inspection. |
-| ❌ **Cancelled** | Booking cancelled by the customer or administrator. |
-| ⏰ **Expired** | Booking automatically expired due to payment timeout. |
+| Category | Technologies |
+|----------|--------------|
+| Backend | ASP.NET Core 10, C#, MediatR, CQRS, FluentValidation |
+| Frontend | Next.js 16, React 19, TypeScript, Tailwind CSS |
+| Database | SQL Server, Entity Framework Core |
+| Authentication | ASP.NET Identity, JWT, Google OAuth |
+| Payments | Paymob |
+| Architecture | Clean Architecture, Repository Pattern |
+| DevOps | Docker, Git, GitHub |
+| Documentation | Swagger (OpenAPI), Mermaid |
+
+# 📂 Project Structure
+
+```text
+ARES-Rental-Platform
+│
+├── Backend
+│   ├── API
+│   ├── Application
+│   ├── Domain
+│   ├── Infrastructure
+│   └── Shared
+│
+├── Frontend
+│   ├── app
+│   ├── components
+│   ├── lib
+│   └── shared
+│
+├── docs
+│
+└── docker
+```
+# 🚀 Quick Start
+
+Get ARES up and running in just a few minutes.
+
+## Prerequisites
+
+Before getting started, make sure you have the following installed:
+
+| Requirement | Version |
+|------------|---------|
+| .NET SDK | 10.0 or later |
+| Bun | 1.0 or later |
+| SQL Server | 2022 |
+| Node.js *(Optional)* | 18+ |
+| ngrok *(Optional, for Paymob Webhooks)* | Latest |
+
+## Quick Setup
+
+```bash
+# Install project dependencies
+bun run deps
+
+# Interactive project setup
+bun run setup
+
+# Quick setup with default values
+bun run setup:quick
+```
+
+> **Tip:** The setup script automatically installs the required .NET tools (`dotnet-ef` and `dotnet-script`) if they are not already available.
+
+# ⚙️ Manual Installation
+
+## 1. Start SQL Server
+
+```bash
+docker run -e "ACCEPT_EULA=Y" \
+-e "SA_PASSWORD=YourStrong@Passw0rd" \
+-p 1433:1433 \
+--name mssql \
+-d mcr.microsoft.com/mssql/server:2022-latest
+```
+
 ---
 
-## 🤖 Automated Business Processes
+## 2. Configure & Run the Backend
 
-ARES automates several critical business operations to reduce manual effort and improve operational efficiency.
+```bash
+cd backend
 
-- ✅ Automatic vehicle availability validation.
-- ✅ Dynamic rental price calculation.
-- ✅ Automatic inspector assignment based on region and workload.
-- ✅ Automatic booking expiration after payment timeout.
-- ✅ Real-time notifications throughout the booking lifecycle.
-- ✅ Vehicle status synchronization.
-- ✅ Refund calculation according to the cancellation policy.
+cp .env.example .env
+
+dotnet restore
+
+cd Api
+
+dotnet ef database update
+
+dotnet run
+```
+
+The backend will be available at:
+
+- **API:** http://localhost:5000
+- **Swagger UI:** http://localhost:5000/swagger
+
+---
+
+## 3. Configure & Run the Frontend
+
+```bash
+cd frontend
+
+cp .env.example .env.local
+
+bun install
+
+bun run dev
+```
+
+The frontend will be available at:
+
+- **Web App:** http://localhost:3000
+
+---
+
+## 4. Configure Paymob (Optional)
+
+ARES supports **Paymob** for online payment processing.
+
+To enable payment integration:
+
+- Create a Paymob Sandbox account.
+- Obtain your **API Key**, **HMAC Secret**, **Integration ID**, and **iFrame ID**.
+- Configure them in the backend `.env` file.
+- Expose your local backend using **ngrok** when testing webhooks locally.
+
+> **Note:** Paymob configuration is optional. The platform can run normally without enabling online payments.
+
+# 📖 API Documentation
+
+ARES exposes a RESTful API documented with **Swagger (OpenAPI)**.
+
+**Swagger UI:** http://localhost:5000/swagger
+
+## API Modules
+
+| Module | Base Path | Purpose |
+|---------|-----------|---------|
+| 🌐 Public | `/api/public/*` | Public content, health checks, promotions, and offers. |
+| 🔐 Authentication | `/api/auth/*` | Registration, login, Google OAuth, JWT, and refresh tokens. |
+| 👤 Customer | `/api/vehicles/*`, `/api/checkout`, `/api/bookings/*` | Vehicle browsing, checkout, and booking management. |
+| 🚘 Supplier | `/api/supplier/*` | Fleet management, bookings, earnings, and reviews. |
+| 🚖 Driver | `/api/driver/*` | Driver profile, license verification, earnings, and payouts. |
+| 🔍 Inspector | `/api/inspector/*` | Inspection dashboard and vehicle inspections. |
+| 🛠 Administrator | `/api/admin/*` | Platform administration, users, bookings, vehicles, categories, inspections, and reports. |
+| 🔄 Shared Services | `/api/notifications/*`, `/api/payments/*` | Notifications, payment processing, and shared platform services. |
+
+---
+
+## API Highlights
+
+- JWT Authentication & Role-Based Authorization
+- Google OAuth Authentication
+- RESTful API Design
+- OpenAPI (Swagger) Documentation
+- FluentValidation Request Validation
+- Standardized Error Responses
+- Global Exception Handling
+- Rate Limiting Protection
+
+---
+
+## Health Checks
+
+| Service | Endpoint |
+|---------|----------|
+| Backend API | `GET /api/health` |
+| Frontend | `GET /api/health` |
+
+
+
+
+
+
