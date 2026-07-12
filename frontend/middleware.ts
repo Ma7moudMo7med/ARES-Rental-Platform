@@ -16,7 +16,7 @@ function getLocale(request: NextRequest): string {
 }
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Skip static files and Next.js internals
@@ -35,8 +35,12 @@ export async function proxy(request: NextRequest) {
   // Determine the "clean" path (without locale prefix) for auth checks
   const cleanPath = hasLocalePrefix ? pathname.replace(/^\/(ar|en)/, "") || "/" : pathname;
 
-  // Auth checks
-  const token = await getToken({ req: request });
+  const isProduction = process.env.NODE_ENV === "production" || request.nextUrl.protocol === "https:";
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+    secureCookie: isProduction,
+  });
 
   if (cleanPath.startsWith("/admin")) {
     if (!token || !token.roles.includes("Admin")) {
